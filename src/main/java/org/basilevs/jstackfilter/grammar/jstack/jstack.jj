@@ -133,18 +133,57 @@ void KeyValue() :
 {
 }
 {
-  < WORD > "=" ( < WORD > | < COMMONSYMBOL >)
+  < WORD > "="
+  (
+    < WORD >
+  | < COMMONSYMBOL >
+  )
 }
 
+//"VM Thread" os_prio=2 cpu=203.12ms elapsed=98699.54s tid=0x000002c22c0b2de0 nid=0x2c90 runnable
+void NativeThread()  :
+{
+  
+}
+{
+  < QUOTE > 
+  ( LOOKAHEAD(2) 
+    < SPACE >
+    (
+      LOOKAHEAD(2)
+      KeyValue()
+    | 
+      < WORD >
+    )
+  )+
+  < SPACE >
+}
+
+//"Worker-136" #2027 prio=5 os_prio=0 cpu=0.00ms elapsed=86.18s tid=0x000002c23074b590 nid=0x5884 in Object.wait()  [0x000000d6fb8fe000]
+//   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+//	at java.lang.Object.wait(java.base@17/Native Method)
+//	- waiting on <no object reference available>
+//	at org.eclipse.core.internal.jobs.WorkerPool.sleep(WorkerPool.java:200)
+//	- locked <0x0000000083286520> (a org.eclipse.core.internal.jobs.WorkerPool)
+//	at org.eclipse.core.internal.jobs.WorkerPool.startJob(WorkerPool.java:242)
+//	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:58)
 void JavaThread() :
 {
 }
 {
-  < QUOTE > < SPACE > "#" ( < WORD > | < COMMONSYMBOL >) < SPACE >
+  < QUOTE > < SPACE > "#"
   (
-    (      <  WORD > |
-    KeyValue())
-  < SPACE >
+    < WORD >
+  | < COMMONSYMBOL >
+  )
+  ( LOOKAHEAD(2) 
+    < SPACE >
+    (
+      LOOKAHEAD(2)
+      KeyValue()
+    | 
+      < WORD >
+    )
   )+
   (< EOL >)? 
   < SPACE > "java.lang.Thread.State: " < WORD > (< SPACE > < COMMENT >)? < EOL >
@@ -170,7 +209,7 @@ void JstackDump() :
   JStackHeader() 
   < EOL >
   (
-    JavaThread() 
+      (LOOKAHEAD(3)       JavaThread() | NativeThread() )
     < EOL >
   )*
 }
