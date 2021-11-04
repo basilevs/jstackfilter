@@ -1,0 +1,176 @@
+options
+{
+  STATIC = false;
+  CHOICE_AMBIGUITY_CHECK = 10;
+}
+
+PARSER_BEGIN(JstackParser)
+package org.basilevs.jstackfilter.grammar.jstack;
+import org.basilevs.jstackfilter.Frame;
+
+public final class JstackParser
+{
+  public static void main(String [] args) throws ParseException, TokenMgrError
+  {
+    JstackParser parser = new JstackParser(System.in);
+    parser.JstackDump();
+  }
+}
+
+PARSER_END(JstackParser)
+
+TOKEN :
+{
+  < COMMENT : "(" ([ "a"-"z", " " ])+ ")" >
+}
+
+TOKEN :
+{
+  < QUOTE : "\"" (~[ "\"" ])* "\"" >
+}
+
+TOKEN :
+{
+  < COMMONSYMBOL : 
+    ~[ " ", "\n", "\r", "{", "}", "_", "\t", "=", "\"", "#" ] >
+}
+
+TOKEN :
+{
+  < WORD :
+    < COMMONSYMBOL >
+    (
+      "_"
+    | < COMMONSYMBOL >
+    )* >
+}
+
+TOKEN :
+{
+  < EOL :
+    "\n"
+  | "\r"
+  | "\r\n" >
+}
+
+TOKEN :
+{
+  < FRAMEINDENT :
+    "        "
+  | "\t" >
+}
+
+TOKEN :
+{
+  < SPACE :
+    " "
+  | "  "
+  | "   " >
+}
+
+void JStackHeader() :
+{
+}
+{
+  < TIME : [ "0"-"9" ] [ "0"-"9" ] [ "0"-"9" ] [ "0"-"9" ] "-" [ "0"-"9" ] [ "0"-"9" ] "-" [ "0"-"9" ] [ "0"-"9" ] " " [ "0"-"9" ] [ "0"-"9" ] ":" [ "0"-"9" ] [ "0"-"9" ] ":" [ "0"-"9" ] [ "0"-"9" ] > < EOL > 
+  "Full thread dump " Line() < EOL > 
+  < EOL > 
+  "Threads class SMR info:" < EOL > 
+  "_java_thread_list=" < WORD > " length=" < WORD > " elements={" < EOL >
+  (
+    Line() < EOL >
+  )*
+  "}" < EOL >
+}
+
+String Line() :
+{
+  StringBuilder image = new StringBuilder();
+  Token t;
+}
+{
+  t = < WORD >
+  {
+    image.append(t.image);
+  }
+  (
+    LOOKAHEAD(2)
+    t = < SPACE >
+    {
+      image.append(t.image);
+    }
+    t = < WORD >
+    {
+      image.append(t.image);
+    }
+  )*
+  {
+    return image.toString();
+  }
+}
+
+Frame Frame() :
+{
+  String line = "";
+}
+{
+  "at " 
+  line = Line()
+  {
+    return new Frame(line);
+  }
+}
+
+void Monitor() :
+{
+  String line = "";
+}
+{
+  "- " Line()
+}
+
+void KeyValue() :
+{
+}
+{
+  < WORD > "=" ( < WORD > | < COMMONSYMBOL >)
+}
+
+void JavaThread() :
+{
+}
+{
+  < QUOTE > < SPACE > "#" ( < WORD > | < COMMONSYMBOL >) < SPACE >
+  (
+    (      <  WORD > |
+    KeyValue())
+  < SPACE >
+  )+
+  (< EOL >)? 
+  < SPACE > "java.lang.Thread.State: " < WORD > (< SPACE > < COMMENT >)? < EOL >
+  (
+    < SPACE > "No compile task" < EOL >
+  |
+    (
+      < FRAMEINDENT >
+      (
+        Monitor()
+      | 
+        Frame()
+      )
+      < EOL >
+    )*
+  )
+}
+
+void JstackDump() :
+{
+}
+{
+  JStackHeader() 
+  < EOL >
+  (
+    JavaThread() 
+    < EOL >
+  )*
+}
