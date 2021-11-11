@@ -12,7 +12,8 @@ public class Main {
 		try (Reader reader = new InputStreamReader(System.in, StandardCharsets.UTF_8)) {
 			try (Stream<JavaThread> stacks = JstackParser.parse(reader)) {
 				Stream<JavaThread> stacksCopy = stacks;
-				stacksCopy = stacksCopy.filter(IdlePools::isIdle);
+				stacksCopy = stacksCopy.filter(Idle::isIdle);
+				stacksCopy.forEach(System.out::println);
 			}
 		}
 

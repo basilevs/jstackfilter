@@ -11,21 +11,19 @@ public interface JstackParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int COMMENT = 1;
+  int QUOTE = 1;
   /** RegularExpression Id. */
-  int QUOTE = 2;
+  int COMMONSYMBOL = 2;
   /** RegularExpression Id. */
-  int COMMONSYMBOL = 3;
+  int WORD = 3;
   /** RegularExpression Id. */
-  int WORD = 4;
+  int EOL = 4;
   /** RegularExpression Id. */
-  int EOL = 5;
+  int FRAMEINDENT = 5;
   /** RegularExpression Id. */
-  int FRAMEINDENT = 6;
+  int SPACE = 6;
   /** RegularExpression Id. */
-  int SPACE = 7;
-  /** RegularExpression Id. */
-  int TIME = 8;
+  int TIME = 7;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -33,7 +31,6 @@ public interface JstackParserConstants {
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
-    "<COMMENT>",
     "<QUOTE>",
     "<COMMONSYMBOL>",
     "<WORD>",
@@ -42,15 +39,30 @@ public interface JstackParserConstants {
     "<SPACE>",
     "<TIME>",
     "\"Full thread dump \"",
+    "\":\"",
     "\"Threads class SMR info:\"",
     "\"_java_thread_list=\"",
-    "\" length=\"",
-    "\" elements={\"",
+    "\", length=\"",
+    "\", elements={\"",
     "\"}\"",
+    "\"(\"",
+    "\")\"",
+    "\"[\"",
+    "\"]\"",
+    "\".\"",
+    "\"$\"",
+    "\"<\"",
+    "\">\"",
+    "\"/\"",
     "\"at \"",
+    "\"java.base@\"",
+    "\"Native Method\"",
+    "\"Unknown Source\"",
     "\"- \"",
     "\"=\"",
     "\"#\"",
+    "\"in \"",
+    "\"()\"",
     "\"java.lang.Thread.State: \"",
     "\"No compile task\"",
   };

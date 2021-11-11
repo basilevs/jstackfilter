@@ -7,22 +7,20 @@ options
 PARSER_BEGIN(JstackParser)
 package org.basilevs.jstackfilter.grammar.jstack;
 import org.basilevs.jstackfilter.Frame;
+import org.basilevs.jstackfilter.JavaThread;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public final class JstackParser
 {
   public static void main(String [] args) throws ParseException, TokenMgrError
   {
     JstackParser parser = new JstackParser(System.in);
-    parser.JstackDump();
+    parser.jstackDump();
   }
 }
 
 PARSER_END(JstackParser)
-
-TOKEN :
-{
-  < COMMENT : "(" ([ "a"-"z", " " ])+ ")" >
-}
 
 TOKEN :
 {
@@ -32,7 +30,7 @@ TOKEN :
 TOKEN :
 {
   < COMMONSYMBOL : 
-    ~[ " ", "\n", "\r", "{", "}", "_", "\t", "=", "\"", "#" ] >
+    [ "A"-"Z", "a"-"z", "0"-"9", "-", "+" ] >
 }
 
 TOKEN :
@@ -65,41 +63,101 @@ TOKEN :
   < SPACE :
     " "
   | "  "
-  | "   " >
+  | "   "
+  | "," >
 }
 
-void JStackHeader() :
+private void jstackHeader() :
 {
 }
 {
   < TIME : [ "0"-"9" ] [ "0"-"9" ] [ "0"-"9" ] [ "0"-"9" ] "-" [ "0"-"9" ] [ "0"-"9" ] "-" [ "0"-"9" ] [ "0"-"9" ] " " [ "0"-"9" ] [ "0"-"9" ] ":" [ "0"-"9" ] [ "0"-"9" ] ":" [ "0"-"9" ] [ "0"-"9" ] > < EOL > 
-  "Full thread dump " Line() < EOL > 
+  "Full thread dump " line() ":" < EOL > 
   < EOL > 
   "Threads class SMR info:" < EOL > 
-  "_java_thread_list=" < WORD > " length=" < WORD > " elements={" < EOL >
+  "_java_thread_list=" < WORD > ", length=" < WORD > ", elements={" < EOL >
   (
-    Line() < EOL >
+    line() < EOL >
   )*
   "}" < EOL >
 }
 
-String Line() :
+private void parenses() :
 {
   StringBuilder image = new StringBuilder();
   Token t;
 }
 {
-  t = < WORD >
-  {
-    image.append(t.image);
-  }
+  "("
+  (
+    t = < SPACE >
+  | t = < WORD >
+    {
+      image.append(t.image);
+    }
+  )*
+  ")"
+}
+
+private String line() :
+{
+  StringBuilder image = new StringBuilder();
+  Token t;
+}
+{
   (
     LOOKAHEAD(2)
+    t = "("
+    {
+      image.append(t.image);
+    }
+  | 
+    t = ")"
+    {
+      image.append(t.image);
+    }
+  | 
+    t = "["
+    {
+      image.append(t.image);
+    }
+  | 
+    t = "]"
+    {
+      image.append(t.image);
+    }
+  | 
+    t = "."
+    {
+      image.append(t.image);
+    }
+  | 
+    t = "$"
+    {
+      image.append(t.image);
+    }
+  | 
+    t = "<"
+    {
+      image.append(t.image);
+    }
+  | 
+    t = ">"
+    {
+      image.append(t.image);
+    }
+  | 
+    t = < WORD >
+    {
+      image.append(t.image);
+    }
+  | 
     t = < SPACE >
     {
       image.append(t.image);
     }
-    t = < WORD >
+  | 
+    t = < COMMONSYMBOL >
     {
       image.append(t.image);
     }
@@ -109,27 +167,116 @@ String Line() :
   }
 }
 
-Frame Frame() :
+private String method() :
 {
-  String line = "";
+  StringBuilder image = new StringBuilder();
+  Token t;
 }
 {
-  "at " 
-  line = Line()
+  (
+    LOOKAHEAD(2)
+    (
+      t = < WORD >
+      {
+        image.append(t.image);
+      }
+    | 
+      t = < COMMONSYMBOL >
+      {
+        image.append(t.image);
+      }
+    | 
+      "."
+      {
+        image.append(".");
+      }
+    | 
+      "$"
+      {
+        image.append("$");
+      }
+    | 
+      "/"
+      {
+        image.append("/");
+      }
+    )
+  )+
   {
-    return new Frame(line);
+    return image.toString();
   }
 }
 
-void Monitor() :
+//at java.lang.Object.wait(java.base@17/Native Method)
+private Frame frame() :
+{
+  StringBuilder image = new StringBuilder();
+  String method;
+  Token t;
+}
+{
+  "at " 
+  method = method() 
+  "("
+  (
+    "java.base@"
+    (
+      < COMMONSYMBOL >
+    | "."
+    | < WORD >
+    )+
+    "/"
+  )?
+  (
+    t = "Native Method"
+    {
+      image.append(t.image);
+    }
+  | 
+    t = "Unknown Source"
+    {
+      image.append(t.image);
+    }
+  |
+    (
+      (
+        t = < WORD >
+        {
+          image.append(t.image);
+        }
+      | 
+        t = < COMMONSYMBOL >
+        {
+          image.append(t.image);
+        }
+      | 
+        "."
+        {
+          image.append(".");
+        }
+      )
+    )+
+    ":" 
+    t = < WORD >
+    {
+      image.append(":").append(t.image);
+    }
+  )
+  ")"
+  {
+    return new Frame(method, image.toString());
+  }
+}
+
+void monitor() :
 {
   String line = "";
 }
 {
-  "- " Line()
+  "- " line()
 }
 
-void KeyValue() :
+void keyValue() :
 {
 }
 {
@@ -137,21 +284,22 @@ void KeyValue() :
   (
     < WORD >
   | < COMMONSYMBOL >
-  )
+  | "."
+  )+
 }
 
 //"VM Thread" os_prio=2 cpu=203.12ms elapsed=98699.54s tid=0x000002c22c0b2de0 nid=0x2c90 runnable
-void NativeThread()  :
+void nativeThread() :
 {
-  
 }
 {
-  < QUOTE > 
-  ( LOOKAHEAD(2) 
+  < QUOTE >
+  (
+    LOOKAHEAD(2)
     < SPACE >
     (
       LOOKAHEAD(2)
-      KeyValue()
+      keyValue()
     | 
       < WORD >
     )
@@ -167,49 +315,109 @@ void NativeThread()  :
 //	- locked <0x0000000083286520> (a org.eclipse.core.internal.jobs.WorkerPool)
 //	at org.eclipse.core.internal.jobs.WorkerPool.startJob(WorkerPool.java:242)
 //	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:58)
-void JavaThread() :
+JavaThread javaThread() :
 {
+  ArrayList < Frame > frames = new ArrayList < Frame > ();
+  Frame f;
+  Token t;
+  String name;
+  String state;
 }
 {
-  < QUOTE > < SPACE > "#"
+  t = < QUOTE >
+  {
+    int length = t.image.length();
+    name = t.image.substring(1, length - 1);	
+  }
+  < SPACE > "#"
   (
     < WORD >
   | < COMMONSYMBOL >
   )
-  ( LOOKAHEAD(2) 
+  (
+    LOOKAHEAD(2)
     < SPACE >
     (
       LOOKAHEAD(2)
-      KeyValue()
+      keyValue()
     | 
+      LOOKAHEAD(2)
       < WORD >
+    | LOOKAHEAD(2)
+      "in " method() "()"
     )
   )+
+  < SPACE > 
+  "[" < WORD > "]" 
   (< EOL >)? 
-  < SPACE > "java.lang.Thread.State: " < WORD > (< SPACE > < COMMENT >)? < EOL >
+  < SPACE > "java.lang.Thread.State: " t = < WORD >
+  {
+    state = t.image;
+  }
+  (
+    < SPACE > t = "("
+    (
+      < WORD >
+    | < SPACE >
+    )*
+    ")"
+    {
+      state += " " + t.image;
+    }
+  )?
+  < EOL >
   (
     < SPACE > "No compile task" < EOL >
   |
     (
       < FRAMEINDENT >
       (
-        Monitor()
+        monitor()
       | 
-        Frame()
+        f = frame()
+        {
+          frames.add(f);
+        }
       )
       < EOL >
     )*
   )
+  {
+    return new JavaThread(name, state, frames);
+  }
 }
 
-void JstackDump() :
+Collection < JavaThread > threads() :
 {
+  ArrayList < JavaThread > javaThreads = new ArrayList < JavaThread > ();
+  JavaThread thread;
 }
 {
-  JStackHeader() 
-  < EOL >
   (
-      (LOOKAHEAD(3)       JavaThread() | NativeThread() )
+    (
+      LOOKAHEAD(3)
+      thread = javaThread()
+      {
+        javaThreads.add(thread);
+      }
+    | nativeThread()
+    )
     < EOL >
   )*
+  {
+    return javaThreads;
+  }
+}
+
+Collection < JavaThread > jstackDump() :
+{
+  Collection < JavaThread > javaThreads;
+}
+{
+  jstackHeader() 
+  < EOL > 
+  javaThreads = threads()
+  {
+    return javaThreads;
+  }
 }

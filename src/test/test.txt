@@ -1,0 +1,447 @@
+2021-11-11 21:35:37
+Full thread dump Java HotSpot(TM) 64-Bit Server VM (11.0.6+8-LTS mixed mode):
+
+Threads class SMR info:
+_java_thread_list=0x0000022192ddef20, length=45, elements={
+0x00000221e08b7000, 0x0000022180827800, 0x0000022180832000, 0x0000022180890000,
+0x0000022180891800, 0x000002218089b800, 0x00000221808a3000, 0x00000221808a6800,
+0x0000022180a26000, 0x0000022180bb2800, 0x0000022183994800, 0x00000221811b5800,
+0x0000022183784000, 0x00000221837d0000, 0x0000022183c29000, 0x00000221837f9800,
+0x000002218668c800, 0x0000022184d7a000, 0x0000022184d7d000, 0x0000022184d7b000,
+0x0000022184d7b800, 0x0000022184d7e000, 0x0000022183539800, 0x0000022183537800,
+0x000002218353a000, 0x000002218353b800, 0x0000022183538800, 0x0000022183530800,
+0x000002218353c800, 0x0000022183537000, 0x0000022185b8d800, 0x0000022183536000,
+0x000002218f756000, 0x000002218f752000, 0x000002218f759800, 0x0000022183533800,
+0x0000022184c80800, 0x000002218388f000, 0x00000221a1165000, 0x0000022185dfa000,
+0x0000022185df5000, 0x00000221a1166000, 0x0000022180fb5000, 0x0000022180fb2800,
+0x0000022180fb2000
+}
+
+"main" #1 prio=6 os_prio=0 cpu=575234.38ms elapsed=29045.16s tid=0x00000221e08b7000 nid=0x6c74 runnable  [0x000000cc90efe000]
+   java.lang.Thread.State: RUNNABLE
+	at org.eclipse.swt.internal.win32.OS.WaitMessage(Native Method)
+	at org.eclipse.swt.widgets.Display.sleep(Display.java:4737)
+	at org.eclipse.ui.application.WorkbenchAdvisor.eventLoopIdle(WorkbenchAdvisor.java:339)
+	at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor.eventLoopIdle(IDEWorkbenchAdvisor.java:994)
+	at org.eclipse.ui.internal.Workbench$1.eventLoopIdle(Workbench.java:479)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1155)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:338)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1041)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:155)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:644)
+	at org.eclipse.ui.infernal.Workbench$$Lambda$175/0x00000001003b2040.run(Unknown Source)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:338)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:551)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:156)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:203)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:136)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:401)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:255)
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(java.base@11.0.6/Native Method)
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(java.base@11.0.6/NativeMethodAccessorImpl.java:62)
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(java.base@11.0.6/DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(java.base@11.0.6/Method.java:566)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:659)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:596)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1467)
+	at org.eclipse.equinox.launcher.Main.main(Main.java:1440)
+
+"Reference Handler" #2 daemon prio=10 os_prio=2 cpu=125.00ms elapsed=29045.13s tid=0x0000022180827800 nid=0x10d4 waiting on condition  [0x000000cc916ff000]
+   java.lang.Thread.State: RUNNABLE
+	at java.lang.ref.Reference.waitForReferencePendingList(java.base@11.0.6/Native Method)
+	at java.lang.ref.Reference.processPendingReferences(java.base@11.0.6/Reference.java:241)
+	at java.lang.ref.Reference$ReferenceHandler.run(java.base@11.0.6/Reference.java:213)
+
+"Finalizer" #3 daemon prio=8 os_prio=1 cpu=93.75ms elapsed=29045.13s tid=0x0000022180832000 nid=0x69bc in Object.wait()  [0x000000cc917ff000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at java.lang.ref.ReferenceQueue.remove(java.base@11.0.6/ReferenceQueue.java:155)
+	- waiting to re-lock in wait() <0x00000000802300b0> (a java.lang.ref.ReferenceQueue$Lock)
+	at java.lang.ref.ReferenceQueue.remove(java.base@11.0.6/ReferenceQueue.java:176)
+	at java.lang.ref.Finalizer$FinalizerThread.run(java.base@11.0.6/Finalizer.java:170)
+
+"Signal Dispatcher" #4 daemon prio=9 os_prio=2 cpu=0.00ms elapsed=29045.11s tid=0x0000022180890000 nid=0x6218 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"Attach Listener" #5 daemon prio=5 os_prio=2 cpu=0.00ms elapsed=29045.11s tid=0x0000022180891800 nid=0x2484 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"C2 CompilerThread0" #6 daemon prio=9 os_prio=2 cpu=203500.00ms elapsed=29045.11s tid=0x000002218089b800 nid=0x3db0 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+"C1 CompilerThread0" #9 daemon prio=9 os_prio=2 cpu=24796.88ms elapsed=29045.11s tid=0x00000221808a3000 nid=0x227c waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+"Sweeper thread" #10 daemon prio=9 os_prio=2 cpu=3593.75ms elapsed=29045.11s tid=0x00000221808a6800 nid=0x3c3c runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"Common-Cleaner" #11 daemon prio=8 os_prio=1 cpu=15.63ms elapsed=29045.02s tid=0x0000022180a26000 nid=0x7634 in Object.wait()  [0x000000cc91dff000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at java.lang.ref.ReferenceQueue.remove(java.base@11.0.6/ReferenceQueue.java:155)
+	- waiting to re-lock in wait() <0x0000000080236848> (a java.lang.ref.ReferenceQueue$Lock)
+	at jdk.internal.ref.CleanerImpl.run(java.base@11.0.6/CleanerImpl.java:148)
+	at java.lang.Thread.run(java.base@11.0.6/Thread.java:834)
+	at jdk.internal.misc.InnocuousThread.run(java.base@11.0.6/InnocuousThread.java:134)
+
+"Service Thread" #12 daemon prio=9 os_prio=0 cpu=78.13ms elapsed=29044.98s tid=0x0000022180bb2800 nid=0x6c38 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"Active Thread: Equinox Container: e6c8f04a-4dce-4326-8f31-d53ecbac7359" #14 prio=5 os_prio=0 cpu=15.63ms elapsed=29043.80s tid=0x0000022183994800 nid=0x4f6c waiting on condition  [0x000000cc927fe000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@11.0.6/Native Method)
+	- parking to wait for  <0x000000008022d868> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@11.0.6/LockSupport.java:234)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(java.base@11.0.6/AbstractQueuedSynchronizer.java:2123)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@11.0.6/ScheduledThreadPoolExecutor.java:1182)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@11.0.6/ScheduledThreadPoolExecutor.java:899)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@11.0.6/ThreadPoolExecutor.java:1054)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@11.0.6/ThreadPoolExecutor.java:1114)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@11.0.6/ThreadPoolExecutor.java:628)
+	at java.lang.Thread.run(java.base@11.0.6/Thread.java:834)
+
+"Framework Event Dispatcher: Equinox Container: e6c8f04a-4dce-4326-8f31-d53ecbac7359" #16 daemon prio=5 os_prio=0 cpu=15.63ms elapsed=29043.53s tid=0x00000221811b5800 nid=0x5734 in Object.wait()  [0x000000cc928fe000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at java.lang.Object.wait(java.base@11.0.6/Object.java:328)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.getNextEvent(EventManager.java:394)
+	- waiting to re-lock in wait() <0x00000000802302f8> (a org.eclipse.osgi.framework.eventmgr.EventManager$EventThread)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:335)
+
+"Start Level: Equinox Container: e6c8f04a-4dce-4326-8f31-d53ecbac7359" #17 daemon prio=5 os_prio=0 cpu=890.63ms elapsed=29043.53s tid=0x0000022183784000 nid=0x46d4 in Object.wait()  [0x000000cc929fe000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <0x0000000080236b30> (a org.eclipse.osgi.framework.eventmgr.EventManager$EventThread)
+	at java.lang.Object.wait(java.base@11.0.6/Object.java:328)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.getNextEvent(EventManager.java:394)
+	- waiting to re-lock in wait() <0x0000000080236b30> (a org.eclipse.osgi.framework.eventmgr.EventManager$EventThread)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:335)
+
+"SCR Component Actor" #18 daemon prio=5 os_prio=0 cpu=0.00ms elapsed=29043.50s tid=0x00000221837d0000 nid=0x82c8 in Object.wait()  [0x000000cc92aff000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <0x0000000080227120> (a java.util.LinkedList)
+	at java.lang.Object.wait(java.base@11.0.6/Object.java:328)
+	at org.apache.felix.scr.impl.ComponentActorThread.run(ComponentActorThread.java:83)
+	- waiting to re-lock in wait() <0x0000000080227120> (a java.util.LinkedList)
+	at java.lang.Thread.run(java.base@11.0.6/Thread.java:834)
+
+"EMF Reference Cleaner" #20 daemon prio=5 os_prio=0 cpu=359.38ms elapsed=29042.85s tid=0x0000022183c29000 nid=0x3604 in Object.wait()  [0x000000cc92dff000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at java.lang.ref.ReferenceQueue.remove(java.base@11.0.6/ReferenceQueue.java:155)
+	- waiting to re-lock in wait() <0x0000000081962568> (a java.lang.ref.ReferenceQueue$Lock)
+	at java.lang.ref.ReferenceQueue.remove(java.base@11.0.6/ReferenceQueue.java:176)
+	at org.eclipse.emf.common.util.CommonUtil$1ReferenceClearingQueuePollingThread.run(CommonUtil.java:70)
+
+"Worker-JM" #21 prio=5 os_prio=0 cpu=0.00ms elapsed=29042.60s tid=0x00000221837f9800 nid=0x110 in Object.wait()  [0x000000cc92efe000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.core.internal.jobs.InternalWorker.run(InternalWorker.java:61)
+	- waiting to re-lock in wait() <0x00000000819c4820> (a java.util.ArrayList)
+
+"Gogo shell" #23 prio=5 os_prio=0 cpu=15.63ms elapsed=29042.41s tid=0x000002218668c800 nid=0x46a8 waiting on condition  [0x000000cc92ffe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@11.0.6/Native Method)
+	- parking to wait for  <0x00000000818fae58> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@11.0.6/LockSupport.java:194)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@11.0.6/AbstractQueuedSynchronizer.java:2081)
+	at java.util.concurrent.LinkedBlockingQueue.take(java.base@11.0.6/LinkedBlockingQueue.java:433)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@11.0.6/ThreadPoolExecutor.java:1054)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@11.0.6/ThreadPoolExecutor.java:1114)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@11.0.6/ThreadPoolExecutor.java:628)
+	at java.lang.Thread.run(java.base@11.0.6/Thread.java:834)
+
+"Git Repository Closer" #27 daemon prio=6 os_prio=0 cpu=0.00ms elapsed=29038.88s tid=0x0000022184d7a000 nid=0x7f58 in Object.wait()  [0x000000cc93bff000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <0x0000000083bf8650> (a java.lang.ref.ReferenceQueue$Lock)
+	at java.lang.ref.ReferenceQueue.remove(java.base@11.0.6/ReferenceQueue.java:155)
+	- waiting to re-lock in wait() <0x0000000083bf8650> (a java.lang.ref.ReferenceQueue$Lock)
+	at java.lang.ref.ReferenceQueue.remove(java.base@11.0.6/ReferenceQueue.java:176)
+	at org.eclipse.egit.core.RepositoryCache$Closer.run(RepositoryCache.java:453)
+
+"Bundle File Closer" #28 daemon prio=6 os_prio=0 cpu=140.63ms elapsed=29038.83s tid=0x0000022184d7d000 nid=0x4294 in Object.wait()  [0x000000cc93cff000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at java.lang.Object.wait(java.base@11.0.6/Object.java:328)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.getNextEvent(EventManager.java:394)
+	- waiting to re-lock in wait() <0x0000000083bae240> (a org.eclipse.osgi.framework.eventmgr.EventManager$EventThread)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:335)
+
+"Java indexing" #30 daemon prio=4 os_prio=-1 cpu=13765.63ms elapsed=29032.57s tid=0x0000022184d7b000 nid=0x7684 in Object.wait()  [0x000000cc940ff000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at java.lang.Object.wait(java.base@11.0.6/Object.java:328)
+	at org.eclipse.jdt.internal.core.search.processing.JobManager.run(JobManager.java:409)
+	- waiting to re-lock in wait() <0x000000008e000288> (a org.eclipse.jdt.internal.core.search.indexing.IndexManager)
+	at java.lang.Thread.run(java.base@11.0.6/Thread.java:834)
+
+"Thread-5" #31 daemon prio=6 os_prio=0 cpu=0.00ms elapsed=29032.19s tid=0x0000022184d7b800 nid=0x2b80 in Object.wait()  [0x000000cc941fe000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at java.lang.Object.wait(java.base@11.0.6/Object.java:328)
+	at org.eclipse.gmf.runtime.common.core.util.RequestCollapser$PostedThread.run(RequestCollapser.java:54)
+	- waiting to re-lock in wait() <0x0000000084b00180> (a org.eclipse.gmf.runtime.diagram.ui.properties.util.SectionUpdateRequestCollapser)
+
+"EventAdmin Async Event Dispatcher Thread" #33 daemon prio=6 os_prio=0 cpu=125.00ms elapsed=29028.97s tid=0x0000022184d7e000 nid=0x7cc0 in Object.wait()  [0x000000cc91efe000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at java.lang.Object.wait(java.base@11.0.6/Object.java:328)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.getNextEvent(EventManager.java:394)
+	- waiting to re-lock in wait() <0x0000000082900000> (a org.eclipse.osgi.framework.eventmgr.EventManager$EventThread)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:335)
+
+"YJP-Plugin-RequestListener" #44 daemon prio=1 os_prio=-2 cpu=0.00ms elapsed=29028.92s tid=0x0000022183539800 nid=0xd34 runnable  [0x000000cc94dfe000]
+   java.lang.Thread.State: RUNNABLE
+	at java.net.PlainSocketImpl.accept0(java.base@11.0.6/Native Method)
+	at java.net.PlainSocketImpl.socketAccept(java.base@11.0.6/PlainSocketImpl.java:159)
+	at java.net.AbstractPlainSocketImpl.accept(java.base@11.0.6/AbstractPlainSocketImpl.java:458)
+	at java.net.ServerSocket.implAccept(java.base@11.0.6/ServerSocket.java:551)
+	at java.net.ServerSocket.accept(java.base@11.0.6/ServerSocket.java:519)
+	at com.yourkit.d.f.run(a:41)
+	at java.lang.Thread.run(java.base@11.0.6/Thread.java:834)
+
+"pool-1-thread-1" #45 prio=5 os_prio=0 cpu=62.50ms elapsed=29028.89s tid=0x0000022183537800 nid=0x77a0 waiting on condition  [0x000000cc94eff000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@11.0.6/Native Method)
+	- parking to wait for  <0x000000009df80178> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@11.0.6/LockSupport.java:194)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@11.0.6/AbstractQueuedSynchronizer.java:2081)
+	at java.util.concurrent.LinkedBlockingQueue.take(java.base@11.0.6/LinkedBlockingQueue.java:433)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@11.0.6/ThreadPoolExecutor.java:1054)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@11.0.6/ThreadPoolExecutor.java:1114)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@11.0.6/ThreadPoolExecutor.java:628)
+	at java.lang.Thread.run(java.base@11.0.6/Thread.java:834)
+
+"pool-2-thread-1" #46 prio=5 os_prio=0 cpu=0.00ms elapsed=29028.89s tid=0x000002218353a000 nid=0x8238 waiting on condition  [0x000000cc94ffe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@11.0.6/Native Method)
+	- parking to wait for  <0x000000009de80178> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@11.0.6/LockSupport.java:194)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@11.0.6/AbstractQueuedSynchronizer.java:2081)
+	at java.util.concurrent.LinkedBlockingQueue.take(java.base@11.0.6/LinkedBlockingQueue.java:433)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@11.0.6/ThreadPoolExecutor.java:1054)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@11.0.6/ThreadPoolExecutor.java:1114)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@11.0.6/ThreadPoolExecutor.java:628)
+	at java.lang.Thread.run(java.base@11.0.6/Thread.java:834)
+
+"Event Loop Monitor" #47 daemon prio=6 os_prio=0 cpu=375.00ms elapsed=29026.79s tid=0x000002218353b800 nid=0xc74 in Object.wait()  [0x000000cc952ff000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.sleepForMillis(EventLoopMonitorThread.java:716)
+	- waiting to re-lock in wait() <0x000000009e2801e8> (a java.lang.Object)
+	at org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.run(EventLoopMonitorThread.java:544)
+
+"Provisioning Event Dispatcher" #51 daemon prio=5 os_prio=0 cpu=0.00ms elapsed=29026.36s tid=0x0000022183538800 nid=0x7dac in Object.wait()  [0x000000cc953ff000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at java.lang.Object.wait(java.base@11.0.6/Object.java:328)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.getNextEvent(EventManager.java:394)
+	- waiting to re-lock in wait() <0x000000009df00000> (a org.eclipse.osgi.framework.eventmgr.EventManager$EventThread)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:335)
+
+"pool-4-thread-1" #53 prio=5 os_prio=0 cpu=281.25ms elapsed=29022.34s tid=0x0000022183530800 nid=0x6724 runnable  [0x000000cc955fe000]
+   java.lang.Thread.State: RUNNABLE
+	at java.io.FileInputStream.readBytes(java.base@11.0.6/Native Method)
+	at java.io.FileInputStream.read(java.base@11.0.6/FileInputStream.java:279)
+	at java.io.BufferedInputStream.fill(java.base@11.0.6/BufferedInputStream.java:252)
+	at java.io.BufferedInputStream.read(java.base@11.0.6/BufferedInputStream.java:271)
+	- locked <0x000000008a6868c8> (a java.io.BufferedInputStream)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:79)
+	at org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:113)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@11.0.6/Executors.java:515)
+	at java.util.concurrent.FutureTask.run(java.base@11.0.6/FutureTask.java:264)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@11.0.6/ThreadPoolExecutor.java:1128)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@11.0.6/ThreadPoolExecutor.java:628)
+	at java.lang.Thread.run(java.base@11.0.6/Thread.java:834)
+
+"org.eclipse.jface.text.reconciler.MonoReconciler" #52 daemon prio=1 os_prio=-2 cpu=31.25ms elapsed=29022.03s tid=0x000002218353c800 nid=0x689c in Object.wait()  [0x000000cc956ff000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.jface.text.reconciler.AbstractReconciler$BackgroundThread.run(AbstractReconciler.java:183)
+	- waiting to re-lock in wait() <0x000000008aa1dfa0> (a org.eclipse.jface.text.reconciler.DirtyRegionQueue)
+
+"org.eclipse.jface.text.reconciler.Reconciler" #54 daemon prio=1 os_prio=-2 cpu=62.50ms elapsed=29021.58s tid=0x0000022183537000 nid=0x69e8 in Object.wait()  [0x000000cc957fe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.jface.text.reconciler.AbstractReconciler$BackgroundThread.run(AbstractReconciler.java:183)
+	- waiting to re-lock in wait() <0x000000009de803f8> (a org.eclipse.jface.text.reconciler.DirtyRegionQueue)
+
+"org.eclipse.jface.text.reconciler.MonoReconciler" #56 daemon prio=1 os_prio=-2 cpu=62.50ms elapsed=29021.16s tid=0x0000022185b8d800 nid=0x7100 in Object.wait()  [0x000000cc959ff000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.jface.text.reconciler.AbstractReconciler$BackgroundThread.run(AbstractReconciler.java:183)
+	- waiting to re-lock in wait() <0x000000009df00308> (a org.eclipse.jface.text.reconciler.DirtyRegionQueue)
+
+"Thread-10" #74 prio=5 os_prio=0 cpu=11625.00ms elapsed=29008.72s tid=0x0000022183536000 nid=0x117c waiting on condition  [0x000000cc951fe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@11.0.6/Native Method)
+	at org.eclipse.equinox.internal.p2.updatechecker.UpdateChecker$UpdateCheckThread.run(UpdateChecker.java:90)
+
+"Provisioning Event Dispatcher" #75 daemon prio=5 os_prio=0 cpu=0.00ms elapsed=29003.79s tid=0x000002218f756000 nid=0x7ad8 in Object.wait()  [0x000000cc96bff000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at java.lang.Object.wait(java.base@11.0.6/Object.java:328)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.getNextEvent(EventManager.java:394)
+	- waiting to re-lock in wait() <0x000000009ed80018> (a org.eclipse.osgi.framework.eventmgr.EventManager$EventThread)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:335)
+
+"org.eclipse.jdt.internal.ui.text.JavaReconciler" #76 daemon prio=1 os_prio=-2 cpu=4000.00ms elapsed=28997.64s tid=0x000002218f752000 nid=0x3218 in Object.wait()  [0x000000cc950fe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.jface.text.reconciler.AbstractReconciler$BackgroundThread.run(AbstractReconciler.java:183)
+	- waiting to re-lock in wait() <0x000000008da00180> (a org.eclipse.jface.text.reconciler.DirtyRegionQueue)
+
+"org.eclipse.jface.text.reconciler.MonoReconciler" #83 daemon prio=1 os_prio=-2 cpu=62.50ms elapsed=28964.95s tid=0x000002218f759800 nid=0x8004 in Object.wait()  [0x000000cc90dfe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.jface.text.reconciler.AbstractReconciler$BackgroundThread.run(AbstractReconciler.java:183)
+	- waiting to re-lock in wait() <0x000000008e600180> (a org.eclipse.jface.text.reconciler.DirtyRegionQueue)
+
+"pool-3-thread-1" #106 prio=5 os_prio=0 cpu=0.00ms elapsed=28804.58s tid=0x0000022183533800 nid=0x7850 waiting on condition  [0x000000cc90cff000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@11.0.6/Native Method)
+	- parking to wait for  <0x0000000086880000> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@11.0.6/LockSupport.java:194)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@11.0.6/AbstractQueuedSynchronizer.java:2081)
+	at java.util.concurrent.LinkedBlockingQueue.take(java.base@11.0.6/LinkedBlockingQueue.java:433)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@11.0.6/ThreadPoolExecutor.java:1054)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@11.0.6/ThreadPoolExecutor.java:1114)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@11.0.6/ThreadPoolExecutor.java:628)
+	at java.lang.Thread.run(java.base@11.0.6/Thread.java:834)
+
+"org.eclipse.jface.text.reconciler.MonoReconciler" #161 daemon prio=1 os_prio=-2 cpu=0.00ms elapsed=28304.79s tid=0x0000022184c80800 nid=0x6d74 in Object.wait()  [0x000000cc954ff000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.jface.text.reconciler.AbstractReconciler$BackgroundThread.run(AbstractReconciler.java:183)
+	- waiting to re-lock in wait() <0x0000000086800180> (a org.eclipse.jface.text.reconciler.DirtyRegionQueue)
+
+"org.eclipse.jdt.internal.ui.text.JavaReconciler" #431 daemon prio=1 os_prio=-2 cpu=1000.00ms elapsed=21072.55s tid=0x000002218388f000 nid=0xebc in Object.wait()  [0x000000cc977ff000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.jface.text.reconciler.AbstractReconciler$BackgroundThread.run(AbstractReconciler.java:183)
+	- waiting to re-lock in wait() <0x0000000082301830> (a org.eclipse.jface.text.reconciler.DirtyRegionQueue)
+
+"org.eclipse.jface.text.reconciler.MonoReconciler" #626 daemon prio=1 os_prio=-2 cpu=62.50ms elapsed=20445.33s tid=0x00000221a1165000 nid=0x4af0 in Object.wait()  [0x000000cc961ff000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.jface.text.reconciler.AbstractReconciler$BackgroundThread.run(AbstractReconciler.java:183)
+	- waiting to re-lock in wait() <0x00000000823046b8> (a org.eclipse.jface.text.reconciler.DirtyRegionQueue)
+
+"org.eclipse.jface.text.reconciler.MonoReconciler" #629 daemon prio=1 os_prio=-2 cpu=15.63ms elapsed=20443.34s tid=0x0000022185dfa000 nid=0x75d8 in Object.wait()  [0x000000cc962fe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.jface.text.reconciler.AbstractReconciler$BackgroundThread.run(AbstractReconciler.java:183)
+	- waiting to re-lock in wait() <0x0000000082303a08> (a org.eclipse.jface.text.reconciler.DirtyRegionQueue)
+
+"org.eclipse.jdt.internal.ui.text.JavaReconciler" #1097 daemon prio=1 os_prio=-2 cpu=31.25ms elapsed=19852.14s tid=0x0000022185df5000 nid=0x6294 in Object.wait()  [0x000000cc979fe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.jface.text.reconciler.AbstractReconciler$BackgroundThread.run(AbstractReconciler.java:183)
+	- waiting to re-lock in wait() <0x0000000082300e70> (a org.eclipse.jface.text.reconciler.DirtyRegionQueue)
+
+"org.eclipse.jface.text.reconciler.MonoReconciler" #1430 daemon prio=1 os_prio=-2 cpu=46.88ms elapsed=16790.56s tid=0x00000221a1166000 nid=0x7df4 in Object.wait()  [0x000000cc964ff000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.jface.text.reconciler.AbstractReconciler$BackgroundThread.run(AbstractReconciler.java:183)
+	- waiting to re-lock in wait() <0x0000000082301000> (a org.eclipse.jface.text.reconciler.DirtyRegionQueue)
+
+"ForkJoinPool.commonPool-worker-3" #1587 daemon prio=6 os_prio=0 cpu=140.63ms elapsed=16162.90s tid=0x0000022180fb5000 nid=0x476c waiting on condition  [0x000000cc943fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@11.0.6/Native Method)
+	- parking to wait for  <0x0000000082f80000> (a java.util.concurrent.ForkJoinPool)
+	at java.util.concurrent.locks.LockSupport.park(java.base@11.0.6/LockSupport.java:194)
+	at java.util.concurrent.ForkJoinPool.runWorker(java.base@11.0.6/ForkJoinPool.java:1628)
+	at java.util.concurrent.ForkJoinWorkerThread.run(java.base@11.0.6/ForkJoinWorkerThread.java:177)
+
+"Worker-77" #1615 prio=5 os_prio=0 cpu=0.00ms elapsed=494.06s tid=0x0000022180fb2800 nid=0x507c in Object.wait()  [0x000000cc92bff000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.core.internal.jobs.WorkerPool.sleep(WorkerPool.java:200)
+	- waiting to re-lock in wait() <0x00000000818993b8> (a org.eclipse.core.internal.jobs.WorkerPool)
+	at org.eclipse.core.internal.jobs.WorkerPool.startJob(WorkerPool.java:242)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:58)
+
+"Worker-78" #1616 prio=5 os_prio=0 cpu=0.00ms elapsed=253.56s tid=0x0000022180fb2000 nid=0x5ef8 in Object.wait()  [0x000000cc9319f000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@11.0.6/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.core.internal.jobs.WorkerPool.sleep(WorkerPool.java:200)
+	- waiting to re-lock in wait() <0x00000000818993b8> (a org.eclipse.core.internal.jobs.WorkerPool)
+	at org.eclipse.core.internal.jobs.WorkerPool.startJob(WorkerPool.java:242)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:58)
+
+"VM Thread" os_prio=2 cpu=5578.13ms elapsed=29045.13s tid=0x00000221ffdbd800 nid=0x4740 runnable  
+
+"GC Thread#0" os_prio=2 cpu=9359.38ms elapsed=29045.15s tid=0x00000221e08ce000 nid=0x5634 runnable  
+
+"GC Thread#1" os_prio=2 cpu=9421.88ms elapsed=29044.03s tid=0x0000022181172000 nid=0x604c runnable  
+
+"GC Thread#2" os_prio=2 cpu=9656.25ms elapsed=29044.03s tid=0x0000022181172800 nid=0x3a20 runnable  
+
+"GC Thread#3" os_prio=2 cpu=10718.75ms elapsed=29044.03s tid=0x0000022180e58000 nid=0x7198 runnable  
+
+"GC Thread#4" os_prio=2 cpu=10750.00ms elapsed=29044.03s tid=0x0000022180e58800 nid=0x2764 runnable  
+
+"GC Thread#5" os_prio=2 cpu=9390.63ms elapsed=29044.03s tid=0x00000221811a4000 nid=0x399c runnable  
+
+"GC Thread#6" os_prio=2 cpu=9281.25ms elapsed=29042.13s tid=0x0000022186f31000 nid=0x650c runnable  
+
+"GC Thread#7" os_prio=2 cpu=10687.50ms elapsed=29042.13s tid=0x0000022182e86800 nid=0x7b60 runnable  
+
+"G1 Main Marker" os_prio=2 cpu=171.88ms elapsed=29045.15s tid=0x00000221e0902800 nid=0x6e54 runnable  
+
+"G1 Conc#0" os_prio=2 cpu=81234.38ms elapsed=29045.15s tid=0x00000221e0903800 nid=0x71bc runnable  
+
+"G1 Conc#1" os_prio=2 cpu=81421.88ms elapsed=29042.87s tid=0x0000022182ff5000 nid=0x8040 runnable  
+
+"G1 Refine#0" os_prio=2 cpu=843.75ms elapsed=29045.15s tid=0x00000221ffc30800 nid=0x5ed4 runnable  
+
+"G1 Refine#1" os_prio=2 cpu=187.50ms elapsed=29042.12s tid=0x0000022185dfc800 nid=0x4244 runnable  
+
+"G1 Refine#2" os_prio=2 cpu=78.13ms elapsed=29041.94s tid=0x0000022185ecf800 nid=0x592c runnable  
+
+"G1 Refine#3" os_prio=2 cpu=31.25ms elapsed=29041.93s tid=0x00000221837ec800 nid=0x6080 runnable  
+
+"G1 Refine#4" os_prio=2 cpu=15.63ms elapsed=29038.69s tid=0x0000022180f3f000 nid=0x49a0 runnable  
+
+"G1 Refine#5" os_prio=2 cpu=0.00ms elapsed=29038.69s tid=0x0000022187428800 nid=0x7ae8 runnable  
+
+"G1 Refine#6" os_prio=2 cpu=0.00ms elapsed=29038.69s tid=0x00000221875df000 nid=0x7f54 runnable  
+
+"G1 Young RemSet Sampling" os_prio=2 cpu=156.25ms elapsed=29045.15s tid=0x00000221ffc31800 nid=0x928 runnable  
+"StrDedup" os_prio=2 cpu=1453.13ms elapsed=29045.14s tid=0x00000221ffc36000 nid=0x3a3c runnable  
+
+"VM Periodic Task Thread" os_prio=2 cpu=1046.88ms elapsed=29044.98s tid=0x0000022180bb4800 nid=0x6930 waiting on condition  
+
+JNI global refs: 212, weak refs: 0
+
