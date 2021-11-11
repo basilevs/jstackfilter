@@ -7,14 +7,14 @@ import java.util.Collection;
 import java.util.List;
 
 import org.basilevs.jstackfilter.Frame;
-import org.basilevs.jstackfilter.Idle;
+import org.basilevs.jstackfilter.Known;
 import org.basilevs.jstackfilter.JavaThread;
 import org.basilevs.jstackfilter.grammar.jstack.JstackParser;
 import org.basilevs.jstackfilter.grammar.jstack.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class IdleTest {
+public class KnownTest {
 
 	@Test
 	public void test() throws IOException, ParseException {
@@ -22,17 +22,17 @@ public class IdleTest {
 		JstackParser subject = new JstackParser(new StringReader(data));
 		Collection<JavaThread> threads = subject.jstackDump();
 		JavaThread first = threads.iterator().next();
-		Assert.assertTrue(Idle.isIdle(first));
+		Assert.assertTrue(Known.isKnown(first));
 		List<Frame> frames = new ArrayList<>(first.frames());
 		JavaThread another = new JavaThread(first.name(), first.state(), frames);
-		Assert.assertTrue(Idle.isIdle(another));
+		Assert.assertTrue(Known.isKnown(another));
 		another = new JavaThread("meh", first.state(), frames);
-		Assert.assertTrue(Idle.isIdle(another));
+		Assert.assertTrue(Known.isKnown(another));
 		another = new JavaThread(first.name(), "boo", frames);
-		Assert.assertTrue(Idle.isIdle(another));
+		Assert.assertTrue(Known.isKnown(another));
 		frames.remove(0);
 		another = new JavaThread(first.name(), first.state(), frames);
-		Assert.assertFalse(Idle.isIdle(another));
+		Assert.assertFalse(Known.isKnown(another));
 	}
 
 }

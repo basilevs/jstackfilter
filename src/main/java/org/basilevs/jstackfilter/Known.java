@@ -8,11 +8,11 @@ import org.basilevs.jstackfilter.grammar.jstack.JstackParser;
 import org.basilevs.jstackfilter.grammar.jstack.ParseException;
 
 
-public class Idle {
+public class Known {
 	private static final List<JavaThread> threads;
 	
 	static {
-		try (InputStream is = Idle.class.getResourceAsStream("idle.txt")) {
+		try (InputStream is = Known.class.getResourceAsStream("known.txt")) {
 			JstackParser subject = new JstackParser(is, "UTF-8");
 			threads = List.copyOf(subject.threads());
 		} catch (IOException  | ParseException e) {
@@ -20,7 +20,7 @@ public class Idle {
 		}
 	}
 
-	public static boolean isIdle(JavaThread stack) {
+	public static boolean isKnown(JavaThread stack) {
 		return threads.stream().anyMatch(stack::equalByMethodName);
 	}
 	

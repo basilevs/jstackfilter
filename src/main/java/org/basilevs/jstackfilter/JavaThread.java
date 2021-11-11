@@ -32,7 +32,7 @@ public final class JavaThread {
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		result.append(String.format("\"%s\"\n   java.lang.Thread.State: %s", name, state));
+		result.append(String.format("\"%s\"\n   java.lang.Thread.State: %s\n", name, state));
 		for (Frame frame : frames) {
 			result.append('\t').append(frame).append('\n');
 		}

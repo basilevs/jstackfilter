@@ -344,7 +344,7 @@ JavaThread javaThread() :
       LOOKAHEAD(2)
       < WORD >
     | LOOKAHEAD(2)
-      "in " method() "()"
+      "in Object.wait()"
     )
   )+
   < SPACE > 
@@ -355,14 +355,23 @@ JavaThread javaThread() :
     state = t.image;
   }
   (
-    < SPACE > t = "("
+    < SPACE > "("
+    {
+      state += " (";
+    }
     (
-      < WORD >
-    | < SPACE >
+      t = < WORD >
+      {
+        state += t.image;
+      }
+    | t = < SPACE >
+      {
+        state += t.image;
+      }
     )*
     ")"
     {
-      state += " " + t.image;
+      state += ")";
     }
   )?
   < EOL >
