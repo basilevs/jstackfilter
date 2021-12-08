@@ -14,7 +14,7 @@ public class Main {
 			try (Stream<JavaThread> stacks = JstackParser.parse(reader)) {
 				Stream<JavaThread> stacksCopy = stacks;
 				stacksCopy = stacksCopy.filter(Predicate.not(Known::isKnown));
-				stacksCopy.forEach(System.out::println);
+				stacksCopy.forEach(thread -> System.out.printf("%s\n\n", thread));
 			}
 		}
 

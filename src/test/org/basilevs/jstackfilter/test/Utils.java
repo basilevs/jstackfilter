@@ -1,4 +1,4 @@
-package org.basilevs.jstackfilter.grammar.jstack.test;
+package org.basilevs.jstackfilter.test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
