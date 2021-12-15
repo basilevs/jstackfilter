@@ -27,6 +27,8 @@ public class JstackParserTest {
 		Assert.assertEquals(secondFrame.method(), "org.eclipse.swt.widgets.Display.sleep");		
 		Assert.assertEquals(secondFrame.location(), "Display.java:4750");
 		Assert.assertNotEquals("", secondFrame.toString());
+		JavaThread thread = threads.stream().filter(t -> t.name().equals("Worker-916: Updating Git status for repository itest")).findFirst().get();
+		Assert.assertEquals("org.eclipse.jgit.dircache.DirCacheIterator.<init>", thread.frames().get(12).method());
 	}
 
 }

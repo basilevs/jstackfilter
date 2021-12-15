@@ -13,17 +13,15 @@ public interface JstackParserConstants {
   /** RegularExpression Id. */
   int QUOTE = 1;
   /** RegularExpression Id. */
-  int COMMONSYMBOL = 2;
+  int WORD = 2;
   /** RegularExpression Id. */
-  int WORD = 3;
+  int EOL = 3;
   /** RegularExpression Id. */
-  int EOL = 4;
+  int FRAMEINDENT = 4;
   /** RegularExpression Id. */
-  int FRAMEINDENT = 5;
+  int SPACE = 5;
   /** RegularExpression Id. */
-  int SPACE = 6;
-  /** RegularExpression Id. */
-  int TIME = 7;
+  int TIME = 6;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -32,7 +30,6 @@ public interface JstackParserConstants {
   String[] tokenImage = {
     "<EOF>",
     "<QUOTE>",
-    "<COMMONSYMBOL>",
     "<WORD>",
     "<EOL>",
     "<FRAMEINDENT>",

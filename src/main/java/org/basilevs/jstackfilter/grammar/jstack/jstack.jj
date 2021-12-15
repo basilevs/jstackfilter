@@ -29,17 +29,11 @@ TOKEN :
 
 TOKEN :
 {
-  < COMMONSYMBOL : 
-    [ "A"-"Z", "a"-"z", "0"-"9", "-", "+" ] >
-}
-
-TOKEN :
-{
   < WORD :
-    < COMMONSYMBOL >
+    [ "A"-"Z", "a"-"z", "0"-"9", "-", "+" ]
     (
       "_"
-    | < COMMONSYMBOL >
+    | [ "A"-"Z", "a"-"z", "0"-"9", "-", "+" ]
     )* >
 }
 
@@ -156,11 +150,6 @@ private String line() :
     {
       image.append(t.image);
     }
-  | 
-    t = < COMMONSYMBOL >
-    {
-      image.append(t.image);
-    }
   )*
   {
     return image.toString();
@@ -181,11 +170,6 @@ private String method() :
         image.append(t.image);
       }
     | 
-      t = < COMMONSYMBOL >
-      {
-        image.append(t.image);
-      }
-    | 
       "."
       {
         image.append(".");
@@ -199,6 +183,13 @@ private String method() :
       "/"
       {
         image.append("/");
+      }
+    |
+      "<"
+       t = < WORD >
+      ">" 
+      {
+        image.append("<" + t.image + ">");
       }
     )
   )+
@@ -221,8 +212,7 @@ private Frame frame() :
   (
     "java.base@"
     (
-      < COMMONSYMBOL >
-    | "."
+    "."
     | < WORD >
     )+
     "/"
@@ -238,14 +228,9 @@ private Frame frame() :
       image.append(t.image);
     }
   |
+        LOOKAHEAD(2)
     (
-      (
         t = < WORD >
-        {
-          image.append(t.image);
-        }
-      | 
-        t = < COMMONSYMBOL >
         {
           image.append(t.image);
         }
@@ -254,7 +239,7 @@ private Frame frame() :
         {
           image.append(".");
         }
-      )
+      
     )+
     ":" 
     t = < WORD >
@@ -283,7 +268,6 @@ void keyValue() :
   < WORD > "="
   (
     < WORD >
-  | < COMMONSYMBOL >
   | "."
   )+
 }
@@ -330,10 +314,7 @@ JavaThread javaThread() :
     name = t.image.substring(1, length - 1);	
   }
   < SPACE > "#"
-  (
     < WORD >
-  | < COMMONSYMBOL >
-  )
   (
     LOOKAHEAD(2)
     < SPACE >
