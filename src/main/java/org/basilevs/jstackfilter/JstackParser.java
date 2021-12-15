@@ -35,7 +35,15 @@ public class JstackParser {
 		try {
 			return Optional.of(parser.javaThread().withRepresentation(thread));
 		} catch (ParseException e) {
-			throw new IllegalArgumentException("Can't parse Java thread\n" + thread, e);
+			var lines = thread.split("\n");
+			StringBuilder message = new StringBuilder("Can't parse Java thread:\n");
+			for (int i = e.currentToken.beginLine; i <= e.currentToken.endLine; i++) {
+				message.append(" > ");
+				message.append(lines[i-1]);
+				message.append("\n");
+			}
+			
+			throw new IllegalArgumentException(message.toString(), e);
 		}
 	}
 
