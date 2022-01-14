@@ -17,7 +17,7 @@ public class JstackParserTest {
 	@Test
 	public void frame1() throws IOException {
 		String data = Utils.readFromInputStream(JstackParserTest.class.getResourceAsStream("eclipse.txt")); 
-		Collection<JavaThread> threads = JstackParser.parse(new StringReader(data)).collect(Collectors.toList());
+		Collection<JavaThread> threads = JstackParser.parseThreads(new StringReader(data)).collect(Collectors.toList());
 		Assert.assertTrue(threads.stream().map(JavaThread::name).anyMatch(Predicate.isEqual("Active Thread: Equinox Container: 4201e9ce-3eab-4ab0-8431-f4be70328a4d")));
 		JavaThread first = threads.iterator().next();
 		Frame firstFrame = first.frames().get(0);

@@ -59,7 +59,6 @@ public final class JavaThread {
 	private static String stripVersions(String input) {
 		// org.eclipse.ui.internal.Workbench$$Lambda$189/0x0000000800dbfa08.run
 		// org.eclipse.ui.infernal.Workbench$$Lambda$175/0x00000001003b2040.run
-		// java.lang.reflect.Method.invoke(java.base@17/Method.java:568)
 		// 
 		// Should produce same result
 		return LAMBDA_PATTERN.matcher(input).replaceAll(JavaThread.class.getName());

@@ -11,7 +11,7 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 		try (Reader reader = new InputStreamReader(System.in, StandardCharsets.UTF_8)) {
-			try (Stream<JavaThread> stacks = JstackParser.parse(reader)) {
+			try (Stream<JavaThread> stacks = JstackParser.parseThreads(reader)) {
 				Stream<JavaThread> stacksCopy = stacks;
 				stacksCopy = stacksCopy.filter(Predicate.not(Known::isKnown));
 				stacksCopy.forEach(thread -> System.out.printf("%s\n\n", thread));

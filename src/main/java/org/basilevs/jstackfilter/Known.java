@@ -14,7 +14,7 @@ public class Known {
 	
 	static {
 		try (InputStream is = Known.class.getResourceAsStream("known.txt")) {
-			Stream<JavaThread> subject = JstackParser.parse(new InputStreamReader(is, "UTF-8"));
+			Stream<JavaThread> subject = JstackParser.parseThreads(new InputStreamReader(is, "UTF-8"));
 			threads = List.copyOf(subject.collect(Collectors.toList()))	;
 		} catch (IOException e) {
 			throw new AssertionError(e);

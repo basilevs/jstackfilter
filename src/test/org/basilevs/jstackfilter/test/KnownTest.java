@@ -20,7 +20,7 @@ public class KnownTest {
 	@Test
 	public void test() throws IOException {
 		String data = Utils.readFromInputStream(JstackParserTest.class.getResourceAsStream("eclipse.txt"));
-		Collection<JavaThread> threads = JstackParser.parse(new StringReader(data)).collect(Collectors.toList());
+		Collection<JavaThread> threads = JstackParser.parseThreads(new StringReader(data)).collect(Collectors.toList());
 		JavaThread first = threads.iterator().next();
 		Assert.assertTrue(Known.isKnown(first));
 		List<Frame> frames = new ArrayList<>(first.frames());

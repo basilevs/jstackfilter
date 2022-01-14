@@ -13,8 +13,9 @@ import org.basilevs.jstackfilter.grammar.jstack.ParseException;
 
 public class JstackParser {
 
-	public static Stream<JavaThread> parse(Reader reader) throws IOException {
-		return splitToChunks(reader).map(JstackParser::parse).flatMap(Optional::stream);
+	/** Parses threads as printed by jstack. Header and native threads are ignored.  */
+	public static Stream<JavaThread> parseThreads(Reader reader) throws IOException {
+		return splitToChunks(reader).map(JstackParser::parseThread).flatMap(Optional::stream);
 	}
 	
 	public static Stream<String> splitToChunks(Reader reader) throws IOException {
@@ -25,7 +26,7 @@ public class JstackParser {
 	
 	
 	private static final Pattern JAVA_THREAD_HEADER_PATTERN = Pattern.compile("^\"[^\\n]+\" #\\d");
-	public static Optional<JavaThread> parse(String thread) {
+	public static Optional<JavaThread> parseThread(String thread) {
 		Matcher matcher = JAVA_THREAD_HEADER_PATTERN.matcher(thread);
 		if (!matcher.find() || matcher.start() != 0) {
 			return Optional.empty();
