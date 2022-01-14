@@ -358,8 +358,14 @@ JavaThread javaThread() :
   )?
   < EOL >
   (
-    < SPACE > "No compile task" < EOL >
-  |
+    < SPACE >
+    (      "No compile task" < EOL >
+    |
+
+    //   Compiling: 37714 % !   4       org.eclipse.jdt.internal.core.builder.NameEnvironment::computeClasspathLocations @ 698 (2340 bytes)    //   Compiling: 18676 %     4       sun.security.util.AbstractAlgorithmConstraints::checkAlgorithm @ 93 (138 bytes)
+    "Compiling: " < WORD > ( (< SPACE > | "%" | "!" | < WORD > ) ) * method() "::" < WORD > <SPACE > ("@" <SPACE > < WORD > <SPACE >)? "(" < WORD > " bytes" ")" < EOL >
+    ) 
+  | 
     (
       < FRAMEINDENT >
       (
