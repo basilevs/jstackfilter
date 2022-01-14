@@ -380,7 +380,7 @@ JavaThread javaThread() :
     )*
   )
   {
-    return new JavaThread(name, state, frames, "");
+    return new JavaThread(name, state, frames);
   }
 }
 

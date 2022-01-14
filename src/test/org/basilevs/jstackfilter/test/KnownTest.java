@@ -24,14 +24,14 @@ public class KnownTest {
 		JavaThread first = threads.iterator().next();
 		Assert.assertTrue(Known.isKnown(first));
 		List<Frame> frames = new ArrayList<>(first.frames());
-		JavaThread another = new JavaThread(first.name(), first.state(), frames, "");
+		JavaThread another = new JavaThread(first.name(), first.state(), frames);
 		Assert.assertTrue(Known.isKnown(another));
-		another = new JavaThread("meh", first.state(), frames, "");
+		another = new JavaThread("meh", first.state(), frames);
 		Assert.assertTrue(Known.isKnown(another));
-		another = new JavaThread(first.name(), "boo", frames, "");
+		another = new JavaThread(first.name(), "boo", frames);
 		Assert.assertTrue(Known.isKnown(another));
 		frames.remove(0);
-		another = new JavaThread(first.name(), first.state(), frames, "");
+		another = new JavaThread(first.name(), first.state(), frames);
 		Assert.assertFalse(Known.isKnown(another));
 	}
 	

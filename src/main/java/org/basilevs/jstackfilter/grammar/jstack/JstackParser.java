@@ -552,7 +552,7 @@ public final class JstackParser implements JstackParserConstants {
         jj_consume_token(EOL);
       }
     }
-    {if (true) return new JavaThread(name, state, frames, "");}
+    {if (true) return new JavaThread(name, state, frames);}
     throw new Error("Missing return statement in function");
   }
 
