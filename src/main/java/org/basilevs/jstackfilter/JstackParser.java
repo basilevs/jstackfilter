@@ -3,7 +3,6 @@ package org.basilevs.jstackfilter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.regex.Matcher;

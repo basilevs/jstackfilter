@@ -5,6 +5,7 @@ import org.basilevs.jstackfilter.JavaThread;
 import java.util.ArrayList;
 import java.util.Collection;
 
+@SuppressWarnings( { "unused", "serial" })
 public final class JstackParser implements JstackParserConstants {
   public static void main(String [] args) throws ParseException, TokenMgrError
   {
