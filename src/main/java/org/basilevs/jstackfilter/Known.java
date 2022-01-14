@@ -2,20 +2,21 @@ package org.basilevs.jstackfilter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.basilevs.jstackfilter.grammar.jstack.JstackParser;
-import org.basilevs.jstackfilter.grammar.jstack.ParseException;
 
-
+/** Widespread threads **/ 
 public class Known {
-	private static final List<JavaThread> threads;
+	public static final List<JavaThread> threads;
 	
 	static {
 		try (InputStream is = Known.class.getResourceAsStream("known.txt")) {
-			JstackParser subject = new JstackParser(is, "UTF-8");
-			threads = List.copyOf(subject.threads());
-		} catch (IOException  | ParseException e) {
+			Stream<JavaThread> subject = JstackParser.parse(new InputStreamReader(is, "UTF-8"));
+			threads = List.copyOf(subject.collect(Collectors.toList()))	;
+		} catch (IOException e) {
 			throw new AssertionError(e);
 		}
 	}
