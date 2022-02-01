@@ -274,3 +274,69 @@
         at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@11.0.6/ThreadPoolExecutor.java:628)
         at java.lang.Thread.run(java.base@11.0.6/Thread.java:834)
 
+"main" #1 prio=6 os_prio=0 cpu=57312.50ms elapsed=15205.97s tid=0x000002e237822800 nid=0x125b4 runnable  [0x000000f82bdfd000]
+   java.lang.Thread.State: RUNNABLE
+        at org.eclipse.swt.internal.win32.OS.$$YJP$$WaitMessage(Native Method)
+        at org.eclipse.swt.internal.win32.OS.WaitMessage(OS.java)
+        at org.eclipse.swt.widgets.Display.sleep(Display.java:4746)
+        at org.eclipse.ui.application.WorkbenchAdvisor.eventLoopIdle(WorkbenchAdvisor.java:339)
+        at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor.eventLoopIdle(IDEWorkbenchAdvisor.java:994)
+        at org.eclipse.ui.internal.Workbench$1.eventLoopIdle(Workbench.java:479)
+        at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1159)
+        at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:338)
+        at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1045)
+        at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:155)
+        at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:644)
+        at org.eclipse.ui.internal.Workbench$$Lambda$214/0x000000010043a040.run(Unknown Source)
+        at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:338)
+        at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:551)
+        at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:156)
+        at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+        at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:203)
+        at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:136)
+        at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+        at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:401)
+        at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:255)
+        at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(java.base@11.0.6/Native Method)
+        at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(java.base@11.0.6/NativeMethodAccessorImpl.java:62)
+        at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(java.base@11.0.6/DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(java.base@11.0.6/Method.java:566)
+        at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:659)
+        at org.eclipse.equinox.launcher.Main.basicRun(Main.java:596)
+        at org.eclipse.equinox.launcher.Main.run(Main.java:1467)
+        at org.eclipse.equinox.launcher.Main.main(Main.java:1440)
+
+"YJPAgent-RequestListener" #13 daemon prio=1 os_prio=-2 cpu=15.63ms elapsed=15205.79s tid=0x000002e235ead800 nid=0x74b0 runnable  [0x000000f82ceff000]
+   java.lang.Thread.State: RUNNABLE
+        at java.net.PlainSocketImpl.$$YJP$$accept0(java.base@11.0.6/Native Method)
+        at java.net.PlainSocketImpl.accept0(java.base@11.0.6/PlainSocketImpl.java)
+        at java.net.PlainSocketImpl.socketAccept(java.base@11.0.6/PlainSocketImpl.java:159)
+        at java.net.AbstractPlainSocketImpl.accept(java.base@11.0.6/AbstractPlainSocketImpl.java:458)
+        at java.net.ServerSocket.implAccept(java.base@11.0.6/ServerSocket.java:551)
+        at java.net.ServerSocket.accept(java.base@11.0.6/ServerSocket.java:519)
+        at com.yourkit.runtime.Core$4.run(Core.java:748)
+        at java.lang.Thread.run(java.base@11.0.6/Unknown Source)
+
+"YJPAgent-Telemetry" #30 daemon prio=5 os_prio=0 cpu=953.13ms elapsed=15195.78s tid=0x000002e25a82e000 nid=0xf7cc in Object.wait()  [0x000000f82d8ff000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+        at java.lang.Object.wait(java.base@11.0.6/Native Method)
+        - waiting on <no object reference available>
+        at com.yourkit.runtime.TelemetryThread.run(TelemetryThread.java:621)
+        - waiting to re-lock in wait() <0x00000000842faf98> (a java.lang.Object)
+
+"YJP-Process-Exit-Listener" #14 daemon prio=5 os_prio=0 cpu=46.88ms elapsed=15186.94s tid=0x000002e25f74a000 nid=0xf018 waiting on condition  [0x000000f82cdfe000]   java.lang.Thread.State: TIMED_WAITING (sleeping)
+        at java.lang.Thread.sleep(java.base@11.0.6/Native Method)
+        at com.yourkit.probes.WindowsProcessHelper$1.run(WindowsProcessHelper.java:99)
+        at java.lang.Thread.run(java.base@11.0.6/Thread.java:834)
+
+"YJP-Plugin-RequestListener" #66 daemon prio=1 os_prio=-2 cpu=0.00ms elapsed=15174.74s tid=0x000002e26a43b000 nid=0x3ab0 runnable  [0x000000f830efe000]
+   java.lang.Thread.State: RUNNABLE
+        at java.net.PlainSocketImpl.$$YJP$$accept0(java.base@11.0.6/Native Method)
+        at java.net.PlainSocketImpl.accept0(java.base@11.0.6/PlainSocketImpl.java)
+        at java.net.PlainSocketImpl.socketAccept(java.base@11.0.6/PlainSocketImpl.java:159)
+        at java.net.AbstractPlainSocketImpl.accept(java.base@11.0.6/AbstractPlainSocketImpl.java:458)
+        at java.net.ServerSocket.implAccept(java.base@11.0.6/ServerSocket.java:551)
+        at java.net.ServerSocket.accept(java.base@11.0.6/ServerSocket.java:519)
+        at com.yourkit.d.f.run(a:41)
+        at java.lang.Thread.run(java.base@11.0.6/Thread.java:834)
+
