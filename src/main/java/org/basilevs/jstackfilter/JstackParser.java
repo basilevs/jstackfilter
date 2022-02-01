@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.basilevs.jstackfilter.grammar.jstack.ParseException;
+import org.basilevs.jstackfilter.grammar.jstack.TokenMgrError;
 
 public class JstackParser {
 
@@ -31,7 +32,8 @@ public class JstackParser {
 		if (!matcher.find() || matcher.start() != 0) {
 			return Optional.empty();
 		}
-		var parser = new org.basilevs.jstackfilter.grammar.jstack.JstackParser(new StringReader(thread+"\n"));
+		String terminatedThread = thread+"\n";
+		var parser = new org.basilevs.jstackfilter.grammar.jstack.JstackParser(new StringReader(terminatedThread));
 		try {
 			return Optional.of(parser.javaThread().withRepresentation(thread));
 		} catch (ParseException e) {
@@ -42,8 +44,11 @@ public class JstackParser {
 				message.append(lines[i-1]);
 				message.append("\n");
 			}
+			message.append(terminatedThread);
 			
 			throw new IllegalArgumentException(message.toString(), e);
+		} catch (TokenMgrError e) {
+			throw new IllegalArgumentException(e.getMessage() + ":\n" + terminatedThread, e);
 		}
 	}
 

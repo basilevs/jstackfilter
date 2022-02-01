@@ -15,13 +15,15 @@ public interface JstackParserConstants {
   /** RegularExpression Id. */
   int WORD = 2;
   /** RegularExpression Id. */
-  int EOL = 3;
+  int NUMBER = 3;
   /** RegularExpression Id. */
-  int FRAMEINDENT = 4;
+  int EOL = 4;
   /** RegularExpression Id. */
-  int SPACE = 5;
+  int FRAMEINDENT = 5;
   /** RegularExpression Id. */
-  int TIME = 6;
+  int SPACE = 6;
+  /** RegularExpression Id. */
+  int TIME = 7;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -31,6 +33,7 @@ public interface JstackParserConstants {
     "<EOF>",
     "<QUOTE>",
     "<WORD>",
+    "<NUMBER>",
     "<EOL>",
     "<FRAMEINDENT>",
     "<SPACE>",
@@ -55,7 +58,9 @@ public interface JstackParserConstants {
     "\"java.base@\"",
     "\"Native Method\"",
     "\"Unknown Source\"",
-    "\"- \"",
+    "\"- locked \"",
+    "\"- waiting \"",
+    "\"- parking to wait for \"",
     "\"=\"",
     "\"#\"",
     "\"in Object.wait()\"",

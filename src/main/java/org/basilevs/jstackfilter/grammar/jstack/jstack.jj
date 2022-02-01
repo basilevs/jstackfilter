@@ -35,10 +35,19 @@ TOKEN :
 TOKEN :
 {
   < WORD :
-    [ "A"-"Z", "a"-"z", "0"-"9", "-", "+" ]
+    [ "A"-"Z", "a"-"z" ]
     (
       "_"
     | [ "A"-"Z", "a"-"z", "0"-"9", "-", "+" ]
+    )* >
+}
+
+TOKEN :
+{
+  < NUMBER : 
+    [ "0"-"9", "-" ] 
+    (
+    [ "0"-"9", "x", "a"-"f", "_", "." ]
     )* >
 }
 
@@ -151,6 +160,11 @@ private String line() :
       image.append(t.image);
     }
   | 
+    t = < NUMBER >
+    {
+      image.append(t.image);
+    }
+  | 
     t = < SPACE >
     {
       image.append(t.image);
@@ -167,10 +181,19 @@ private String method() :
   Token t;
 }
 {
+  t = < WORD >
+  {
+    image.append(t.image);
+  }
   (
     LOOKAHEAD(2)
     (
       t = < WORD >
+      {
+        image.append(t.image);
+      }
+    | 
+      t = < NUMBER >
       {
         image.append(t.image);
       }
@@ -218,7 +241,7 @@ private Frame frame() :
     "java.base@"
     (
       "."
-    | < WORD >
+    | < NUMBER >
     )+
     "/"
   )?
@@ -247,7 +270,7 @@ private Frame frame() :
     )+
     (
       ":" 
-      t = < WORD >
+      t = < NUMBER >
       {
         image.append(":").append(t.image);
       }
@@ -264,7 +287,12 @@ void monitor() :
   String line = "";
 }
 {
-  "- " line()
+  (
+    "- locked "
+  | "- waiting "
+  | "- parking to wait for "
+  )
+  line()
 }
 
 void keyValue() :
@@ -273,8 +301,10 @@ void keyValue() :
 {
   < WORD > "="
   (
+    < NUMBER > 
+    (
     < WORD >
-  | "."
+    )?
   )+
 }
 
@@ -320,7 +350,7 @@ JavaThread javaThread() :
     name = t.image.substring(1, length - 1);	
   }
   < SPACE > "#" 
-  < WORD >
+  < NUMBER >
   (
     LOOKAHEAD(2)
     < SPACE >
@@ -335,7 +365,7 @@ JavaThread javaThread() :
     )
   )+
   < SPACE > 
-  "[" < WORD > "]" 
+  "[" < NUMBER > "]" 
   (< EOL >)? 
   < SPACE > "java.lang.Thread.State: " t = < WORD >
   {
@@ -368,17 +398,17 @@ JavaThread javaThread() :
       "No compile task" < EOL >
     | 
       //   Compiling: 37714 % !   4       org.eclipse.jdt.internal.core.builder.NameEnvironment::computeClasspathLocations @ 698 (2340 bytes)      //   Compiling: 18676 %     4       sun.security.util.AbstractAlgorithmConstraints::checkAlgorithm @ 93 (138 bytes)
-      "Compiling: " < WORD >
+      "Compiling: " < NUMBER >
       (
         LOOKAHEAD(2)
         (
           < SPACE >
         | "%"
         | "!"
-        | < WORD >
+        | < NUMBER >
         )
       )*
-      method() "::" < WORD > < SPACE > ("@" < SPACE > < WORD > < SPACE >)? "(" < WORD > " bytes" ")" < EOL >
+      method() "::" < WORD > < SPACE > ("@" < SPACE > < NUMBER > < SPACE >)? "(" < NUMBER > " bytes" ")" < EOL >
     )
   |
     (
