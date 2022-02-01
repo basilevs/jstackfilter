@@ -370,6 +370,7 @@ JavaThread javaThread() :
       //   Compiling: 37714 % !   4       org.eclipse.jdt.internal.core.builder.NameEnvironment::computeClasspathLocations @ 698 (2340 bytes)      //   Compiling: 18676 %     4       sun.security.util.AbstractAlgorithmConstraints::checkAlgorithm @ 93 (138 bytes)
       "Compiling: " < WORD >
       (
+        LOOKAHEAD(2)
         (
           < SPACE >
         | "%"
