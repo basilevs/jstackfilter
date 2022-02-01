@@ -10,8 +10,12 @@ import org.basilevs.jstackfilter.Frame;
 import org.basilevs.jstackfilter.JavaThread;
 import java.util.ArrayList;
 import java.util.Collection;
+@ SuppressWarnings(
+{
+  "unused", "serial"
+}
 
-@SuppressWarnings( { "unused", "serial" })
+) 
 public final class JstackParser
 {
   public static void main(String [] args) throws ParseException, TokenMgrError
@@ -185,10 +189,10 @@ private String method() :
       {
         image.append("/");
       }
-    |
-      "<"
-       t = < WORD >
-      ">" 
+    | 
+      "<" 
+      t = < WORD > 
+      ">"
       {
         image.append("<" + t.image + ">");
       }
@@ -213,7 +217,7 @@ private Frame frame() :
   (
     "java.base@"
     (
-    "."
+      "."
     | < WORD >
     )+
     "/"
@@ -228,25 +232,26 @@ private Frame frame() :
     {
       image.append(t.image);
     }
-  |
-        LOOKAHEAD(2)
+  | 
+    LOOKAHEAD(2)
     (
-        t = < WORD >
-        {
-          image.append(t.image);
-        }
-      | 
-        "."
-        {
-          image.append(".");
-        }
-      
+      t = < WORD >
+      {
+        image.append(t.image);
+      }
+    | 
+      "."
+      {
+        image.append(".");
+      }
     )+
-    ":" 
-    t = < WORD >
-    {
-      image.append(":").append(t.image);
-    }
+    (
+      ":" 
+      t = < WORD >
+      {
+        image.append(":").append(t.image);
+      }
+    )?
   )
   ")"
   {
@@ -314,8 +319,8 @@ JavaThread javaThread() :
     int length = t.image.length();
     name = t.image.substring(1, length - 1);	
   }
-  < SPACE > "#"
-    < WORD >
+  < SPACE > "#" 
+  < WORD >
   (
     LOOKAHEAD(2)
     < SPACE >
@@ -359,13 +364,22 @@ JavaThread javaThread() :
   < EOL >
   (
     < SPACE >
-    (      "No compile task" < EOL >
-    |
-
-    //   Compiling: 37714 % !   4       org.eclipse.jdt.internal.core.builder.NameEnvironment::computeClasspathLocations @ 698 (2340 bytes)    //   Compiling: 18676 %     4       sun.security.util.AbstractAlgorithmConstraints::checkAlgorithm @ 93 (138 bytes)
-    "Compiling: " < WORD > ( (< SPACE > | "%" | "!" | < WORD > ) ) * method() "::" < WORD > <SPACE > ("@" <SPACE > < WORD > <SPACE >)? "(" < WORD > " bytes" ")" < EOL >
-    ) 
-  | 
+    (
+      "No compile task" < EOL >
+    | 
+      //   Compiling: 37714 % !   4       org.eclipse.jdt.internal.core.builder.NameEnvironment::computeClasspathLocations @ 698 (2340 bytes)      //   Compiling: 18676 %     4       sun.security.util.AbstractAlgorithmConstraints::checkAlgorithm @ 93 (138 bytes)
+      "Compiling: " < WORD >
+      (
+        (
+          < SPACE >
+        | "%"
+        | "!"
+        | < WORD >
+        )
+      )*
+      method() "::" < WORD > < SPACE > ("@" < SPACE > < WORD > < SPACE >)? "(" < WORD > " bytes" ")" < EOL >
+    )
+  |
     (
       < FRAMEINDENT >
       (
