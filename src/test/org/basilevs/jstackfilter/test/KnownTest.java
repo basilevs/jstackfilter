@@ -2,7 +2,6 @@ package org.basilevs.jstackfilter.test;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -36,7 +35,7 @@ public class KnownTest {
 	}
 	
 	@Test
-	public void knownThreadsAreUnique() throws UnsupportedEncodingException, IOException {
+	public void knownThreadsAreUnique() {
 		List<JavaThread> subject = new ArrayList<>(Known.threads);
 		while (!subject.isEmpty()) {
 			JavaThread first = subject.remove(0);

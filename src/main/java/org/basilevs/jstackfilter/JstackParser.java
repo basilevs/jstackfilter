@@ -1,6 +1,5 @@
 package org.basilevs.jstackfilter;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Optional;
@@ -15,11 +14,11 @@ import org.basilevs.jstackfilter.grammar.jstack.TokenMgrError;
 public class JstackParser {
 
 	/** Parses threads as printed by jstack. Header and native threads are ignored.  */
-	public static Stream<JavaThread> parseThreads(Reader reader) throws IOException {
+	public static Stream<JavaThread> parseThreads(Reader reader) {
 		return splitToChunks(reader).map(JstackParser::parseThread).flatMap(Optional::stream);
 	}
 	
-	public static Stream<String> splitToChunks(Reader reader) throws IOException {
+	public static Stream<String> splitToChunks(Reader reader) {
 		Scanner scanner = new Scanner(reader);
 		scanner.useDelimiter("(?:\n\r|\r\n|\n){2}");
 		return scanner.tokens().onClose(scanner::close);
