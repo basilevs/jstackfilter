@@ -1,4 +1,4 @@
-package org.basilevs.jstackfilter.collectors;
+package org.basilevs.jstackfilter;
 
 
 import java.util.ArrayList;
@@ -41,7 +41,16 @@ public class DistinctBy<T> implements Collector<T, Collection<T>, Collection<T>>
 	@Override
 	public BinaryOperator<Collection<T>> combiner() {
 		return (list1, list2) -> {
-			list1.addAll(list2);
+			var copy = new ArrayList<>(list1);
+			root: for (var item: list2) {
+				for (var i = copy.iterator(); i.hasNext();) {
+					if (predicate.test(i.next(), item)) {
+						i.remove();
+						continue root;
+					}
+				}
+				list1.add(item);
+			}
 			return list1;
 		};
 	}

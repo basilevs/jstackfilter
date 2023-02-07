@@ -30,5 +30,11 @@ public class JstackParserTest {
 		JavaThread thread = threads.stream().filter(t -> t.name().equals("Worker-916: Updating Git status for repository itest")).findFirst().get();
 		Assert.assertEquals("org.eclipse.jgit.dircache.DirCacheIterator.<init>", thread.frames().get(12).method());
 	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void invalidInput() {
+		String data = "\"bleh\" #1";
+		JstackParser.parseThreads(new StringReader(data)).findAny();
+	}
 
 }
