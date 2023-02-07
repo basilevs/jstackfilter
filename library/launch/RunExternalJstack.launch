@@ -21,6 +21,6 @@
         <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;4&quot; projectName=&quot;org.basilevs.jstackfilter&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
     </listAttribute>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="org.basilevs.jstackfilter"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="7790"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="93033"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="org.basilevs.jstackfilter"/>
 </launchConfiguration>
