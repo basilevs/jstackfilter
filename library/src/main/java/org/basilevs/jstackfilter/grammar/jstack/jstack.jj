@@ -226,11 +226,37 @@ private String method() :
   }
 }
 
-//at java.lang.Object.wait(java.base@17/Native Method)
+private String dottedIdentifier():
+{
+  
+  StringBuilder image = new StringBuilder();
+  String method;
+  Token t;
+}
+{
+    (
+      t = < WORD >
+      {
+        image.append(t.image);
+      }
+    | 
+      "."
+      {
+        image.append(".");
+      }
+    )+
+    {
+    	return image.toString();
+    }
+
+}
+
+// at java.lang.Object.wait(java.base@17/Native Method)
+// at sun.java2d.Disposer.run(java.desktop@11.0.16/Disposer.java:144)
 private Frame frame() :
 {
   StringBuilder image = new StringBuilder();
-  String method;
+  String method, p;
   Token t;
 }
 {
@@ -238,7 +264,9 @@ private Frame frame() :
   method = method() 
   "("
   (
-    "java.base@"
+    LOOKAHEAD(4)
+  	dottedIdentifier()
+    "@"
     (
       "."
     | < NUMBER >
@@ -255,19 +283,11 @@ private Frame frame() :
     {
       image.append(t.image);
     }
-  | 
-    LOOKAHEAD(2)
-    (
-      t = < WORD >
-      {
-        image.append(t.image);
-      }
-    | 
-      "."
-      {
-        image.append(".");
-      }
-    )+
+  |
+    p = dottedIdentifier()
+    { 
+    	image.append(p);
+    }
     (
       ":" 
       t = < NUMBER >

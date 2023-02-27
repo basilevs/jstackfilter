@@ -842,3 +842,11 @@ JNI global refs: 221, weak refs: 45
 	at org.eclipse.equinox.launcher.Main.run(Main.java:1467)
 	at org.eclipse.equinox.launcher.Main.main(Main.java:1440)
 
+"AWT-Windows" #51 daemon prio=6 os_prio=0 cpu=640.63ms elapsed=506787.97s tid=0x000001aae327c000 nid=0x145c runnable  [0x00000042fc9fe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.awt.windows.WToolkit.eventLoop(java.desktop@11.0.16/Native Method)
+	at sun.awt.windows.WToolkit.run(java.desktop@11.0.16/WToolkit.java:305)
+	at java.lang.Thread.run(java.base@11.0.16/Thread.java:829)
+
+
+

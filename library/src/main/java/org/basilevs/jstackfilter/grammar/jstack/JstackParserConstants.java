@@ -55,7 +55,7 @@ public interface JstackParserConstants {
     "\">\"",
     "\"/\"",
     "\"at \"",
-    "\"java.base@\"",
+    "\"@\"",
     "\"Native Method\"",
     "\"Unknown Source\"",
     "\"- locked \"",
@@ -70,7 +70,6 @@ public interface JstackParserConstants {
     "\"%\"",
     "\"!\"",
     "\"::\"",
-    "\"@\"",
     "\" bytes\"",
   };
 
