@@ -1,5 +1,6 @@
 package org.basilevs.jstackfilter.ui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.io.FilterInputStream;
@@ -60,7 +61,12 @@ public class Application {
 		
 		Dimension minTextSize = new Dimension(800, 300);
 		textPane.setPreferredSize(minTextSize);
-		setError = text::setText;
+		setError = message -> {
+			text.setForeground(Color.RED);
+			text.setText(message);
+		};
+		
+		var defaultForeground = text.getForeground();
 
 		try {
 			table.setModel(jpsTableModel());
@@ -70,13 +76,13 @@ public class Application {
 		} catch (IOException e2) {
 			handleError(e2);
 		}
-
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				Integer pid = (Integer) table.getModel().getValueAt(table.getSelectedRow(), 0);
 				try {
+					text.setForeground(defaultForeground);
 					text.setText(Application.this.toString(processJstack(jstackByPid(pid))));
 				} catch (IOException|IllegalArgumentException e1) {
 					handleError(e1);

@@ -3,6 +3,7 @@
 	<name>org.basilevs.jstackfilter.ui</name>
 	<comment></comment>
 	<projects>
+		<project>org.basilevs.jstackfilter</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
