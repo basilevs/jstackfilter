@@ -309,6 +309,7 @@ void monitor() :
 {
   (
     "- locked "
+  | "- eliminated " 
   | "- waiting "
   | "- parking to wait for "
   )

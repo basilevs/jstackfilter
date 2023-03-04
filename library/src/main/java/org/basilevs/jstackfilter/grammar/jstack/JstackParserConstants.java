@@ -59,6 +59,7 @@ public interface JstackParserConstants {
     "\"Native Method\"",
     "\"Unknown Source\"",
     "\"- locked \"",
+    "\"- eliminated \"",
     "\"- waiting \"",
     "\"- parking to wait for \"",
     "\"=\"",
