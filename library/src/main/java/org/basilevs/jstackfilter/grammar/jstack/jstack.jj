@@ -266,11 +266,13 @@ private Frame frame() :
   (
     LOOKAHEAD(4)
   	dottedIdentifier()
+  	(  	  
     "@"
     (
       "."
     | < NUMBER >
     )+
+  )?
     "/"
   )?
   (
