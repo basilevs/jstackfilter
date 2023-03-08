@@ -5,17 +5,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -32,34 +22,26 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import org.basilevs.jstackfilter.ProcessInput;
-import org.basilevs.jstackfilter.ui.internal.SystemUtil;
 import org.basilevs.jstackfilter.ui.internal.WindowUtil;
 
 public class Application {
 	private final Preferences prefs = Preferences.userNodeForPackage(Application.class);
 	private Consumer<String> setError;
-	private final ExecutorService executor = Executors.newFixedThreadPool(1);
-	private static final long CURRENT_PID = ProcessHandle.current().pid();
+	private Consumer<String> setOutput;
+	private final Model model = new Model(this::handleError, this::handleOutput); 
 
 	private Application() throws BackingStoreException {
 	}
 	
-	private void close() {
-		executor.shutdownNow();
+	
+	private void handleError(String message) {
+		setError.accept(message);
 	}
 	
-	private void handleError(Exception e) {
-		if (e instanceof SystemUtil.ErrorOutput) {
-			setError.accept(e.getMessage());	
-		} else {
-			e.printStackTrace();
-			var text = new StringWriter();
-			e.printStackTrace(new PrintWriter(text));
-			setError.accept(text.toString());
-		}
+	private void handleOutput(String output) {
+		setOutput.accept(output);
 	}
-
+	
 	/**
 	 * Create the GUI and show it. For thread safety, this method should be invoked
 	 * from the event-dispatching thread.
@@ -73,7 +55,8 @@ public class Application {
 			@Override
 			public void windowClosed(WindowEvent e) {
 				super.windowClosed(e);
-				close();
+				model.close();
+				System.exit(0);
 			}
 		});
 
@@ -93,34 +76,23 @@ public class Application {
 			text.setForeground(Color.RED);
 			text.setText(message);
 		};
-
+		
 		var defaultForeground = text.getForeground();
+		setOutput = message -> {
+			text.setForeground(defaultForeground);
+			text.setText(message);
+		};
 
-		try {
-			table.setModel(toTableModel(getJavaProcesses()));
-			table.getColumnModel().getColumn(0).setHeaderValue("PID");
-			table.getColumnModel().getColumn(1).setHeaderValue("Command");
-			packColumns(table);
-		} catch (IOException e2) {
-			handleError(e2);
-		}
+
+		table.setModel(toTableModel(model.getJavaProcesses()));
+		table.getColumnModel().getColumn(0).setHeaderValue("PID");
+		table.getColumnModel().getColumn(1).setHeaderValue("Command");
+		packColumns(table);
+		
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				try {
-					Long pid = (Long) table.getModel().getValueAt(table.getSelectedRow(), 0);
-					text.setForeground(defaultForeground);
-					text.setText(SystemUtil.toString(jstackByPid(pid)));
-				} catch (IllegalStateException e2 ) {
-					var cause = e2.getCause();
-					if (cause instanceof SystemUtil.ErrorOutput) {
-						handleError((Exception) cause);
-					} else {
-						handleError(e2);
-					}
-				} catch (Exception e1) {
-					handleError(e1);
-				}
+				model.selectRow(table.getModel().getValueAt(table.getSelectedRow(), 0));
 			}
 		});
 
@@ -134,9 +106,6 @@ public class Application {
 		frame.setVisible(true);
 	}
 
-	private Reader jstackByPid(long pid) throws IOException {
-		return ProcessInput.filter(new InputStreamReader(SystemUtil.captureOutput(executor, "jstack", "" + pid), StandardCharsets.UTF_8));
-	}
 
 	private static void packColumns(JTable table) {
 		for (int column = 0; column < table.getColumnCount() - 1; column++) {
@@ -162,7 +131,7 @@ public class Application {
 		}
 	}
 
-	private static TableModel toTableModel(List<JavaProcess> rows) throws IOException {
+	private static TableModel toTableModel(List<JavaProcess> rows) {
 		TableModel model = new AbstractTableModel() {
 			private static final long serialVersionUID = -5401119664597487084L;
 
@@ -191,43 +160,6 @@ public class Application {
 		};
 		return model;
 	}
-
-	private static record JavaProcess(long pid, String command) {
-	}
-
-	private ArrayList<JavaProcess> getJavaProcesses() throws IOException {
-		ArrayList<JavaProcess> rows = new ArrayList<>();
-		try (Scanner lines = new Scanner(SystemUtil.captureOutput(executor, "jps", "-v"), StandardCharsets.UTF_8)) {
-			try {
-				lines.useDelimiter("\n");
-				while (lines.hasNext()) {
-					Scanner fields = new Scanner(lines.next());
-					fields.useDelimiter("\s+");
-					if (fields.hasNext()) {
-						long pid = Long.parseLong(fields.next());
-						fields.skip("\s+");
-						fields.useDelimiter("\\A");
-						var rest = fields.next();
-						if (rest.startsWith("Jps")) {
-							continue;
-						}
-						if (pid == CURRENT_PID) {
-							continue;
-						}
-						rows.add(new JavaProcess(pid, rest));
-					}
-				}
-				lines.close();
-			} finally {
-				var error = lines.ioException();
-				if (error != null) {
-					throw error;
-				}
-			}
-		}
-		return rows;
-	}
-
 	public static void main(String[] args) throws BackingStoreException {
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
