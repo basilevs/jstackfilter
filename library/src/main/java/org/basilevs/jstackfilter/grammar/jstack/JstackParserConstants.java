@@ -65,6 +65,7 @@ public interface JstackParserConstants {
     "\"=\"",
     "\"#\"",
     "\"in Object.wait()\"",
+    "\"at breakpoint\"",
     "\"java.lang.Thread.State: \"",
     "\"No compile task\"",
     "\"Compiling: \"",

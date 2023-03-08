@@ -226,29 +226,27 @@ private String method() :
   }
 }
 
-private String dottedIdentifier():
+private String dottedIdentifier() :
 {
-  
   StringBuilder image = new StringBuilder();
   String method;
   Token t;
 }
 {
-    (
-      t = < WORD >
-      {
-        image.append(t.image);
-      }
-    | 
-      "."
-      {
-        image.append(".");
-      }
-    )+
+  (
+    t = < WORD >
     {
-    	return image.toString();
+      image.append(t.image);
     }
-
+  | 
+    "."
+    {
+      image.append(".");
+    }
+  )+
+  {
+    return image.toString();
+  }
 }
 
 // at java.lang.Object.wait(java.base@17/Native Method)
@@ -265,14 +263,14 @@ private Frame frame() :
   "("
   (
     LOOKAHEAD(4)
-  	dottedIdentifier()
-  	(  	  
-    "@"
+    dottedIdentifier()
     (
-      "."
-    | < NUMBER >
-    )+
-  )?
+      "@"
+      (
+        "."
+      | < NUMBER >
+      )+
+    )?
     "/"
   )?
   (
@@ -285,10 +283,10 @@ private Frame frame() :
     {
       image.append(t.image);
     }
-  |
+  | 
     p = dottedIdentifier()
-    { 
-    	image.append(p);
+    {
+      image.append(p);
     }
     (
       ":" 
@@ -311,7 +309,7 @@ void monitor() :
 {
   (
     "- locked "
-  | "- eliminated " 
+  | "- eliminated "
   | "- waiting "
   | "- parking to wait for "
   )
@@ -385,6 +383,7 @@ JavaThread javaThread() :
       < WORD >
     | LOOKAHEAD(2)
       "in Object.wait()"
+    | "at breakpoint"
     )
   )+
   < SPACE > 

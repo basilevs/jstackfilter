@@ -898,4 +898,12 @@ JNI global refs: 221, weak refs: 45
         at javax.swing.plaf.basic.BasicTableUI$Handler.mouseReleased(java.desktop@17.0.4.1/BasicTableUI.java:1205)
         at javax.swing.plaf.basic.BasicTableUI$MouseInputHandler.mouseReleased(java.desktop@17.0.4.1/BasicTableUI.java:840)
 
+"pool-1-thread-1" #26 prio=5 os_prio=31 cpu=9.32ms elapsed=108.41s tid=0x000000013da5a200 nid=0x11803 at breakpoint [0x0000000173062000]
+   java.lang.Thread.State: RUNNABLE
+	at org.basilevs.jstackfilter.ui.internal.SystemUtil.lambda$0(org.basilevs.jstackfilter.ui/SystemUtil.java:31)
+	at org.basilevs.jstackfilter.ui.internal.SystemUtil$$Lambda$152/0x0000000800c07890.get(org.basilevs.jstackfilter.ui/Unknown Source)
+	at java.util.concurrent.CompletableFuture$AsyncSupply.run(java.base@17.0.4.1/CompletableFuture.java:1768)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4.1/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4.1/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4.1/Thread.java:833)
 
