@@ -1,5 +1,6 @@
 package org.basilevs.jstackfilter;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Optional;
@@ -21,7 +22,13 @@ public class JstackParser {
 	public static Stream<String> splitToChunks(Reader reader) {
 		Scanner scanner = new Scanner(reader);
 		scanner.useDelimiter("(?:\n\r|\r\n|\n){2}");
-		return scanner.tokens().onClose(scanner::close);
+		return scanner.tokens().onClose(() -> {
+			scanner.close();
+			IOException error = scanner.ioException();
+			if (error != null) {
+				throw new IllegalStateException(error);
+			}
+		});
 	}
 	
 	

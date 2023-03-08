@@ -3,9 +3,6 @@ package org.basilevs.jstackfilter.ui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -17,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -35,28 +34,29 @@ import javax.swing.table.TableModel;
 
 import org.basilevs.jstackfilter.ProcessInput;
 import org.basilevs.jstackfilter.ui.internal.SystemUtil;
+import org.basilevs.jstackfilter.ui.internal.WindowUtil;
 
 public class Application {
 	private final Preferences prefs = Preferences.userNodeForPackage(Application.class);
 	private Consumer<String> setError;
-	private final Dimension windowSize = new Dimension();
+	private final ExecutorService executor = Executors.newFixedThreadPool(1);
 
 	private Application() throws BackingStoreException {
-		this.windowSize.width = prefs.getInt("width", 800);
-		this.windowSize.height = prefs.getInt("height", 600);
 	}
 	
-	private void close() throws BackingStoreException {
-		prefs.putInt("width", this.windowSize.width);
-		prefs.putInt("height", this.windowSize.height);
-		System.exit(0);
+	private void close() {
+		executor.shutdownNow();
 	}
 	
 	private void handleError(Exception e) {
-		e.printStackTrace();
-		var text = new StringWriter();
-		e.printStackTrace(new PrintWriter(text));
-		setError.accept(text.toString());
+		if (e instanceof SystemUtil.ErrorOutput) {
+			setError.accept(e.getMessage());	
+		} else {
+			e.printStackTrace();
+			var text = new StringWriter();
+			e.printStackTrace(new PrintWriter(text));
+			setError.accept(text.toString());
+		}
 	}
 
 	/**
@@ -66,26 +66,13 @@ public class Application {
 	private void createAndShowGUI() {
 		// Create and set up the window.
 		JFrame frame = new JFrame("jstackfilter");
-		frame.setSize(windowSize);
+		WindowUtil.configureSize(prefs, frame);
+		WindowUtil.closeOnEsc(frame);
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent e) {
-				try {
-					windowSize.setSize(frame.getSize());
-					close();
-				} catch (Exception e1) {
-					handleError(e1);
-				}
-			}
-		});
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
-			@Override
-			public boolean dispatchKeyEvent(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-					frame.setVisible(false);
-					frame.dispose();
-				}
-				return false;
+				super.windowClosed(e);
+				close();
 			}
 		});
 
@@ -123,7 +110,14 @@ public class Application {
 				try {
 					text.setForeground(defaultForeground);
 					text.setText(SystemUtil.toString(jstackByPid(pid)));
-				} catch (IOException | IllegalArgumentException e1) {
+				} catch (IllegalStateException e2 ) {
+					var cause = e2.getCause();
+					if (cause instanceof SystemUtil.ErrorOutput) {
+						handleError((Exception) cause);
+					} else {
+						handleError(e2);
+					}
+				} catch (Exception e1) {
 					handleError(e1);
 				}
 			}
@@ -139,8 +133,8 @@ public class Application {
 		frame.setVisible(true);
 	}
 
-	private static Reader jstackByPid(int pid) throws IOException {
-		return ProcessInput.filter(new InputStreamReader(SystemUtil.captureOutput("jstack", "" + pid), StandardCharsets.UTF_8));
+	private Reader jstackByPid(int pid) throws IOException {
+		return ProcessInput.filter(new InputStreamReader(SystemUtil.captureOutput(executor, "jstack", "" + pid), StandardCharsets.UTF_8));
 	}
 
 	private static void packColumns(JTable table) {
@@ -200,22 +194,30 @@ public class Application {
 	private static record JavaProcess(int pid, String command) {
 	}
 
-	private static ArrayList<JavaProcess> getJavaProcesses() throws IOException {
+	private ArrayList<JavaProcess> getJavaProcesses() throws IOException {
 		ArrayList<JavaProcess> rows = new ArrayList<>();
-		try (Scanner lines = new Scanner(SystemUtil.captureOutput("jps", "-v"), StandardCharsets.UTF_8)) {
-			lines.useDelimiter("\n");
-			while (lines.hasNext()) {
-				Scanner fields = new Scanner(lines.next());
-				fields.useDelimiter("\s+");
-				if (fields.hasNext()) {
-					int pid = Integer.valueOf(fields.next());
-					fields.skip("\s+");
-					fields.useDelimiter("\\A");
-					var rest = fields.next();
-					if (rest.startsWith("Jps")) {
-						continue;
+		try (Scanner lines = new Scanner(SystemUtil.captureOutput(executor, "jps", "-v"), StandardCharsets.UTF_8)) {
+			try {
+				lines.useDelimiter("\n");
+				while (lines.hasNext()) {
+					Scanner fields = new Scanner(lines.next());
+					fields.useDelimiter("\s+");
+					if (fields.hasNext()) {
+						int pid = Integer.valueOf(fields.next());
+						fields.skip("\s+");
+						fields.useDelimiter("\\A");
+						var rest = fields.next();
+						if (rest.startsWith("Jps")) {
+							continue;
+						}
+						rows.add(new JavaProcess(pid, rest));
 					}
-					rows.add(new JavaProcess(pid, rest));
+				}
+				lines.close();
+			} finally {
+				var error = lines.ioException();
+				if (error != null) {
+					throw error;
 				}
 			}
 		}

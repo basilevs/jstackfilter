@@ -9,9 +9,9 @@ import java.util.stream.Stream;
 /** Concatenate a Stream of strings **/
 public class StreamReader extends Reader {
 	private final Stream<? extends CharSequence> delegate;
-	private final StringBuilder  buffer = new StringBuilder();
+	private final StringBuilder buffer = new StringBuilder();
 	private final Iterator<? extends CharSequence> iterator;
-	
+
 	public StreamReader(Stream<? extends CharSequence> input) {
 		this.delegate = Objects.requireNonNull(input);
 		this.iterator = input.iterator();
@@ -19,7 +19,7 @@ public class StreamReader extends Reader {
 
 	@Override
 	public int read(char[] cbuf, int off, int len) throws IOException {
-		while (buffer.length() > 0 || iterator.hasNext() ) {
+		while (buffer.length() > 0 || iterator.hasNext()) {
 			if (buffer.length() > 0) {
 				int length = Math.min(buffer.length(), len);
 				buffer.getChars(0, length, cbuf, off);
@@ -36,7 +36,15 @@ public class StreamReader extends Reader {
 
 	@Override
 	public void close() throws IOException {
-		delegate.close();
+		try {
+			delegate.close();
+		} catch (RuntimeException e) {
+			var cause = e.getCause();
+			if (cause instanceof IOException) {
+				throw (IOException) cause;
+			}
+			throw e;
+		}
 	}
 
 }
