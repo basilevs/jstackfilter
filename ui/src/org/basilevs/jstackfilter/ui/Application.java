@@ -40,6 +40,7 @@ public class Application {
 	private final Preferences prefs = Preferences.userNodeForPackage(Application.class);
 	private Consumer<String> setError;
 	private final ExecutorService executor = Executors.newFixedThreadPool(1);
+	private static final long CURRENT_PID = ProcessHandle.current().pid();
 
 	private Application() throws BackingStoreException {
 	}
@@ -106,8 +107,8 @@ public class Application {
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				Integer pid = (Integer) table.getModel().getValueAt(table.getSelectedRow(), 0);
 				try {
+					Long pid = (Long) table.getModel().getValueAt(table.getSelectedRow(), 0);
 					text.setForeground(defaultForeground);
 					text.setText(SystemUtil.toString(jstackByPid(pid)));
 				} catch (IllegalStateException e2 ) {
@@ -133,7 +134,7 @@ public class Application {
 		frame.setVisible(true);
 	}
 
-	private Reader jstackByPid(int pid) throws IOException {
+	private Reader jstackByPid(long pid) throws IOException {
 		return ProcessInput.filter(new InputStreamReader(SystemUtil.captureOutput(executor, "jstack", "" + pid), StandardCharsets.UTF_8));
 	}
 
@@ -191,7 +192,7 @@ public class Application {
 		return model;
 	}
 
-	private static record JavaProcess(int pid, String command) {
+	private static record JavaProcess(long pid, String command) {
 	}
 
 	private ArrayList<JavaProcess> getJavaProcesses() throws IOException {
@@ -203,11 +204,14 @@ public class Application {
 					Scanner fields = new Scanner(lines.next());
 					fields.useDelimiter("\s+");
 					if (fields.hasNext()) {
-						int pid = Integer.valueOf(fields.next());
+						long pid = Long.parseLong(fields.next());
 						fields.skip("\s+");
 						fields.useDelimiter("\\A");
 						var rest = fields.next();
 						if (rest.startsWith("Jps")) {
+							continue;
+						}
+						if (pid == CURRENT_PID) {
 							continue;
 						}
 						rows.add(new JavaProcess(pid, rest));
