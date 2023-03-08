@@ -6,18 +6,20 @@ import java.awt.Dimension;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
-import java.io.FilterInputStream;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.lang.ProcessBuilder.Redirect;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.function.Consumer;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -32,11 +34,24 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.basilevs.jstackfilter.ProcessInput;
+import org.basilevs.jstackfilter.ui.internal.SystemUtil;
 
 public class Application {
-
+	private final Preferences prefs = Preferences.userNodeForPackage(Application.class);
 	private Consumer<String> setError;
+	private final Dimension windowSize = new Dimension();
 
+	private Application() throws BackingStoreException {
+		this.windowSize.width = prefs.getInt("width", 800);
+		this.windowSize.height = prefs.getInt("height", 600);
+	}
+	
+	private void close() throws BackingStoreException {
+		prefs.putInt("width", this.windowSize.width);
+		prefs.putInt("height", this.windowSize.height);
+		System.exit(0);
+	}
+	
 	private void handleError(Exception e) {
 		e.printStackTrace();
 		var text = new StringWriter();
@@ -51,18 +66,29 @@ public class Application {
 	private void createAndShowGUI() {
 		// Create and set up the window.
 		JFrame frame = new JFrame("jstackfilter");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		KeyboardFocusManager.getCurrentKeyboardFocusManager()
-		  .addKeyEventDispatcher(new KeyEventDispatcher() {
-		      @Override
-		      public boolean dispatchKeyEvent(KeyEvent e) {
-		    	if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-		    		frame.dispose();
-		    	}
-		        return false;
-		      }
+		frame.setSize(windowSize);
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				try {
+					windowSize.setSize(frame.getSize());
+					close();
+				} catch (Exception e1) {
+					handleError(e1);
+				}
+			}
 		});
-		
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+			@Override
+			public boolean dispatchKeyEvent(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+					frame.setVisible(false);
+					frame.dispose();
+				}
+				return false;
+			}
+		});
+
 		JTable table = new JTable();
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
@@ -72,18 +98,18 @@ public class Application {
 		JTextArea text = new JTextArea();
 		JScrollPane textPane = new JScrollPane(text);
 		frame.getContentPane().add(textPane);
-		
+
 		Dimension minTextSize = new Dimension(800, 300);
 		textPane.setPreferredSize(minTextSize);
 		setError = message -> {
 			text.setForeground(Color.RED);
 			text.setText(message);
 		};
-		
+
 		var defaultForeground = text.getForeground();
 
 		try {
-			table.setModel(jpsTableModel());
+			table.setModel(toTableModel(getJavaProcesses()));
 			table.getColumnModel().getColumn(0).setHeaderValue("PID");
 			table.getColumnModel().getColumn(1).setHeaderValue("Command");
 			packColumns(table);
@@ -96,58 +122,25 @@ public class Application {
 				Integer pid = (Integer) table.getModel().getValueAt(table.getSelectedRow(), 0);
 				try {
 					text.setForeground(defaultForeground);
-					text.setText(Application.toString(processJstack(jstackByPid(pid))));
-				} catch (IOException|IllegalArgumentException e1) {
+					text.setText(SystemUtil.toString(jstackByPid(pid)));
+				} catch (IOException | IllegalArgumentException e1) {
 					handleError(e1);
 				}
 			}
 		});
-		
-		Dimension size = new Dimension(
-		        table.getPreferredSize().width,
-		        table.getRowHeight() * table.getModel().getRowCount());
+
+		Dimension size = new Dimension(table.getPreferredSize().width,
+				table.getRowHeight() * table.getModel().getRowCount());
 		table.setPreferredScrollableViewportSize(size);
 		table.setMaximumSize(size);
 
-		// Display the window.
-		frame.pack();
+		
+		
 		frame.setVisible(true);
 	}
 
-	private static String toString(Reader input) {
-		try (var scanner = new Scanner(input)) {
-			scanner.useDelimiter("\\A");
-			if (!scanner.hasNext()) {
-				return "";
-			}
-			return scanner.next();
-		}
-	}
-
 	private static Reader jstackByPid(int pid) throws IOException {
-		return new InputStreamReader(captureOutput("jstack", "" + pid), StandardCharsets.UTF_8);
-	}
-
-	private static Reader processJstack(Reader input) {
-		return ProcessInput.filter(input);
-	}
-
-	private static InputStream captureOutput(String... commandLine) throws IOException {
-		var pb = new ProcessBuilder();
-		pb.command(commandLine);
-		pb.redirectError(Redirect.INHERIT);
-		Process process = pb.start();
-		return onClose(process.getInputStream(), process::destroy);
-	}
-
-	private static InputStream onClose(InputStream delegate, Runnable runnable) {
-		return new FilterInputStream(delegate) {
-			@Override
-			public void close() throws IOException {
-				super.close();
-				runnable.run();
-			}
-		};
+		return ProcessInput.filter(new InputStreamReader(SystemUtil.captureOutput("jstack", "" + pid), StandardCharsets.UTF_8));
 	}
 
 	private static void packColumns(JTable table) {
@@ -174,31 +167,21 @@ public class Application {
 		}
 	}
 
-	private static TableModel jpsTableModel() throws IOException {
-		var rows = new ArrayList<Object[]>();
-		try (Scanner lines = new Scanner(captureOutput("jps", "-v"), StandardCharsets.UTF_8)) {
-			lines.useDelimiter("\n");
-			while (lines.hasNext()) {
-				Scanner fields = new Scanner(lines.next());
-				fields.useDelimiter("\s+");
-				if (fields.hasNext()) {
-					int pid = Integer.valueOf(fields.next());
-					fields.skip("\s+");
-					fields.useDelimiter("\\A");
-					var rest = fields.next();
-					if (rest.startsWith("Jps")) {
-						continue;
-					}
-					rows.add(new Object[] { pid, rest });
-				}
-			}
-		}
+	private static TableModel toTableModel(List<JavaProcess> rows) throws IOException {
 		TableModel model = new AbstractTableModel() {
 			private static final long serialVersionUID = -5401119664597487084L;
 
 			@Override
 			public Object getValueAt(int rowIndex, int columnIndex) {
-				return rows.get(rowIndex)[columnIndex];
+				JavaProcess process = rows.get(rowIndex);
+				switch (columnIndex) {
+				case 0:
+					return process.pid();
+				case 1:
+					return process.command();
+				default:
+					throw new IllegalArgumentException("No column " + columnIndex);
+				}
 			}
 
 			@Override
@@ -214,12 +197,37 @@ public class Application {
 		return model;
 	}
 
-	public static void main(String[] args) {
+	private static record JavaProcess(int pid, String command) {
+	}
+
+	private static ArrayList<JavaProcess> getJavaProcesses() throws IOException {
+		ArrayList<JavaProcess> rows = new ArrayList<>();
+		try (Scanner lines = new Scanner(SystemUtil.captureOutput("jps", "-v"), StandardCharsets.UTF_8)) {
+			lines.useDelimiter("\n");
+			while (lines.hasNext()) {
+				Scanner fields = new Scanner(lines.next());
+				fields.useDelimiter("\s+");
+				if (fields.hasNext()) {
+					int pid = Integer.valueOf(fields.next());
+					fields.skip("\s+");
+					fields.useDelimiter("\\A");
+					var rest = fields.next();
+					if (rest.startsWith("Jps")) {
+						continue;
+					}
+					rows.add(new JavaProcess(pid, rest));
+				}
+			}
+		}
+		return rows;
+	}
+
+	public static void main(String[] args) throws BackingStoreException {
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
+		var a = new Application();
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				var a = new Application();
 				a.createAndShowGUI();
 			}
 		});

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+/** Concatenate a Stream of strings **/
 public class StreamReader extends Reader {
 	private final Stream<? extends CharSequence> delegate;
 	private final StringBuilder  buffer = new StringBuilder();
