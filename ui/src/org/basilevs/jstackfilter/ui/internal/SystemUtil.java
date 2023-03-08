@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.ProcessBuilder.Redirect;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
@@ -14,9 +13,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 public class SystemUtil {
-	
+
 	public static final class ErrorOutput extends IOException {
 		private static final long serialVersionUID = 4137648395124930959L;
+
 		public ErrorOutput(String output) {
 			super(output);
 		}
@@ -41,7 +41,7 @@ public class SystemUtil {
 				}
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				throw new IOException("Interrupted while waiting for error stream for " + commandLine);
+				throw new IOException("Interrupted while waiting for error stream of " + commandLine);
 			} catch (ExecutionException e) {
 				var ioException = findIoException(e);
 				if (ioException != null) {
@@ -51,7 +51,7 @@ public class SystemUtil {
 			}
 		});
 	}
-	
+
 	private static IOException findIoException(Exception e) {
 		if (e == null) {
 			return null;
@@ -60,7 +60,7 @@ public class SystemUtil {
 			return (IOException) e;
 		}
 		var cause = e.getCause();
-		if (cause instanceof Exception) { 
+		if (cause instanceof Exception) {
 			return findIoException((Exception) cause);
 		}
 		return null;
@@ -94,7 +94,7 @@ public class SystemUtil {
 					throw error;
 				}
 			}
-		} 
+		}
 	}
 
 }

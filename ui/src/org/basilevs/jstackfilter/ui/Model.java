@@ -22,14 +22,13 @@ public class Model {
 	private static final long CURRENT_PID = ProcessHandle.current().pid();
 	private final Consumer<String> errorListener;
 	private final Consumer<String> outputListener;
-	
-	
+
 	public Model(Consumer<String> errorListener, Consumer<String> outputListener) {
 		super();
 		this.outputListener = Objects.requireNonNull(outputListener);
 		this.errorListener = Objects.requireNonNull(errorListener);
 	}
-	
+
 	public void selectRow(Object firstColumn) {
 		long pid = (Long) firstColumn;
 		try {
@@ -38,12 +37,11 @@ public class Model {
 			handleError(e);
 		}
 	}
-	
+
 	public void close() {
 		executor.shutdownNow();
 	}
 
-	
 	public List<JavaProcess> getJavaProcesses() {
 		ArrayList<JavaProcess> rows = new ArrayList<>();
 		try (Scanner lines = new Scanner(SystemUtil.captureOutput(executor, "jps", "-v"), StandardCharsets.UTF_8)) {
@@ -78,10 +76,10 @@ public class Model {
 		}
 		return rows;
 	}
-	
+
 	private void handleError(Exception e) {
 		if (e instanceof SystemUtil.ErrorOutput) {
-			errorListener.accept(e.getMessage());	
+			errorListener.accept(e.getMessage());
 		} else {
 			e.printStackTrace();
 			var text = new StringWriter();
@@ -89,9 +87,10 @@ public class Model {
 			errorListener.accept(text.toString());
 		}
 	}
-	
+
 	private Reader jstackByPid(long pid) throws IOException {
-		return ProcessInput.filter(new InputStreamReader(SystemUtil.captureOutput(executor, "jstack", "" + pid), StandardCharsets.UTF_8));
+		return ProcessInput.filter(
+				new InputStreamReader(SystemUtil.captureOutput(executor, "jstack", "" + pid), StandardCharsets.UTF_8));
 	}
 
 }

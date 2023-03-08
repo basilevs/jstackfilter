@@ -28,20 +28,19 @@ public class Application {
 	private final Preferences prefs = Preferences.userNodeForPackage(Application.class);
 	private Consumer<String> setError;
 	private Consumer<String> setOutput;
-	private final Model model = new Model(this::handleError, this::handleOutput); 
+	private final Model model = new Model(this::handleError, this::handleOutput);
 
 	private Application() throws BackingStoreException {
 	}
-	
-	
+
 	private void handleError(String message) {
 		setError.accept(message);
 	}
-	
+
 	private void handleOutput(String output) {
 		setOutput.accept(output);
 	}
-	
+
 	/**
 	 * Create the GUI and show it. For thread safety, this method should be invoked
 	 * from the event-dispatching thread.
@@ -76,19 +75,18 @@ public class Application {
 			text.setForeground(Color.RED);
 			text.setText(message);
 		};
-		
+
 		var defaultForeground = text.getForeground();
 		setOutput = message -> {
 			text.setForeground(defaultForeground);
 			text.setText(message);
 		};
 
-
 		table.setModel(toTableModel(model.getJavaProcesses()));
 		table.getColumnModel().getColumn(0).setHeaderValue("PID");
 		table.getColumnModel().getColumn(1).setHeaderValue("Command");
 		packColumns(table);
-		
+
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
@@ -101,11 +99,8 @@ public class Application {
 		table.setPreferredScrollableViewportSize(size);
 		table.setMaximumSize(size);
 
-		
-		
 		frame.setVisible(true);
 	}
-
 
 	private static void packColumns(JTable table) {
 		for (int column = 0; column < table.getColumnCount() - 1; column++) {
@@ -160,6 +155,7 @@ public class Application {
 		};
 		return model;
 	}
+
 	public static void main(String[] args) throws BackingStoreException {
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
