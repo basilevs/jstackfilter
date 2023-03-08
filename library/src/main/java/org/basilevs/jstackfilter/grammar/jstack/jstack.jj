@@ -90,23 +90,6 @@ private void jstackHeader() :
   "}" < EOL >
 }
 
-private void parenses() :
-{
-  StringBuilder image = new StringBuilder();
-  Token t;
-}
-{
-  "("
-  (
-    t = < SPACE >
-  | t = < WORD >
-    {
-      image.append(t.image);
-    }
-  )*
-  ")"
-}
-
 private String line() :
 {
   StringBuilder image = new StringBuilder();
@@ -258,6 +241,9 @@ private Frame frame() :
   Token t;
 }
 {
+  (
+	"- eliminated <owner is scalar replaced> " "(" < WORD > < SPACE > dottedIdentifier()  ")" < FRAMEINDENT > 
+  )?
   "at " 
   method = method() 
   "("

@@ -907,3 +907,19 @@ JNI global refs: 221, weak refs: 45
 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4.1/ThreadPoolExecutor.java:635)
 	at java.lang.Thread.run(java.base@17.0.4.1/Thread.java:833)
 
+"Packet Receive Manager" #7072 daemon prio=5 os_prio=31 cpu=124.05ms elapsed=46.52s tid=0x00000002baab3600 nid=0x4e02b runnable  [0x000000032b15e000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@17.0.4.1/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@17.0.4.1/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@17.0.4.1/NioSocketImpl.java:261)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@17.0.4.1/NioSocketImpl.java:312)
+	at sun.nio.ch.NioSocketImpl.read(java.base@17.0.4.1/NioSocketImpl.java:350)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@17.0.4.1/NioSocketImpl.java:803)
+	at java.net.Socket$SocketInputStream.read(java.base@17.0.4.1/Socket.java:966)
+	at java.net.Socket$SocketInputStream.read(java.base@17.0.4.1/Socket.java:961)
+	at java.io.DataInputStream.readInt(java.base@17.0.4.1/DataInputStream.java:393)
+	at org.eclipse.jdi.internal.connect.SocketConnection.readPacket(SocketConnection.java:82)
+	- eliminated <owner is scalar replaced> (a java.io.DataInputStream)	at org.eclipse.jdi.internal.connect.PacketReceiveManager.readAvailablePacket(PacketReceiveManager.java:303)
+	at org.eclipse.jdi.internal.connect.PacketReceiveManager.run(PacketReceiveManager.java:90)
+	at java.lang.Thread.run(java.base@17.0.4.1/Thread.java:833)
+
