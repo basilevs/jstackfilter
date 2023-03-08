@@ -22,6 +22,8 @@ public class Model {
 	private static final long CURRENT_PID = ProcessHandle.current().pid();
 	private final Consumer<String> errorListener;
 	private final Consumer<String> outputListener;
+	private boolean filter = true;
+	private long pid = 0;
 
 	public Model(Consumer<String> errorListener, Consumer<String> outputListener) {
 		super();
@@ -30,12 +32,21 @@ public class Model {
 	}
 
 	public void selectRow(Object firstColumn) {
-		long pid = (Long) firstColumn;
+		this.pid = (Long) firstColumn;
+		update();
+	}
+
+	private void update() {
 		try {
 			outputListener.accept(SystemUtil.toString(jstackByPid(pid)));
 		} catch (Exception e) {
 			handleError(e);
 		}
+	}
+	
+	public void setFilter(boolean filter) {
+		this.filter = filter;
+		update();
 	}
 
 	public void close() {
@@ -89,8 +100,12 @@ public class Model {
 	}
 
 	private Reader jstackByPid(long pid) throws IOException {
-		return ProcessInput.filter(
-				new InputStreamReader(SystemUtil.captureOutput(executor, "jstack", "" + pid), StandardCharsets.UTF_8));
+		Reader result = new InputStreamReader(SystemUtil.captureOutput(executor, "jstack", "" + pid), StandardCharsets.UTF_8);
+		if (filter) {
+			return ProcessInput.filter(result);
+		} else {
+			return result;
+		}
 	}
 
 }

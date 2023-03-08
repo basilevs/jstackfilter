@@ -1,8 +1,12 @@
 package org.basilevs.jstackfilter.ui;
 
+import static javax.swing.SwingUtilities.invokeLater;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
@@ -10,7 +14,9 @@ import java.util.function.Consumer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -59,27 +65,43 @@ public class Application {
 			}
 		});
 
-		JTable table = new JTable();
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		var tablePane = new JScrollPane(table);
-		frame.getContentPane().add(tablePane);
-		tablePane.setMinimumSize(new Dimension(800, 200));
-		JTextArea text = new JTextArea();
-		JScrollPane textPane = new JScrollPane(text);
-		frame.getContentPane().add(textPane);
+		
+		var controls = Box.createHorizontalBox();
+		frame.getContentPane().add(controls);
+		var filter = new JCheckBox("Filter");
+		controls.add(filter);
+		filter.setSelected(true);
+		filter.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				model.setFilter(filter.isSelected());
+			}
+		});
 
-		Dimension minTextSize = new Dimension(800, 300);
-		textPane.setPreferredSize(minTextSize);
+		JTable table = new JTable();
+		var tableScroll = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		frame.getContentPane().add(tableScroll);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+		JTextArea output = new JTextArea();
+		var scrollPane = new JScrollPane(output);
+		frame.getContentPane().add(scrollPane);
+
 		setError = message -> {
-			text.setForeground(Color.RED);
-			text.setText(message);
+			invokeLater(() -> {
+				output.setForeground(Color.RED);
+				output.setText(message);
+			});
 		};
 
-		var defaultForeground = text.getForeground();
+		var defaultForeground = output.getForeground();
 		setOutput = message -> {
-			text.setForeground(defaultForeground);
-			text.setText(message);
+			invokeLater(() -> {
+				output.setForeground(defaultForeground);
+				output.setText(message);
+			});
 		};
 
 		table.setModel(toTableModel(model.getJavaProcesses()));
@@ -94,16 +116,18 @@ public class Application {
 			}
 		});
 
-		Dimension size = new Dimension(table.getPreferredSize().width,
+		Dimension size = new Dimension(Integer.MAX_VALUE,
 				table.getRowHeight() * table.getModel().getRowCount());
 		table.setPreferredScrollableViewportSize(size);
+		table.setMinimumSize(size);
 		table.setMaximumSize(size);
+		tableScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, size.height));
 
 		frame.setVisible(true);
 	}
 
 	private static void packColumns(JTable table) {
-		for (int column = 0; column < table.getColumnCount() - 1; column++) {
+		for (int column = 0; column < table.getColumnCount() ; column++) {
 			TableColumn tableColumn = table.getColumnModel().getColumn(column);
 			int preferredWidth = tableColumn.getMinWidth();
 			int maxWidth = tableColumn.getMaxWidth();
@@ -122,7 +146,7 @@ public class Application {
 				}
 			}
 
-			tableColumn.setMaxWidth(preferredWidth);
+			tableColumn.setPreferredWidth(preferredWidth);
 		}
 	}
 

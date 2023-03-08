@@ -32,7 +32,7 @@ public class WindowUtil {
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 					frame.dispose();
 				}
-				return false;
+				return true;
 			}
 		});
 	}
