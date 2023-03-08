@@ -3,13 +3,15 @@ package org.basilevs.jstackfilter.ui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.charset.StandardCharsets;
@@ -32,14 +34,16 @@ import javax.swing.table.TableModel;
 import org.basilevs.jstackfilter.ProcessInput;
 
 public class Application {
-	
+
 	private Consumer<String> setError;
-	private void handleError(Exception e ) {
+
+	private void handleError(Exception e) {
 		e.printStackTrace();
 		var text = new StringWriter();
 		e.printStackTrace(new PrintWriter(text));
 		setError.accept(text.toString());
 	}
+
 	/**
 	 * Create the GUI and show it. For thread safety, this method should be invoked
 	 * from the event-dispatching thread.
@@ -48,7 +52,17 @@ public class Application {
 		// Create and set up the window.
 		JFrame frame = new JFrame("jstackfilter");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+		KeyboardFocusManager.getCurrentKeyboardFocusManager()
+		  .addKeyEventDispatcher(new KeyEventDispatcher() {
+		      @Override
+		      public boolean dispatchKeyEvent(KeyEvent e) {
+		    	if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+		    		frame.dispose();
+		    	}
+		        return false;
+		      }
+		});
+		
 		JTable table = new JTable();
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
@@ -77,18 +91,16 @@ public class Application {
 			handleError(e2);
 		}
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				Integer pid = (Integer) table.getModel().getValueAt(table.getSelectedRow(), 0);
 				try {
 					text.setForeground(defaultForeground);
-					text.setText(Application.this.toString(processJstack(jstackByPid(pid))));
+					text.setText(Application.toString(processJstack(jstackByPid(pid))));
 				} catch (IOException|IllegalArgumentException e1) {
 					handleError(e1);
 				}
 			}
-
 		});
 		
 		Dimension size = new Dimension(
@@ -101,7 +113,7 @@ public class Application {
 		frame.pack();
 		frame.setVisible(true);
 	}
-	
+
 	private static String toString(Reader input) {
 		try (var scanner = new Scanner(input)) {
 			scanner.useDelimiter("\\A");
@@ -112,11 +124,10 @@ public class Application {
 		}
 	}
 
-
 	private static Reader jstackByPid(int pid) throws IOException {
 		return new InputStreamReader(captureOutput("jstack", "" + pid), StandardCharsets.UTF_8);
 	}
-	
+
 	private static Reader processJstack(Reader input) {
 		return ProcessInput.filter(input);
 	}
@@ -172,8 +183,13 @@ public class Application {
 				fields.useDelimiter("\s+");
 				if (fields.hasNext()) {
 					int pid = Integer.valueOf(fields.next());
+					fields.skip("\s+");
 					fields.useDelimiter("\\A");
-					rows.add(new Object[] { pid, fields.next() });
+					var rest = fields.next();
+					if (rest.startsWith("Jps")) {
+						continue;
+					}
+					rows.add(new Object[] { pid, rest });
 				}
 			}
 		}
@@ -203,7 +219,7 @@ public class Application {
 		// creating and showing this application's GUI.
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				var a  = new Application();
+				var a = new Application();
 				a.createAndShowGUI();
 			}
 		});
