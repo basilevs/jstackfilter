@@ -38,7 +38,7 @@ public class Model {
 
 	private void update() {
 		try {
-			outputListener.accept(SystemUtil.toString(jstackByPid(pid)));
+			outputListener.accept(jstackByPid(pid));
 		} catch (Exception e) {
 			handleError(e);
 		}
@@ -99,12 +99,19 @@ public class Model {
 		}
 	}
 
-	private Reader jstackByPid(long pid) throws IOException {
-		Reader result = new InputStreamReader(SystemUtil.captureOutput(executor, "jstack", "" + pid), StandardCharsets.UTF_8);
-		if (filter) {
-			return ProcessInput.filter(result);
-		} else {
-			return result;
+	private String jstackByPid(long pid) throws IOException {
+		try (Reader result = new InputStreamReader(SystemUtil.captureOutput(executor, "jstack", "" + pid), StandardCharsets.UTF_8)) {
+			Reader filtered;
+			if (filter) {
+				filtered = ProcessInput.filter(result);
+			} else {
+				filtered = result;
+			}
+			var str = SystemUtil.toString(filtered);
+			if (str.isEmpty()) {
+				str = "No interesting threads";
+			}
+			return str;
 		}
 	}
 
