@@ -4,7 +4,10 @@ import static javax.swing.SwingUtilities.invokeLater;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
@@ -15,7 +18,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -65,10 +67,15 @@ public class Application {
 			}
 		});
 
-		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
+		Container content = frame.getContentPane();
+		content.setLayout(new GridBagLayout());
 		
 		var controls = Box.createHorizontalBox();
-		frame.getContentPane().add(controls);
+		var c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		c.weightx = 1;
+		content.add(controls, c);
 		var filter = new JCheckBox("Filter");
 		controls.add(filter);
 		filter.setSelected(true);
@@ -82,12 +89,14 @@ public class Application {
 
 		JTable table = new JTable();
 		var tableScroll = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		frame.getContentPane().add(tableScroll);
+		content.add(tableScroll, c);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
 		JTextArea output = new JTextArea();
 		var scrollPane = new JScrollPane(output);
-		frame.getContentPane().add(scrollPane);
+		c.fill = GridBagConstraints.BOTH;
+		c.weighty = 1;
+		content.add(scrollPane, c);
 
 		setError = message -> {
 			invokeLater(() -> {
@@ -116,12 +125,11 @@ public class Application {
 			}
 		});
 
-		Dimension size = new Dimension(Integer.MAX_VALUE,
+		Dimension size = new Dimension(100,
 				table.getRowHeight() * table.getModel().getRowCount());
 		table.setPreferredScrollableViewportSize(size);
-		table.setMinimumSize(size);
-		table.setMaximumSize(size);
-		tableScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, size.height));
+		tableScroll.setMinimumSize(new Dimension(200, 100));
+		
 
 		frame.setVisible(true);
 	}
