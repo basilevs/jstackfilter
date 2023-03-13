@@ -60,16 +60,24 @@ public class Application {
 		WindowUtil.closeOnEsc(frame);
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
+			public void windowClosing(WindowEvent e) {
+				// On Mac OS closing window does not "terminate" the application and
+				// windowClosed is not called
+				// As we have no way to work without windows, we close the main window
+				// completely, forcing termination
+				frame.dispose();
+			}
+
+			@Override
 			public void windowClosed(WindowEvent e) {
 				super.windowClosed(e);
 				model.close();
-				System.exit(0);
 			}
 		});
 
 		Container content = frame.getContentPane();
 		content.setLayout(new GridBagLayout());
-		
+
 		var controls = Box.createHorizontalBox();
 		var c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -80,7 +88,7 @@ public class Application {
 		controls.add(filter);
 		filter.setSelected(true);
 		filter.addItemListener(new ItemListener() {
-			
+
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				model.setFilter(filter.isSelected());
@@ -88,7 +96,8 @@ public class Application {
 		});
 
 		JTable table = new JTable();
-		var tableScroll = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		var tableScroll = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+				JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		content.add(tableScroll, c);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
@@ -125,17 +134,15 @@ public class Application {
 			}
 		});
 
-		Dimension size = new Dimension(100,
-				table.getRowHeight() * table.getModel().getRowCount());
+		Dimension size = new Dimension(100, table.getRowHeight() * table.getModel().getRowCount());
 		table.setPreferredScrollableViewportSize(size);
 		tableScroll.setMinimumSize(new Dimension(200, 100));
-		
 
 		frame.setVisible(true);
 	}
 
 	private static void packColumns(JTable table) {
-		for (int column = 0; column < table.getColumnCount() ; column++) {
+		for (int column = 0; column < table.getColumnCount(); column++) {
 			TableColumn tableColumn = table.getColumnModel().getColumn(column);
 			int preferredWidth = tableColumn.getMinWidth();
 			int maxWidth = tableColumn.getMaxWidth();
