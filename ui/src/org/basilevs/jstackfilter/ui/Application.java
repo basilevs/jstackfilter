@@ -8,6 +8,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
@@ -17,7 +18,10 @@ import java.util.function.Consumer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -94,6 +98,9 @@ public class Application {
 				model.setFilter(filter.isSelected());
 			}
 		});
+		
+		var refreshButton = new JButton("Refresh");
+		controls.add(refreshButton);
 
 		JTable table = new JTable();
 		var tableScroll = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
@@ -121,16 +128,31 @@ public class Application {
 				output.setText(message);
 			});
 		};
+		
+		AbstractAction refreshAction = new AbstractAction("Refresh") {
 
-		table.setModel(toTableModel(model.getJavaProcesses()));
-		table.getColumnModel().getColumn(0).setHeaderValue("PID");
-		table.getColumnModel().getColumn(1).setHeaderValue("Command");
-		packColumns(table);
+			private static final long serialVersionUID = -5436279312088472338L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				table.setModel(toTableModel(model.getJavaProcesses()));
+				table.getColumnModel().getColumn(0).setHeaderValue("PID");
+				table.getColumnModel().getColumn(1).setHeaderValue("Command");
+				packColumns(table);
+			}
+			
+		};
+		refreshButton.setAction(refreshAction);
+		refreshAction.actionPerformed(null);
+
 
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				model.selectRow(table.getModel().getValueAt(table.getSelectedRow(), 0));
+				int index = table.getSelectedRow();
+				if (index >= 0) {
+					model.selectRow(table.getModel().getValueAt(index, 0));
+				}
 			}
 		});
 
