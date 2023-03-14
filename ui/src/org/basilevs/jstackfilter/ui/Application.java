@@ -136,14 +136,23 @@ public class Application {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				table.setModel(toTableModel(model.getJavaProcesses()));
-				table.getColumnModel().getColumn(0).setHeaderValue("PID");
-				table.getColumnModel().getColumn(1).setHeaderValue("Command");
 				packColumns(table);
+				Dimension size = new Dimension(100, table.getRowHeight() * table.getModel().getRowCount());
+				table.setPreferredScrollableViewportSize(size);
 			}
 			
 		};
+		
+		table.setAutoCreateColumnsFromModel(false);
 		refreshButton.setAction(refreshAction);
+		var column = new TableColumn(0);
+		column.setHeaderValue("PID");;
+		table.getColumnModel().addColumn(column);
+		column = new TableColumn(1);
+		column.setHeaderValue("Command");;
+		table.getColumnModel().addColumn(column);
 		refreshAction.actionPerformed(null);
+
 
 
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -156,8 +165,6 @@ public class Application {
 			}
 		});
 
-		Dimension size = new Dimension(100, table.getRowHeight() * table.getModel().getRowCount());
-		table.setPreferredScrollableViewportSize(size);
 		tableScroll.setMinimumSize(new Dimension(200, 100));
 
 		frame.setVisible(true);
