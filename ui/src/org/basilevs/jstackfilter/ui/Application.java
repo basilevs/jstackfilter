@@ -8,11 +8,18 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,19 +29,24 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
+import javax.swing.TransferHandler;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+import javax.swing.text.DefaultEditorKit;
 
 import org.basilevs.jstackfilter.ui.internal.WindowUtil;
 
@@ -54,6 +66,14 @@ public class Application {
 	private void handleOutput(String output) {
 		setOutput.accept(output);
 	}
+	
+	private void handleError(Exception e) {
+		e.printStackTrace();
+		var text = new StringWriter();
+		e.printStackTrace(new PrintWriter(text));
+		handleError(text.toString());
+	}
+
 
 	/**
 	 * Create the GUI and show it. For thread safety, this method should be invoked
@@ -61,9 +81,8 @@ public class Application {
 	 */
 	private void createAndShowGUI() {
 		// Create and set up the window.
-		JFrame frame = new JFrame("jstackfilter");
+		final JFrame frame = new JFrame("jstackfilter");
 		WindowUtil.configureSize(prefs, frame);
-		WindowUtil.closeOnEsc(frame);
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -81,7 +100,7 @@ public class Application {
 			}
 		});
 
-		Container content = frame.getContentPane();
+		final Container content = frame.getContentPane();
 		content.setLayout(new GridBagLayout());
 
 		var controls = Box.createHorizontalBox();
@@ -94,7 +113,6 @@ public class Application {
 		controls.add(filter);
 		filter.setSelected(true);
 		filter.addItemListener(new ItemListener() {
-
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				model.setFilter(filter.isSelected());
@@ -103,6 +121,13 @@ public class Application {
 		
 		var refreshButton = new JButton("Refresh");
 		controls.add(refreshButton);
+		
+		var pasteButton = new JButton("Paste");
+		controls.add(pasteButton);
+		
+		var loadButton = new JButton();
+		controls.add(loadButton);
+
 
 		JTable table = new JTable();
 		var tableScroll = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
@@ -115,6 +140,8 @@ public class Application {
 		c.fill = GridBagConstraints.BOTH;
 		c.weighty = 1;
 		content.add(scrollPane, c);
+		output.enableInputMethods(false);
+		output.setEditable(false);
 
 		setError = message -> {
 			invokeLater(() -> {
@@ -131,19 +158,20 @@ public class Application {
 			});
 		};
 		
-		Supplier<Optional<Object>> selection = () -> {
+		Supplier<Optional<Long>> selection = () -> {
 			return Optional.of(table.getSelectedRow())
 					.filter(x -> x >= 0)
 					.map(index -> 
-			table.getModel().getValueAt(index, 0));
+			table.getModel().getValueAt(index, 0)).map(Long.class::cast);
 		};
-		AbstractAction refreshAction = new AbstractAction("Refresh") {
-
+		
+		
+		String refreshName = "refresh";
+		AbstractAction refreshAction = new AbstractAction(refreshName) {
 			private static final long serialVersionUID = -5436279312088472338L;
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Optional<Object> previousSelection = selection.get();
+				Optional<Long> previousSelection = selection.get();
 				table.setModel(toTableModel(model.getJavaProcesses()));
 				previousSelection.ifPresent(selection -> 
 					selectRowByFirstColumn(table, selection)
@@ -153,30 +181,69 @@ public class Application {
 				table.setPreferredScrollableViewportSize(size);
 			}
 
+		};
+		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0), refreshName);
+		frame.getRootPane().getActionMap().put(refreshName, refreshAction);
+		refreshButton.setAction(refreshAction);
+
+		
+		Clipboard clipboard = frame.getToolkit().getSystemClipboard();
+		String pasteName = (String) TransferHandler.getPasteAction().getValue(Action.NAME);
+		AbstractAction pasteAction = new AbstractAction(pasteName) {
 			
+			private static final long serialVersionUID = 9199450855113081882L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					table.clearSelection();
+					model.setInput((String) clipboard.getData(DataFlavor.stringFlavor));
+				} catch (UnsupportedFlavorException | IOException e1) {
+					handleError(e1);
+				}
+			}
+		};
+		WindowUtil.handleKeystrokes(frame.getRootPane(), pasteName, KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK), KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK));
+		frame.getRootPane().getActionMap().put(pasteName, pasteAction);
+		frame.getRootPane().getActionMap().put(DefaultEditorKit.pasteAction, pasteAction);
+		table.getActionMap().put(pasteName, pasteAction);
+		output.getActionMap().put(DefaultEditorKit.pasteAction, pasteAction);
+		pasteButton.setAction(pasteAction);
+		
+
+		String exitName = "exit";
+		AbstractAction exitAction = new AbstractAction(exitName) {
+			private static final long serialVersionUID = -5146316832581685550L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+			}
 		};
 		
+		frame.getRootPane().getActionMap().put(exitName, exitAction);
+		WindowUtil.handleKeystrokes(frame.getRootPane(), exitName, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+		
 		table.setAutoCreateColumnsFromModel(false);
-		refreshButton.setAction(refreshAction);
 		var column = new TableColumn(0);
 		column.setHeaderValue("PID");;
 		table.getColumnModel().addColumn(column);
 		column = new TableColumn(1);
 		column.setHeaderValue("Command");;
 		table.getColumnModel().addColumn(column);
-		refreshAction.actionPerformed(null);
 
 
 
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				selection.get().ifPresent(model::selectRow);
+				selection.get().ifPresent(model::selectJavaProcess);
 			}
 		});
 
 		tableScroll.setMinimumSize(new Dimension(200, 100));
 
+		refreshAction.actionPerformed(null);
 		frame.setVisible(true);
 	}
 
@@ -211,7 +278,6 @@ public class Application {
 			}
 		}
 	}
-
 
 	private static TableModel toTableModel(List<JavaProcess> rows) {
 		TableModel model = new AbstractTableModel() {

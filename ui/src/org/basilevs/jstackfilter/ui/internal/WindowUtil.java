@@ -1,12 +1,12 @@
 package org.basilevs.jstackfilter.ui.internal;
 
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.Window;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
+
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 
 public class WindowUtil {
 	public static void configureSize(Preferences preferences, Window window) {
@@ -24,17 +24,11 @@ public class WindowUtil {
 			}
 		});
 	}
-
-	public static void closeOnEsc(Window frame) {
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
-			@Override
-			public boolean dispatchKeyEvent(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-					frame.dispose();
-				}
-				return true;
-			}
-		});
+	
+	public static void handleKeystrokes(JComponent handler, String actionCommand, KeyStroke ... keys) {
+		for (var key: keys) {
+			handler.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(key, actionCommand);
+		}
 	}
-
+	
 }
