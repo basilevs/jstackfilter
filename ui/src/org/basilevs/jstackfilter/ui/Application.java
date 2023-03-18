@@ -14,12 +14,14 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -129,17 +131,28 @@ public class Application {
 			});
 		};
 		
+		Supplier<Optional<Object>> selection = () -> {
+			return Optional.of(table.getSelectedRow())
+					.filter(x -> x >= 0)
+					.map(index -> 
+			table.getModel().getValueAt(index, 0));
+		};
 		AbstractAction refreshAction = new AbstractAction("Refresh") {
 
 			private static final long serialVersionUID = -5436279312088472338L;
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				Optional<Object> previousSelection = selection.get();
 				table.setModel(toTableModel(model.getJavaProcesses()));
+				previousSelection.ifPresent(selection -> 
+					selectRowByFirstColumn(table, selection)
+				);
 				packColumns(table);
 				Dimension size = new Dimension(100, table.getRowHeight() * table.getModel().getRowCount());
 				table.setPreferredScrollableViewportSize(size);
 			}
+
 			
 		};
 		
@@ -158,10 +171,7 @@ public class Application {
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				int index = table.getSelectedRow();
-				if (index >= 0) {
-					model.selectRow(table.getModel().getValueAt(index, 0));
-				}
+				selection.get().ifPresent(model::selectRow);
 			}
 		});
 
@@ -193,6 +203,15 @@ public class Application {
 			tableColumn.setPreferredWidth(preferredWidth);
 		}
 	}
+	
+	private static void selectRowByFirstColumn(JTable table, Object selection) {
+		for (int row = 0; row < table.getRowCount(); row++) {
+			if (Objects.equals(selection, table.getValueAt(row, 0))) {
+				table.getSelectionModel().setSelectionInterval(row, row);
+			}
+		}
+	}
+
 
 	private static TableModel toTableModel(List<JavaProcess> rows) {
 		TableModel model = new AbstractTableModel() {
