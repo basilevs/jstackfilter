@@ -60,10 +60,10 @@ public class Model {
 				lines.useDelimiter("\n");
 				while (lines.hasNext()) {
 					Scanner fields = new Scanner(lines.next());
-					fields.useDelimiter("\s+");
+					fields.useDelimiter("\\s+");
 					if (fields.hasNext()) {
 						long pid = Long.parseLong(fields.next());
-						fields.skip("\s+");
+						fields.skip("\\s+");
 						fields.useDelimiter("\\A");
 						var rest = fields.next();
 						if (rest.startsWith("Jps")) {
