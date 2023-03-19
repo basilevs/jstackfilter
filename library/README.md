@@ -1,8 +1,8 @@
 # Overview
-Jstack is a program bundled with JDK that allows capturing stacktraces of all threads in a running JVM. It is essential in debugging poor performance and deadlocks especially outside of a full development environment. Modern Java applications abuse threads, making the full dump of Jstack bloated and noisy. Significant time should be spent to find needed threads among everpresent pools and mundane background tasks.
+`jstack` is a program bundled with JDK that allows capturing stacktraces of all threads in a running JVM. It is essential in debugging poor performance and deadlocks especially outside of a full development environment. Modern Java applications abuse threads, making the full dump of Jstack bloated and noisy. Significant time should be spent to find needed threads among everpresent pools and mundane background tasks.
 Jstackfilter aims to drastically reduce noise in Jstack output by filtering out trivial threads and eliminating stacktrace duplicates to allow a user to focus on unusual, meaningful threads to hopefully isolate the problem quicker.
 # Usage
-Download jstackfilter.
+Download [jstackfilter](https://github.com/basilevs/jstackfilter/releases/latest/download/jstackfilter.jar).
 
 List running Java processes using `jps` command (distributed with JDK).
 
