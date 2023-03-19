@@ -923,3 +923,11 @@ JNI global refs: 221, weak refs: 45
 	at org.eclipse.jdi.internal.connect.PacketReceiveManager.run(PacketReceiveManager.java:90)
 	at java.lang.Thread.run(java.base@17.0.4.1/Thread.java:833)
 
+"Worker-48: Loading the repository {0}" #270 prio=5 os_prio=31 cpu=1.18ms elapsed=1.74s tid=0x0000000124555c00 nid=0x27bf3 in Object.wait()  [0x00000002acdf2000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4.1/Native Method)
+	- waiting on <no object reference available>
+	at org.eclipse.equinox.internal.p2.transport.ecf.FileInfoReader.run(FileInfoReader.java:52)
+	- locked <0x000000079abe0628> (a [Ljava.lang.Boolean;)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+

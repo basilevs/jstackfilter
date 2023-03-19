@@ -48,6 +48,7 @@ public final class JstackParser implements JstackParserConstants {
       case 20:
       case 21:
       case 22:
+      case 23:
         ;
         break;
       default:
@@ -61,9 +62,7 @@ public final class JstackParser implements JstackParserConstants {
     jj_consume_token(EOL);
   }
 
-  final private String line() throws ParseException {
-  StringBuilder image = new StringBuilder();
-  Token t;
+  final private void line() throws ParseException {
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -78,6 +77,7 @@ public final class JstackParser implements JstackParserConstants {
       case 20:
       case 21:
       case 22:
+      case 23:
         ;
         break;
       default:
@@ -85,49 +85,41 @@ public final class JstackParser implements JstackParserConstants {
         break label_2;
       }
       if (jj_2_1(2)) {
-        t = jj_consume_token(15);
-      image.append(t.image);
+        jj_consume_token(15);
       } else {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case 16:
-          t = jj_consume_token(16);
-      image.append(t.image);
+          jj_consume_token(16);
           break;
         case 17:
-          t = jj_consume_token(17);
-      image.append(t.image);
+          jj_consume_token(17);
           break;
         case 18:
-          t = jj_consume_token(18);
-      image.append(t.image);
+          jj_consume_token(18);
           break;
         case 19:
-          t = jj_consume_token(19);
-      image.append(t.image);
+          jj_consume_token(19);
           break;
         case 20:
-          t = jj_consume_token(20);
-      image.append(t.image);
+          jj_consume_token(20);
           break;
         case 21:
-          t = jj_consume_token(21);
-      image.append(t.image);
+          jj_consume_token(21);
           break;
         case 22:
-          t = jj_consume_token(22);
-      image.append(t.image);
+          jj_consume_token(22);
+          break;
+        case 23:
+          jj_consume_token(23);
           break;
         case WORD:
-          t = jj_consume_token(WORD);
-      image.append(t.image);
+          jj_consume_token(WORD);
           break;
         case NUMBER:
-          t = jj_consume_token(NUMBER);
-      image.append(t.image);
+          jj_consume_token(NUMBER);
           break;
         case SPACE:
-          t = jj_consume_token(SPACE);
-      image.append(t.image);
+          jj_consume_token(SPACE);
           break;
         default:
           jj_la1[2] = jj_gen;
@@ -136,8 +128,6 @@ public final class JstackParser implements JstackParserConstants {
         }
       }
     }
-    {if (true) return image.toString();}
-    throw new Error("Missing return statement in function");
   }
 
   final private String method() throws ParseException {
@@ -164,8 +154,8 @@ public final class JstackParser implements JstackParserConstants {
         jj_consume_token(20);
         image.append("$");
         break;
-      case 23:
-        jj_consume_token(23);
+      case 24:
+        jj_consume_token(24);
         image.append("/");
         break;
       case 21:
@@ -228,8 +218,8 @@ public final class JstackParser implements JstackParserConstants {
   String method, p;
   Token t;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 24:
-      jj_consume_token(24);
+    case 25:
+      jj_consume_token(25);
       jj_consume_token(15);
       jj_consume_token(WORD);
       jj_consume_token(SPACE);
@@ -241,14 +231,14 @@ public final class JstackParser implements JstackParserConstants {
       jj_la1[6] = jj_gen;
       ;
     }
-    jj_consume_token(25);
+    jj_consume_token(26);
     method = method();
     jj_consume_token(15);
     if (jj_2_3(4)) {
       dottedIdentifier();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 26:
-        jj_consume_token(26);
+      case 27:
+        jj_consume_token(27);
         label_5:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -278,17 +268,17 @@ public final class JstackParser implements JstackParserConstants {
         jj_la1[9] = jj_gen;
         ;
       }
-      jj_consume_token(23);
+      jj_consume_token(24);
     } else {
       ;
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 27:
-      t = jj_consume_token(27);
-      image.append(t.image);
-      break;
     case 28:
       t = jj_consume_token(28);
+      image.append(t.image);
+      break;
+    case 29:
+      t = jj_consume_token(29);
       image.append(t.image);
       break;
     case WORD:
@@ -319,9 +309,6 @@ public final class JstackParser implements JstackParserConstants {
   final public void monitor() throws ParseException {
   String line = "";
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 29:
-      jj_consume_token(29);
-      break;
     case 30:
       jj_consume_token(30);
       break;
@@ -330,6 +317,9 @@ public final class JstackParser implements JstackParserConstants {
       break;
     case 32:
       jj_consume_token(32);
+      break;
+    case 33:
+      jj_consume_token(33);
       break;
     default:
       jj_la1[12] = jj_gen;
@@ -341,7 +331,7 @@ public final class JstackParser implements JstackParserConstants {
 
   final public void keyValue() throws ParseException {
     jj_consume_token(WORD);
-    jj_consume_token(33);
+    jj_consume_token(34);
     label_6:
     while (true) {
       jj_consume_token(NUMBER);
@@ -410,7 +400,7 @@ public final class JstackParser implements JstackParserConstants {
     int length = t.image.length();
     name = t.image.substring(1, length - 1);
     jj_consume_token(SPACE);
-    jj_consume_token(34);
+    jj_consume_token(35);
     jj_consume_token(NUMBER);
     label_8:
     while (true) {
@@ -420,11 +410,11 @@ public final class JstackParser implements JstackParserConstants {
       } else if (jj_2_7(2)) {
         jj_consume_token(WORD);
       } else if (jj_2_8(2)) {
-        jj_consume_token(35);
+        jj_consume_token(36);
       } else {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 36:
-          jj_consume_token(36);
+        case 37:
+          jj_consume_token(37);
           break;
         default:
           jj_la1[16] = jj_gen;
@@ -451,7 +441,7 @@ public final class JstackParser implements JstackParserConstants {
       ;
     }
     jj_consume_token(SPACE);
-    jj_consume_token(37);
+    jj_consume_token(38);
     t = jj_consume_token(WORD);
     state = t.image;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -497,12 +487,12 @@ public final class JstackParser implements JstackParserConstants {
     case SPACE:
       jj_consume_token(SPACE);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 38:
-        jj_consume_token(38);
-        jj_consume_token(EOL);
-        break;
       case 39:
         jj_consume_token(39);
+        jj_consume_token(EOL);
+        break;
+      case 40:
+        jj_consume_token(40);
         jj_consume_token(NUMBER);
         label_10:
         while (true) {
@@ -515,11 +505,11 @@ public final class JstackParser implements JstackParserConstants {
           case SPACE:
             jj_consume_token(SPACE);
             break;
-          case 40:
-            jj_consume_token(40);
-            break;
           case 41:
             jj_consume_token(41);
+            break;
+          case 42:
+            jj_consume_token(42);
             break;
           case NUMBER:
             jj_consume_token(NUMBER);
@@ -531,12 +521,12 @@ public final class JstackParser implements JstackParserConstants {
           }
         }
         method();
-        jj_consume_token(42);
+        jj_consume_token(43);
         jj_consume_token(WORD);
         jj_consume_token(SPACE);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 26:
-          jj_consume_token(26);
+        case 27:
+          jj_consume_token(27);
           jj_consume_token(SPACE);
           jj_consume_token(NUMBER);
           jj_consume_token(SPACE);
@@ -547,7 +537,7 @@ public final class JstackParser implements JstackParserConstants {
         }
         jj_consume_token(15);
         jj_consume_token(NUMBER);
-        jj_consume_token(43);
+        jj_consume_token(44);
         jj_consume_token(16);
         jj_consume_token(EOL);
         break;
@@ -571,14 +561,14 @@ public final class JstackParser implements JstackParserConstants {
         }
         jj_consume_token(FRAMEINDENT);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 29:
         case 30:
         case 31:
         case 32:
+        case 33:
           monitor();
           break;
-        case 24:
         case 25:
+        case 26:
           f = frame();
           frames.add(f);
           break;
@@ -713,79 +703,6 @@ public final class JstackParser implements JstackParserConstants {
     finally { jj_save(10, xla); }
   }
 
-  private boolean jj_3_7() {
-    if (jj_scan_token(WORD)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_14() {
-    if (jj_scan_token(NUMBER)) return true;
-    return false;
-  }
-
-  private boolean jj_3_10() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(6)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(40)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(41)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(3)) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3_6() {
-    if (jj_3R_21()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_26() {
-    if (jj_scan_token(19)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_13() {
-    if (jj_scan_token(WORD)) return true;
-    return false;
-  }
-
-  private boolean jj_3_9() {
-    if (jj_scan_token(SPACE)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_6()) {
-    jj_scanpos = xsp;
-    if (jj_3_7()) {
-    jj_scanpos = xsp;
-    if (jj_3_8()) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(36)) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_25() {
-    if (jj_scan_token(WORD)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_23() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_25()) {
-    jj_scanpos = xsp;
-    if (jj_3R_26()) return true;
-    }
-    return false;
-  }
-
   private boolean jj_3_2() {
     Token xsp;
     xsp = jj_scanpos;
@@ -835,19 +752,19 @@ public final class JstackParser implements JstackParserConstants {
 
   private boolean jj_3R_21() {
     if (jj_scan_token(WORD)) return true;
-    if (jj_scan_token(33)) return true;
+    if (jj_scan_token(34)) return true;
     return false;
   }
 
   private boolean jj_3R_22() {
     if (jj_scan_token(QUOTE)) return true;
     if (jj_scan_token(SPACE)) return true;
-    if (jj_scan_token(34)) return true;
+    if (jj_scan_token(35)) return true;
     return false;
   }
 
   private boolean jj_3R_20() {
-    if (jj_scan_token(26)) return true;
+    if (jj_scan_token(27)) return true;
     Token xsp;
     if (jj_3R_24()) return true;
     while (true) {
@@ -862,7 +779,7 @@ public final class JstackParser implements JstackParserConstants {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3R_20()) jj_scanpos = xsp;
-    if (jj_scan_token(23)) return true;
+    if (jj_scan_token(24)) return true;
     return false;
   }
 
@@ -873,12 +790,7 @@ public final class JstackParser implements JstackParserConstants {
   }
 
   private boolean jj_3R_17() {
-    if (jj_scan_token(23)) return true;
-    return false;
-  }
-
-  private boolean jj_3_1() {
-    if (jj_scan_token(15)) return true;
+    if (jj_scan_token(24)) return true;
     return false;
   }
 
@@ -909,7 +821,85 @@ public final class JstackParser implements JstackParserConstants {
   }
 
   private boolean jj_3_8() {
-    if (jj_scan_token(35)) return true;
+    if (jj_scan_token(36)) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_scan_token(15)) return true;
+    return false;
+  }
+
+  private boolean jj_3_7() {
+    if (jj_scan_token(WORD)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_14() {
+    if (jj_scan_token(NUMBER)) return true;
+    return false;
+  }
+
+  private boolean jj_3_10() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(6)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(41)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(42)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(3)) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_6() {
+    if (jj_3R_21()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_26() {
+    if (jj_scan_token(19)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_13() {
+    if (jj_scan_token(WORD)) return true;
+    return false;
+  }
+
+  private boolean jj_3_9() {
+    if (jj_scan_token(SPACE)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_6()) {
+    jj_scanpos = xsp;
+    if (jj_3_7()) {
+    jj_scanpos = xsp;
+    if (jj_3_8()) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(37)) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_25() {
+    if (jj_scan_token(WORD)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_23() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_25()) {
+    jj_scanpos = xsp;
+    if (jj_3R_26()) return true;
+    }
     return false;
   }
 
@@ -932,10 +922,10 @@ public final class JstackParser implements JstackParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x7f805c,0x7f804c,0x7f004c,0xb8000c,0x80004,0x80004,0x1000000,0x80008,0x80008,0x4000000,0x200,0x18080004,0xe0000000,0x4,0x8,0x4,0x0,0x10,0x44,0x44,0x40,0x48,0x4000000,0x0,0x20,0xe3000000,0x40,0x2,0x2,};
+      jj_la1_0 = new int[] {0xff805c,0xff804c,0xff004c,0x138000c,0x80004,0x80004,0x2000000,0x80008,0x80008,0x8000000,0x200,0x30080004,0xc0000000,0x4,0x8,0x4,0x0,0x10,0x44,0x44,0x40,0x48,0x8000000,0x0,0x20,0xc6000000,0x40,0x2,0x2,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x10,0x0,0x0,0x0,0x0,0x300,0x0,0xc0,0x0,0x1,0x0,0x0,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3,0x0,0x0,0x0,0x20,0x0,0x0,0x0,0x0,0x600,0x0,0x180,0x0,0x3,0x0,0x0,0x0,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[11];
   private boolean jj_rescan = false;
@@ -1121,7 +1111,7 @@ public final class JstackParser implements JstackParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[44];
+    boolean[] la1tokens = new boolean[45];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -1138,7 +1128,7 @@ public final class JstackParser implements JstackParserConstants {
         }
       }
     }
-    for (int i = 0; i < 44; i++) {
+    for (int i = 0; i < 45; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

@@ -90,72 +90,35 @@ private void jstackHeader() :
   "}" < EOL >
 }
 
-private String line() :
+private void line() :
 {
-  StringBuilder image = new StringBuilder();
-  Token t;
 }
 {
   (
     LOOKAHEAD(2)
-    t = "("
-    {
-      image.append(t.image);
-    }
+     "("
   | 
-    t = ")"
-    {
-      image.append(t.image);
-    }
+     ")"
   | 
-    t = "["
-    {
-      image.append(t.image);
-    }
+     "["
   | 
-    t = "]"
-    {
-      image.append(t.image);
-    }
+     "]"
   | 
-    t = "."
-    {
-      image.append(t.image);
-    }
+     "."
   | 
-    t = "$"
-    {
-      image.append(t.image);
-    }
+     "$"
   | 
-    t = "<"
-    {
-      image.append(t.image);
-    }
+     "<"
   | 
-    t = ">"
-    {
-      image.append(t.image);
-    }
+     ">"
+  |  ";"
   | 
-    t = < WORD >
-    {
-      image.append(t.image);
-    }
+     < WORD >
   | 
-    t = < NUMBER >
-    {
-      image.append(t.image);
-    }
+     < NUMBER >
   | 
-    t = < SPACE >
-    {
-      image.append(t.image);
-    }
+     < SPACE >
   )*
-  {
-    return image.toString();
-  }
 }
 
 private String method() :
