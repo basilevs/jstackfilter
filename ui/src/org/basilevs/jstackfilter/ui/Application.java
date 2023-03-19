@@ -57,6 +57,7 @@ public class Application {
 	private Consumer<String> setError;
 	private Consumer<String> setOutput;
 	private final Model model = new Model(this::handleError, this::handleOutput);
+	private JFileChooser fileChooser;
 
 	private Application() throws BackingStoreException {
 	}
@@ -214,17 +215,14 @@ public class Application {
 		
 		
 		String loadName = "load";
-		
+		fileChooser = new JFileChooser();
+		String previousFile = prefs.get("lastFile", System.getProperty("user.home"));
+		fileChooser.setCurrentDirectory(new File(previousFile));
 		AbstractAction loadAction = new AbstractAction(loadName) {
-			
 			private static final long serialVersionUID = 9199450855113081882L;
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				table.clearSelection();
-				JFileChooser fileChooser = new JFileChooser();
-				String previousFile = prefs.get("lastFile", System.getProperty("user.home"));
-				fileChooser.setCurrentDirectory(new File(previousFile));
 				int result = fileChooser.showOpenDialog(frame);
 				if (result == JFileChooser.APPROVE_OPTION) {
 				    File selectedFile = fileChooser.getSelectedFile();
