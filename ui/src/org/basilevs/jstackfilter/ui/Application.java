@@ -112,15 +112,9 @@ public class Application {
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		c.weightx = 1;
 		content.add(controls, c);
-		var filter = new JCheckBox("Filter");
+		var filter = new JCheckBox("filter");
 		controls.add(filter);
 		filter.setSelected(true);
-		filter.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				model.setFilter(filter.isSelected());
-			}
-		});
 		
 		var refreshButton = new JButton();
 		controls.add(refreshButton);
@@ -168,6 +162,17 @@ public class Application {
 			table.getModel().getValueAt(index, 0)).map(Long.class::cast);
 		};
 		
+		String filterName = "filter";
+		var filterAction = new AbstractAction(filterName) {
+			private static final long serialVersionUID = 2783229494384910800L;
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				model.setFilter(filter.isSelected());
+			}
+		};
+		filterAction.putValue(Action.SHORT_DESCRIPTION, "Disable jstackfilter to see original jstack output");
+		filter.setAction(filterAction);
+		
 		
 		String refreshName = "refresh";
 		AbstractAction refreshAction = new AbstractAction(refreshName) {
@@ -185,6 +190,7 @@ public class Application {
 			}
 
 		};
+		refreshAction.putValue(Action.SHORT_DESCRIPTION, "(F5) Reload the file, rerun jps and jstack.");
 		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0), refreshName);
 		frame.getRootPane().getActionMap().put(refreshName, refreshAction);
 		refreshButton.setAction(refreshAction);
@@ -206,6 +212,7 @@ public class Application {
 				}
 			}
 		};
+		pasteAction.putValue(Action.SHORT_DESCRIPTION, "(Ctrl+V) Take jstack output from system's clipboard.");
 		WindowUtil.handleKeystrokes(frame.getRootPane(), pasteName, KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK), KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK));
 		frame.getRootPane().getActionMap().put(pasteName, pasteAction);
 		frame.getRootPane().getActionMap().put(DefaultEditorKit.pasteAction, pasteAction);
@@ -231,6 +238,7 @@ public class Application {
 				}
 			}
 		};
+		loadAction.putValue(Action.SHORT_DESCRIPTION, "(Ctrl+O) Load jstack output from a file.");
 		WindowUtil.handleKeystrokes(frame.getRootPane(), loadName, KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK), KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_DOWN_MASK));
 		frame.getRootPane().getActionMap().put(loadName, loadAction);
 		table.getActionMap().put(loadName, loadAction);
