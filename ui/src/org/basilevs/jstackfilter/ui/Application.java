@@ -17,6 +17,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -34,6 +35,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -119,10 +121,10 @@ public class Application {
 			}
 		});
 		
-		var refreshButton = new JButton("Refresh");
+		var refreshButton = new JButton();
 		controls.add(refreshButton);
 		
-		var pasteButton = new JButton("Paste");
+		var pasteButton = new JButton();
 		controls.add(pasteButton);
 		
 		var loadButton = new JButton();
@@ -209,6 +211,32 @@ public class Application {
 		table.getActionMap().put(pasteName, pasteAction);
 		output.getActionMap().put(DefaultEditorKit.pasteAction, pasteAction);
 		pasteButton.setAction(pasteAction);
+		
+		
+		String loadName = "load";
+		
+		AbstractAction loadAction = new AbstractAction(loadName) {
+			
+			private static final long serialVersionUID = 9199450855113081882L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				table.clearSelection();
+				JFileChooser fileChooser = new JFileChooser();
+				String previousFile = prefs.get("lastFile", System.getProperty("user.home"));
+				fileChooser.setCurrentDirectory(new File(previousFile));
+				int result = fileChooser.showOpenDialog(frame);
+				if (result == JFileChooser.APPROVE_OPTION) {
+				    File selectedFile = fileChooser.getSelectedFile();
+				    prefs.put("lastFile", selectedFile.toString());
+				    model.setFile(selectedFile.toPath());
+				}
+			}
+		};
+		WindowUtil.handleKeystrokes(frame.getRootPane(), loadName, KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK), KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_DOWN_MASK));
+		frame.getRootPane().getActionMap().put(loadName, loadAction);
+		table.getActionMap().put(loadName, loadAction);
+		loadButton.setAction(loadAction);
 		
 
 		String exitName = "exit";
