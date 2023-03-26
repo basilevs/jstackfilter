@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-import org.basilevs.jstackfilter.ProcessInput;
+import org.basilevs.jstackfilter.Filter;
 import org.basilevs.jstackfilter.ui.internal.SystemUtil;
 
 public class Model {
@@ -72,7 +72,7 @@ public class Model {
 		try {
 			Reader filtered;
 			if (filter) {
-				filtered = ProcessInput.filter(input);
+				filtered = Filter.filter(input);
 			} else {
 				filtered = input;
 			}
