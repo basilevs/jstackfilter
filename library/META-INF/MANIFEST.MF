@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jstackfilter
+Bundle-SymbolicName: org.basilevs.jstackfilter
+Bundle-Version: 0.0.2.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Export-Package: .,
+ org.basilevs.jstackfilter,
+ org.basilevs.jstackfilter.grammar.jstack,
+ org.basilevs.jstackfilter.test

@@ -12,8 +12,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -222,9 +220,12 @@ public class Application {
 		
 		
 		String loadName = "load";
-		fileChooser = new JFileChooser();
+		if (fileChooser == null) {
+			fileChooser = new JFileChooser();
+			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		}
 		String previousFile = prefs.get("lastFile", System.getProperty("user.home"));
-		fileChooser.setCurrentDirectory(new File(previousFile));
+		fileChooser.ensureFileIsVisible(new File(previousFile));
 		AbstractAction loadAction = new AbstractAction(loadName) {
 			private static final long serialVersionUID = 9199450855113081882L;
 			@Override

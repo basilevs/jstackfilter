@@ -45,7 +45,8 @@ public final class JavaThread {
 	public boolean equalByMethodName(JavaThread that) {
 		Object[] thisList = frames().stream().map(Frame::method).map(JavaThread::stripVersions).toArray();
 		Object[] thatList = that.frames().stream().map(Frame::method).map(JavaThread::stripVersions).toArray();
-		return Arrays.equals(thisList, thatList);
+		boolean result = Arrays.equals(thisList, thatList);
+		return result;
 	}
 
 	public JavaThread withRepresentation(String representation) {

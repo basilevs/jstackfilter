@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.viewActions">
+      <viewContribution
+            id="org.basilevs.jstackfilter.eclipse.contribution"
+            targetID="org.eclipse.debug.ui.DebugView">
+         <action
+               class="org.basilevs.jstackfilter.eclipse.JstackfilterAction"
+               id="org.basilevs.jstackfilter.eclipse.action1"
+               label="Show idle threads"
+               menubarPath="org.eclipse.jdt.debug.ui.LaunchView.javaSubmenu/javaPart"
+               state="true"
+               style="toggle"
+               tooltip="Remove threads thats are known to do nothing per Jstackfilter">
+         </action>
+      </viewContribution>
+   </extension>
+
+</plugin>
