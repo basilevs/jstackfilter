@@ -7,9 +7,11 @@ options
 PARSER_BEGIN(JstackParser)
 package org.basilevs.jstackfilter.grammar.jstack;
 import org.basilevs.jstackfilter.Frame;
+import org.basilevs.jstackfilter.KeyValue;
 import org.basilevs.jstackfilter.JavaThread;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 @ SuppressWarnings(
 {
   "unused", "serial"
@@ -265,17 +267,31 @@ void monitor() :
   line()
 }
 
-void keyValue() :
+KeyValue keyValue() :
 {
+    Token key;
+    Token t;
+ 	StringBuilder value = new StringBuilder();
 }
 {
-  < WORD > "="
+  key =  < WORD >
+  
+  "="
   (
-    < NUMBER > 
+    t = < NUMBER >
+    {
+      value.append(t.image);
+    }
     (
-    < WORD >
+    t = < WORD >
+     {
+       value.append(t.image);
+     }
     )?
   )+
+  {
+    return new KeyValue(key.image, value.toString());
+  }
 }
 
 //"VM Thread" os_prio=2 cpu=203.12ms elapsed=98699.54s tid=0x000002c22c0b2de0 nid=0x2c90 runnable
@@ -312,6 +328,8 @@ JavaThread javaThread() :
   Token t;
   String name;
   String state;
+  long id = 0;
+  KeyValue pair;
 }
 {
   t = < QUOTE >
@@ -326,7 +344,12 @@ JavaThread javaThread() :
     < SPACE >
     (
       LOOKAHEAD(2)
-      keyValue()
+      pair = keyValue()
+      {
+        if (Objects.equals(pair.key, "id")) {
+          id = Long.valueOf(pair.value);
+        }
+      }
     | 
       LOOKAHEAD(2)
       < WORD >
@@ -396,7 +419,7 @@ JavaThread javaThread() :
     )*
   )
   {
-    return new JavaThread(name, state, frames);
+    return new JavaThread(name, id, state, frames);
   }
 }
 
