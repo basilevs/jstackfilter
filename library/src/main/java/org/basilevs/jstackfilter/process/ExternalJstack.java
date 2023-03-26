@@ -1,4 +1,4 @@
-package org.basilevs.jstackfilter;
+package org.basilevs.jstackfilter.process;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -6,7 +6,9 @@ import java.io.Reader;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.charset.StandardCharsets;
 
-public class RunExternalJstack {
+import org.basilevs.jstackfilter.Filter;
+
+public class ExternalJstack {
 	public static void main(String[] args) throws IOException {
 		var pb = new ProcessBuilder();
 		pb.command("jstack", args[0]);
@@ -14,7 +16,7 @@ public class RunExternalJstack {
 		Process process = pb.start();
 		try {
 			try (Reader reader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)) {
-				ProcessInput.process(reader);
+				Filter.process(reader);
 			}
 		} finally {
 			process.destroy();

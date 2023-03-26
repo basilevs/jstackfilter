@@ -1,20 +1,14 @@
 package org.basilevs.jstackfilter;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class ProcessInput {
-
-	public static void main(String[] args) throws IOException {
-		try (Reader reader = new InputStreamReader(System.in, StandardCharsets.UTF_8)) {
-			ProcessInput.process(reader);
-		}
+public final class Filter {
+	private Filter() {
 	}
 
 	public static void process(Reader reader) throws IOException {
@@ -31,12 +25,11 @@ public class ProcessInput {
 	}
 
 	public static void copy(Reader input, Writer output) throws IOException {
-		char[] buffer = new char[1024*1024];
+		char[] buffer = new char[1024 * 1024];
 		int n = 0;
 		while (-1 != (n = input.read(buffer))) {
 			output.write(buffer, 0, n);
 		}
 	}
-
 
 }
