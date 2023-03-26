@@ -12,6 +12,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
+import org.basilevs.jstackfilter.Filter;
+
 public class SystemUtil {
 
 	public static final class ErrorOutput extends IOException {
@@ -33,7 +35,7 @@ public class SystemUtil {
 				throw new IllegalStateException(e);
 			}
 		}, executor);
-		return SystemUtil.onClose(process.getInputStream(), () -> {
+		return Filter.onClose(process.getInputStream(), () -> {
 			process.destroy();
 			try {
 				if (!error.get().trim().isEmpty()) {
@@ -64,19 +66,6 @@ public class SystemUtil {
 			return findIoException((Exception) cause);
 		}
 		return null;
-	}
-
-	public static InputStream onClose(InputStream delegate, Closeable runnable) {
-		return new FilterInputStream(delegate) {
-			@Override
-			public void close() throws IOException {
-				try {
-					super.close();
-				} finally {
-					runnable.close();
-				}
-			}
-		};
 	}
 
 	public static String toString(Reader input) throws IOException {
