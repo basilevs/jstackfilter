@@ -12,17 +12,19 @@ public final class JavaThread {
 	private final String name;
 	private final String state;
 	private final String representation;
+	private final long id;
 
-	public JavaThread(String name, String state, Collection<Frame> frames) {
-		this(name, state, frames, buildRepresentation(name, state, frames));
+	public JavaThread(String name, long id, String state, Collection<Frame> frames) {
+		this(name, id, state, frames, buildRepresentation(name, state, frames));
 
 	}
 
-	public JavaThread(String name, String state, Collection<Frame> frames, String representation) {
+	public JavaThread(String name, long id, String state, Collection<Frame> frames, String representation) {
 		this.name = Objects.requireNonNull(name);
 		this.state = Objects.requireNonNull(state);
 		this.frames = List.copyOf(frames);
 		this.representation = representation;
+		this.id = id;
 	}
 
 	public List<Frame> frames() {
@@ -50,7 +52,7 @@ public final class JavaThread {
 	}
 
 	public JavaThread withRepresentation(String representation) {
-		return new JavaThread(this.name(), this.state(), frames, representation);
+		return new JavaThread(this.name(), this.id(), this.state(), frames, representation);
 	}
 
 	private static final Pattern LAMBDA_PATTERN = Pattern.compile("\\$\\$Lambda\\$\\d+/0x[\\dabcdef]+\\.");
@@ -70,5 +72,9 @@ public final class JavaThread {
 			result.append('\t').append(frame).append('\n');
 		}
 		return result.toString();
+	}
+
+	public long id() {
+		return id;
 	}
 }
