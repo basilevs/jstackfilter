@@ -1,93 +1,99 @@
 package org.basilevs.jstackfilter.eclipse;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.HashSet;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.basilevs.jstackfilter.Filter;
 import org.basilevs.jstackfilter.Frame;
 import org.basilevs.jstackfilter.JavaThread;
-import org.basilevs.jstackfilter.JstackParser;
 import org.basilevs.jstackfilter.Known;
 import org.basilevs.jstackfilter.eclipse.jdt.AbstractThreadsViewFilterAction;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.jdt.debug.core.IJavaStackFrame;
 import org.eclipse.jdt.debug.core.IJavaThread;
-import org.eclipse.jdt.internal.debug.core.model.JDIDebugTarget;
 import org.eclipse.jdt.internal.debug.core.model.JDIThread;
 import org.eclipse.jface.viewers.StructuredViewer;
 
+import com.sun.jdi.IncompatibleThreadStateException;
+import com.sun.jdi.Location;
+import com.sun.jdi.StackFrame;
+import com.sun.jdi.ThreadReference;
+
 public class JstackfilterAction extends AbstractThreadsViewFilterAction {
-	private final LinkedHashSet<JDIDebugTarget> requests = new LinkedHashSet<>();
-	private final Map<JDIDebugTarget, Set<Long>> idleThreads = new WeakHashMap<>(); 
-	
-	private final Job refreshJob = new Job("Detect idle threads") {
-		{
-			setPriority(Job.LONG);
-			setUser(false);
+	private static final ILog LOG = Platform.getLog(JstackfilterAction.class);
+	private final Map<IJavaThread, Boolean> idleThreads = new WeakHashMap<>();
+
+	private void updateIdle(IJavaThread thread, boolean isIdle) {
+		Boolean previous;
+		synchronized (idleThreads) {
+			previous = idleThreads.put(thread, isIdle);
+		}
+		if (previous == null) {
+			previous = Boolean.FALSE;
 		}
 
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
-			for (;;) {
-				JDIDebugTarget target;
-				synchronized (requests) {
-					var i = requests.iterator();
-					if (!i.hasNext()) {
-						return Status.OK_STATUS;
-					}
-					target = i.next();
-					i.remove();
-				}
-				if (monitor.isCanceled()) {
-					return Status.CANCEL_STATUS;
-				}
-				long pid = target.getVM().process().pid();
-				Set<Long> result;
-				try (Reader reader = org.basilevs.jstackfilter.ExternalJstack.read(pid)) {
-					result = JstackParser.parseThreads(reader)
-					.filter(Known::isKnown)
-					.map(JavaThread::id)
-					.collect(Collectors.toSet());
-				} catch (IOException e) {
-					return Status.error("Jstack failed for PID " + pid, e);
-				}
-				
-				Set<Long> previous;
-				synchronized (idleThreads) {
-					previous = idleThreads.put(target, result);
-				}
-				if (!previous.equals(result)) {
-					StructuredViewer viewer = getStructuredViewer();
-					var control = viewer.getControl();
-					if (control.isDisposed())
-						continue;
-					control.getDisplay().asyncExec(() -> {
-						if (!control.isDisposed()) {
-							viewer.refresh(target);
-						}
-					});
+		if (previous.booleanValue() == isIdle) {
+			return;
+		}
+
+		StructuredViewer viewer = getStructuredViewer();
+		var control = viewer.getControl();
+		if (control.isDisposed())
+			return;
+		control.getDisplay().asyncExec(() -> {
+			if (!control.isDisposed()) {
+				viewer.refresh(thread.getDebugTarget());
+				try {
+					viewer.refresh(thread.getThreadGroup());
+				} catch (DebugException e) {
+					LOG.error("Can't get thread group", e);
 				}
 			}
-			
+		});
+	}
+
+	private boolean isIdle(IJavaThread thread) {
+		List<StackFrame> frames;
+		synchronized (thread) {
+			if (thread.isSuspended()) {
+				return false;
+			}
+
+			if (!thread.canSuspend()) {
+				return false;
+			}
+
+			if (thread.isPerformingEvaluation())
+				return false;
+
+			if (!(thread instanceof JDIThread)) {
+				return false;
+			}
+			JDIThread jdiThread = (JDIThread) thread;
+
+			ThreadReference underlyingThread = jdiThread.getUnderlyingThread();
+			underlyingThread.suspend();
+			try {
+				frames = underlyingThread.frames();
+			} catch (IncompatibleThreadStateException e) {
+				LOG.error("Failed to get frames", e);
+				return false;
+			} finally {
+				underlyingThread.resume();
+			}
 		}
-		
-	};
+
+		boolean result = Known.isKnown(adapt(frames));
+		return result;
+
+	}
+
+	private JavaThread adapt(List<StackFrame> frames) {
+		return new JavaThread("irrelevant", 0, "irrelevant",
+				frames.stream().<Frame>map(JstackfilterAction::adapt).collect(Collectors.toUnmodifiableList()));
+	}
 
 	@Override
 	protected boolean isCandidateThread(IJavaThread thread) throws DebugException {
@@ -96,39 +102,28 @@ public class JstackfilterAction extends AbstractThreadsViewFilterAction {
 
 	@Override
 	protected boolean selectThread(IJavaThread thread) throws DebugException {
-		if (!(thread instanceof JDIThread)) {
-			return false;
-		}
-		
-		JDIThread jdiThread = (JDIThread) thread;
-		
-		
-		synchronized (requests) {
-			requests.add(jdiThread.getJavaDebugTarget());
-			refreshJob.schedule();
-		}
-		
+		thread.queueRunnable(() -> {
+			updateIdle(thread, isIdle(thread));
+		});
+
 		synchronized (idleThreads) {
-			return idleThreads.getOrDefault(jdiThread.getJavaDebugTarget(), Collections.emptySet()).contains(jdiThread.getUnderlyingThread().uniqueID());
+			Boolean result = idleThreads.getOrDefault(thread, false);
+			return !result;
 		}
 	}
 
-	private static Frame adapt(IJavaStackFrame frame) {
-		try {
-			return new Frame(frame.getDeclaringTypeName()+"." + frame.getMethodName(), "irrelevant");
-		} catch (DebugException e) {
-			return new Frame("invalid", "irrelevant");
-		}
+	private static Frame adapt(StackFrame frame) {
+		Location location = frame.location();
+		return new Frame(location.declaringType().name() + "." + location.method().name(), "irrelevant");
 	}
 
 	@Override
 	protected String getPreferenceKey() {
 		return "show_mundane_threads";
 	}
-	
+
 	@Override
 	public void dispose() {
-		refreshJob.cancel();
 		super.dispose();
 	}
 
