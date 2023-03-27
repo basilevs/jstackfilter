@@ -483,3 +483,8 @@
 	at org.eclipse.equinox.launcher.Main.run(Main.java:1467)
 	at org.eclipse.equinox.launcher.Main.main(Main.java:1440)
 
+"FileWatchdog" #36 daemon prio=6 os_prio=31 cpu=0.06ms elapsed=50.01s tid=0x00000001278bd600 nid=0xc703 waiting on condition  [0x00000002a188a000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4.1/Native Method)
+	at org.apache.log4j.helpers.FileWatchdog.run(FileWatchdog.java:99)
+
