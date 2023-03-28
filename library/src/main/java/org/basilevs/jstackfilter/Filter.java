@@ -47,10 +47,18 @@ public final class Filter {
 
 
 	public static void copy(Reader input, Writer output) throws IOException {
-		char[] buffer = new char[1024 * 1024];
-		int n = 0;
-		while (-1 != (n = input.read(buffer))) {
-			output.write(buffer, 0, n);
+		try {
+			char[] buffer = new char[1024 * 1024];
+			int n = 0;
+			while (-1 != (n = input.read(buffer))) {
+				output.write(buffer, 0, n);
+			}
+		} finally {
+			try {
+				input.close();
+			} finally {
+				output.close();
+			}
 		}
 	}
 
