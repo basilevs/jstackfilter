@@ -44,9 +44,9 @@ public class JstackfilterAction extends AbstractThreadsViewFilterAction {
 			return;
 		control.getDisplay().asyncExec(() -> {
 			if (!control.isDisposed()) {
-				viewer.refresh(thread.getDebugTarget());
+				viewer.refresh(thread.getDebugTarget(), false);
 				try {
-					viewer.refresh(thread.getThreadGroup());
+					viewer.refresh(thread.getThreadGroup(), false);
 				} catch (DebugException e) {
 					LOG.error("Can't get thread group", e);
 				}
