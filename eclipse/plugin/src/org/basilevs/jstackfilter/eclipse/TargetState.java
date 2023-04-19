@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.basilevs.jstackfilter.Frame;
 import org.basilevs.jstackfilter.JavaThread;
-import org.basilevs.jstackfilter.Known;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
@@ -43,6 +43,7 @@ final class TargetState {
 		}
 		return Status.OK_STATUS;
 	}));
+	private final Predicate<JavaThread> isThreadIdle;
 
 	private void compute(BooleanSupplier isCancelled) throws DebugException {
 		var result = Arrays.stream(target.getThreads()).filter(this::computeIdle).peek(item -> {
@@ -61,7 +62,8 @@ final class TargetState {
 		}
 	}
 
-	public TargetState(IDebugTarget target, Runnable listener) {
+	public TargetState(IDebugTarget target, Predicate<JavaThread> isThreadIdle, Runnable listener) {
+		this.isThreadIdle = Objects.requireNonNull(isThreadIdle);
 		this.target = Objects.requireNonNull(target);
 		this.listener = Objects.requireNonNull(listener);
 		job.setUser(false);
@@ -114,7 +116,8 @@ final class TargetState {
 			}
 		}
 
-		boolean idle = Known.isKnown(adapt(frames));
+		JavaThread threadCandidate = adapt(frames);
+		boolean idle = isThreadIdle.test(threadCandidate);
 		if (DEBUG) {
 			try {
 				LOG.info(thread.getName() + (idle ?  " is idle" : " is not idle"));

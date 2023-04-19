@@ -16,8 +16,11 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.basilevs.jstackfilter.Filter;
+import org.basilevs.jstackfilter.JavaThread;
+import org.basilevs.jstackfilter.Known;
 import org.basilevs.jstackfilter.ui.internal.SystemUtil;
 
 public class Model {
@@ -32,7 +35,7 @@ public class Model {
 	private final Consumer<String> outputListener;
 	private boolean filter = true;
 	private ReaderSupplier input = NO_INPUT;
-
+	private final Known known = new Known();
 
 	public Model(Consumer<String> errorListener, Consumer<String> outputListener) {
 		super();
@@ -72,7 +75,7 @@ public class Model {
 		try {
 			Reader filtered;
 			if (filter) {
-				filtered = Filter.filter(input);
+				filtered = Filter.filter(Predicate.<JavaThread>not(known::isKnown), input);
 			} else {
 				filtered = input;
 			}

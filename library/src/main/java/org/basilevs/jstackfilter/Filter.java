@@ -15,18 +15,19 @@ public final class Filter {
 	}
 
 	public static void process(Reader reader) throws IOException {
-		copy(filter(reader), new OutputStreamWriter(System.out));
+		Known known = new Known();
+		copy(filter(Predicate.<JavaThread>not(known::isKnown), reader), new OutputStreamWriter(System.out));
 	}
 
-	public static Reader filter(Reader reader) {
+	public static Reader filter(Predicate<JavaThread> select, Reader reader) {
 		Stream<JavaThread> stacks = JstackParser.parseThreads(reader);
-		Stream<JavaThread> stacksCopy = filter(stacks);
+		Stream<JavaThread> stacksCopy = filter(select, stacks);
 		return new StreamReader(stacksCopy.map(thread -> thread + "\n\n"));
 	}
 
-	public static Stream<JavaThread> filter(Stream<JavaThread> stacks) {
+	public static Stream<JavaThread> filter(Predicate<JavaThread> select, Stream<JavaThread> stacks) {
 		Stream<JavaThread> stacksCopy = stacks;
-		stacksCopy = stacksCopy.filter(Predicate.not(Known::isKnown));
+		stacksCopy = stacksCopy.filter(select);
 		stacksCopy = stacksCopy.collect(new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2))).stream();
 		stacksCopy.onClose(stacks::close);
 		return stacksCopy;

@@ -3,6 +3,7 @@ package org.basilevs.jstackfilter.eclipse;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.basilevs.jstackfilter.Known;
 import org.basilevs.jstackfilter.eclipse.jdt.AbstractThreadsViewFilterAction;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
@@ -13,6 +14,7 @@ import org.eclipse.jdt.debug.core.IJavaThread;
 public class JstackfilterAction extends AbstractThreadsViewFilterAction {
 	static final ILog LOG = Platform.getLog(JstackfilterAction.class);
 	private final Map<IDebugTarget, TargetState> targetStates = new WeakHashMap<>();
+	private final Known idleThreads = new Known();
 
 	@Override
 	protected boolean isCandidateThread(IJavaThread thread) throws DebugException {
@@ -24,7 +26,7 @@ public class JstackfilterAction extends AbstractThreadsViewFilterAction {
 		var target = thread.getDebugTarget();
 		TargetState state;
 		synchronized (targetStates) {
-			state = targetStates.computeIfAbsent(target, (t) -> new TargetState(t, () -> this.refresh(t)));
+			state = targetStates.computeIfAbsent(target, (t) -> new TargetState(t, idleThreads::isKnown, () -> this.refresh(t)));
 		}
 		return !state.isIdle(thread);
 	}
