@@ -1,5 +1,6 @@
 package org.basilevs.jstackfilter.eclipse;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -14,7 +15,14 @@ import org.eclipse.jdt.debug.core.IJavaThread;
 public class JstackfilterAction extends AbstractThreadsViewFilterAction {
 	static final ILog LOG = Platform.getLog(JstackfilterAction.class);
 	private final Map<IDebugTarget, TargetState> targetStates = new WeakHashMap<>();
-	private final Known idleThreads = new Known();
+	private final Known idleThreads; 
+	{
+		try {
+			idleThreads = new Known();
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
 	@Override
 	protected boolean isCandidateThread(IJavaThread thread) throws DebugException {

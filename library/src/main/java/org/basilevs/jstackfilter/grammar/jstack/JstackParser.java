@@ -412,15 +412,13 @@ public final class JstackParser implements JstackParserConstants {
     name = t.image.substring(1, length - 1);
     jj_consume_token(SPACE);
     jj_consume_token(35);
-    jj_consume_token(NUMBER);
+    t = jj_consume_token(NUMBER);
+        id = Long.valueOf(t.image);
     label_8:
     while (true) {
       jj_consume_token(SPACE);
       if (jj_2_6(2)) {
         pair = keyValue();
-        if (Objects.equals(pair.key, "id")) {
-          id = Long.valueOf(pair.value);
-        }
       } else if (jj_2_7(2)) {
         jj_consume_token(WORD);
       } else if (jj_2_8(2)) {
@@ -754,11 +752,6 @@ public final class JstackParser implements JstackParserConstants {
     return false;
   }
 
-  private boolean jj_3_8() {
-    if (jj_scan_token(36)) return true;
-    return false;
-  }
-
   private boolean jj_3_3() {
     if (jj_3R_19()) return true;
     Token xsp;
@@ -770,6 +763,17 @@ public final class JstackParser implements JstackParserConstants {
 
   private boolean jj_3_4() {
     if (jj_3R_21()) return true;
+    return false;
+  }
+
+  private boolean jj_3_8() {
+    if (jj_scan_token(36)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_18() {
+    if (jj_scan_token(21)) return true;
+    if (jj_scan_token(WORD)) return true;
     return false;
   }
 
@@ -794,12 +798,6 @@ public final class JstackParser implements JstackParserConstants {
     return false;
   }
 
-  private boolean jj_3R_18() {
-    if (jj_scan_token(21)) return true;
-    if (jj_scan_token(WORD)) return true;
-    return false;
-  }
-
   private boolean jj_3_5() {
     if (jj_scan_token(SPACE)) return true;
     Token xsp;
@@ -811,18 +809,13 @@ public final class JstackParser implements JstackParserConstants {
     return false;
   }
 
-  private boolean jj_3R_17() {
-    if (jj_scan_token(24)) return true;
-    return false;
-  }
-
   private boolean jj_3_6() {
     if (jj_3R_21()) return true;
     return false;
   }
 
-  private boolean jj_3R_16() {
-    if (jj_scan_token(20)) return true;
+  private boolean jj_3R_17() {
+    if (jj_scan_token(24)) return true;
     return false;
   }
 
@@ -840,6 +833,11 @@ public final class JstackParser implements JstackParserConstants {
     }
     }
     }
+    return false;
+  }
+
+  private boolean jj_3R_16() {
+    if (jj_scan_token(20)) return true;
     return false;
   }
 

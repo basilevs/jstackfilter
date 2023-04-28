@@ -27,7 +27,7 @@ public class Model {
 	private interface ReaderSupplier {
 		Reader read() throws IOException;
 	}
-	
+
 	private static final ReaderSupplier NO_INPUT = () -> new StringReader("No input selected");
 	private final ExecutorService executor = Executors.newFixedThreadPool(1);
 	private static final long CURRENT_PID = ProcessHandle.current().pid();
@@ -35,7 +35,14 @@ public class Model {
 	private final Consumer<String> outputListener;
 	private boolean filter = true;
 	private ReaderSupplier input = NO_INPUT;
-	private final Known known = new Known();
+	private final Known known;
+	{
+		try {
+			known = new Known();
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
 	public Model(Consumer<String> errorListener, Consumer<String> outputListener) {
 		super();

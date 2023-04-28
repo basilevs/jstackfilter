@@ -15,7 +15,7 @@ public final class JavaThread {
 	private final long id;
 
 	public JavaThread(String name, long id, String state, Collection<Frame> frames) {
-		this(name, id, state, frames, buildRepresentation(name, state, frames));
+		this(name, id, state, frames, buildRepresentation(name, id, state, frames));
 
 	}
 
@@ -65,9 +65,9 @@ public final class JavaThread {
 		return LAMBDA_PATTERN.matcher(input).replaceAll(JavaThread.class.getName());
 	}
 
-	private static String buildRepresentation(String name, String state, Collection<Frame> frames) {
+	private static String buildRepresentation(String name, long id, String state, Collection<Frame> frames) {
 		StringBuilder result = new StringBuilder();
-		result.append(String.format("\"%s\"\n   java.lang.Thread.State: %s\n", name, state));
+		result.append(String.format("\"%s\" #%d prio=1 [0x0000000000000000]\n   java.lang.Thread.State: %s\n", name, id, state));
 		for (Frame frame : frames) {
 			result.append('\t').append(frame).append('\n');
 		}

@@ -338,18 +338,16 @@ JavaThread javaThread() :
     name = t.image.substring(1, length - 1);	
   }
   < SPACE > "#" 
-  < NUMBER >
+  t = < NUMBER >
+      {
+        id = Long.valueOf(t.image);
+      }
   (
     LOOKAHEAD(2)
     < SPACE >
     (
       LOOKAHEAD(2)
       pair = keyValue()
-      {
-        if (Objects.equals(pair.key, "id")) {
-          id = Long.valueOf(pair.value);
-        }
-      }
     | 
       LOOKAHEAD(2)
       < WORD >
