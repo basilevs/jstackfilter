@@ -1,7 +1,5 @@
 package org.basilevs.jstackfilter.ui.internal;
 
-import java.io.Closeable;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
