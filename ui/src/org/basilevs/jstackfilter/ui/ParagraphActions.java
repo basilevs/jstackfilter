@@ -9,6 +9,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.text.Caret;
 import javax.swing.text.JTextComponent;
 
 public class ParagraphActions {
@@ -27,9 +28,7 @@ public class ParagraphActions {
 			}
 		});
 		textArea.addCaretListener(e -> {
-			int targetStart = textArea.getSelectionStart();
-			int targetEng = textArea.getSelectionEnd();
-			selectParagraphs(targetStart, targetEng, false);
+			selectParagraphs(e.getMark(), e.getDot());
 		});
 
 		// Handle caret-up action
@@ -39,34 +38,44 @@ public class ParagraphActions {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				int position = textArea.getSelectionStart() - (PARAGRPAH_DELIMIETER.length() * 2);
-				selectParagraphs(position, position, true);
+				selectParagraphs(position, position);
 			}
 		});
 	}
 
-	private void selectParagraphs(int targetStart, int targetEng, boolean scrollBack) {
-		int start = findParagraphStart(targetStart);
-		int end = findParagraphEnd(targetEng);
+	private void selectParagraphs(int from, int to) {
+		int start = findParagraphStart(Math.min(from, to));
+		int end = findParagraphEnd(Math.max(from,  to));
 
-		if (start < end && !inUpdate) {
-			int caret;
-			int mark;
-			if (scrollBack) {
-				caret = start;
-				mark = end;
+		if (start < end) {
+			int caretPos;
+			int markPos;
+			if (from > to) {
+				caretPos = start;
+				markPos = end;
 			} else {
-				mark = start;
-				caret = end;
+				markPos = start;
+				caretPos = end;
 			}
-			SwingUtilities.invokeLater(() -> {
-				inUpdate = true;
-				try {
-					textArea.setCaretPosition(mark);
-					textArea.moveCaretPosition(caret);
-				} finally {
-					inUpdate = false;
-				}
-			});
+			select(markPos, caretPos);
+		}
+	}
+
+	private void select(int from, int to) {
+		if (inUpdate) {
+			return;
+		}
+		inUpdate = true;
+		try {
+			Caret caret = textArea.getCaret();
+			if (caret.getMark() != from) {
+				caret.setDot(from);
+				caret.moveDot(to);
+			} else if (caret.getDot() != to) {
+				caret.moveDot(to);
+			}
+		} finally {
+			inUpdate = false;
 		}
 	}
 
