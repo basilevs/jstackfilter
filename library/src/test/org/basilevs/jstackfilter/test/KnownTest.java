@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.basilevs.jstackfilter.Frame;
 import org.basilevs.jstackfilter.JavaThread;
@@ -69,7 +70,7 @@ public class KnownTest {
 	public void persistOverSaveAndLoad() throws IOException {
 		Assert.assertFalse(Files.exists(configurationFile));
 		Assert.assertFalse(subject.isKnown(UNKNOWN));
-		subject.add(UNKNOWN);
+		subject.addAll(Stream.of(UNKNOWN));
 		Assert.assertTrue(subject.isKnown(UNKNOWN));
 		subject.close();
 		subject = new Known(configurationFile);

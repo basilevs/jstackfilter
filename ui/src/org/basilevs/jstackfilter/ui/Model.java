@@ -95,9 +95,15 @@ public class Model {
 			input.close();
 		}
 	}
+	
+	public void rememberIdleThreads(String selection) {
+		known.load(new StringReader(selection));
+		update();
+	}
 
-	public void close() {
+	public void close() throws IOException {
 		executor.shutdownNow();
+		known.close();
 	}
 
 	public List<JavaProcess> getJavaProcesses() {

@@ -98,7 +98,11 @@ public class Application {
 			@Override
 			public void windowClosed(WindowEvent e) {
 				super.windowClosed(e);
-				model.close();
+				try {
+					model.close();
+				} catch (IOException e1) {
+					throw new RuntimeException(e1);
+				}
 			}
 		});
 
@@ -123,6 +127,9 @@ public class Application {
 		
 		var loadButton = new JButton();
 		controls.add(loadButton);
+		
+		var markIdleButton = new JButton();
+		controls.add(markIdleButton);
 
 
 		JTable table = new JTable();
@@ -250,6 +257,18 @@ public class Application {
 		table.getActionMap().put(loadName, loadAction);
 		loadButton.setAction(loadAction);
 		
+		var markIdleName = "mark idle";
+		AbstractAction markIdle = new AbstractAction(markIdleName) {
+			private static final long serialVersionUID = 9199450855113081882L;
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				model.rememberIdleThreads(output.getSelectedText());
+			}
+		};
+		markIdle.putValue(Action.SHORT_DESCRIPTION, "(Ctrl+I) Mark selected threads as idle.");
+		WindowUtil.handleKeystrokes(frame.getRootPane(), markIdleName, KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK), KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.META_DOWN_MASK));
+		frame.getRootPane().getActionMap().put(markIdleName, markIdle);
+		markIdleButton.setAction(markIdle);
 
 		String exitName = "exit";
 		AbstractAction exitAction = new AbstractAction(exitName) {

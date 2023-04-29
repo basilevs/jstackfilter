@@ -9,12 +9,12 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.basilevs.jstackfilter.internal.OS;
 
@@ -40,11 +40,8 @@ public final class Known implements Closeable {
 		}
 	}
 
-	private void load(Reader reader) {
-		Collection<JavaThread> newThreads = JstackParser.parseThreads(reader)
-				.collect(new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2)));
-		threads.addAll(
-				newThreads.stream().filter(Predicate.not(this::isKnown)).collect(Collectors.toUnmodifiableList()));
+	public void load(Reader reader) {
+		addAll(JstackParser.parseThreads(reader));
 	}
 
 	private void save(Writer output) {
@@ -71,8 +68,10 @@ public final class Known implements Closeable {
 		}
 	}
 
-	public void add(JavaThread another) {
-		 threads.add(another);
+	public void addAll(Stream<JavaThread> newThreads) {
+		var tmp = newThreads.collect(new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2)));
+		threads.addAll(tmp.stream().filter(Predicate.not(this::isKnown)).collect(Collectors.toUnmodifiableList()));
+		// Due to concurrency, threads will contain some duplicates, but there won't be a lot, and they won't affect performance much
 	}
 
 }
