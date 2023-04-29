@@ -137,6 +137,8 @@ public class Application {
 		content.add(scrollPane, c);
 		output.enableInputMethods(false);
 		output.setEditable(false);
+		
+		ParagraphActions paragraphActions = new ParagraphActions(output);
 
 		setError = message -> {
 			invokeLater(() -> {
