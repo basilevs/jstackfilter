@@ -48,6 +48,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.text.DefaultEditorKit;
 
+import org.basilevs.jstackfilter.ui.internal.ParagraphCaret;
 import org.basilevs.jstackfilter.ui.internal.WindowUtil;
 
 public class Application {
@@ -138,7 +139,9 @@ public class Application {
 		output.enableInputMethods(false);
 		output.setEditable(false);
 		
-		ParagraphActions paragraphActions = new ParagraphActions(output);
+//		ParagraphActions paragraphActions = new ParagraphActions(output);
+		
+		output.setCaret(new ParagraphCaret());
 
 		setError = message -> {
 			invokeLater(() -> {
