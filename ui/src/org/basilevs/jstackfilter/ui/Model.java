@@ -97,8 +97,12 @@ public class Model {
 	}
 	
 	public void rememberIdleThreads(String selection) {
-		known.load(new StringReader(selection));
-		update();
+		try {
+			known.load(new StringReader(selection));
+			update();
+		} catch (Exception e) {
+			handleError(e);
+		}
 	}
 
 	public void close() throws IOException {

@@ -69,9 +69,17 @@ public final class Known implements Closeable {
 	}
 
 	public void addAll(Stream<JavaThread> newThreads) {
-		var tmp = newThreads.collect(new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2)));
+		var tmp = newThreads.peek(this::checkThread).collect(new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2)));
 		threads.addAll(tmp.stream().filter(Predicate.not(this::isKnown)).collect(Collectors.toUnmodifiableList()));
 		// Due to concurrency, threads will contain some duplicates, but there won't be a lot, and they won't affect performance much
+	}
+
+	private void checkThread(JavaThread input) {
+		var dump = input.toString();
+		JavaThread parsed = JstackParser.parseThread(dump).get();
+		if (!input.equalByMethodName(parsed)) {
+			throw new IllegalArgumentException("Can't properly serialize " + input);
+		}
 	}
 
 }
