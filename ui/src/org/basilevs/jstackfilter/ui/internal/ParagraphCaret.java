@@ -27,6 +27,7 @@ public class ParagraphCaret extends DefaultCaret {
 				LOG.log(Level.DEBUG, "caret-up: {0} {1} {2}", getMark(), getDot(), range);
 				ParagraphCaret.super.setDot(range.from, Bias.Forward);
 				ParagraphCaret.super.moveDot(range.to, Bias.Forward);
+				
 			}
 		});
 
@@ -49,9 +50,9 @@ public class ParagraphCaret extends DefaultCaret {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Range range = Paragraphs.findPreviousParagraphRange(getComponent().getText(), getMark(), getDot());
+				Range range = Paragraphs.includePreviousParagraph(getComponent().getText(), getMark(), getDot());
 				LOG.log(Level.DEBUG, "selection-up: {0} {1} {2}", getMark(), getDot(), range);
-				ParagraphCaret.super.setDot(Math.max(getMark(), getDot()), Bias.Forward);
+				ParagraphCaret.super.setDot(range.from, Bias.Forward);
 				ParagraphCaret.super.moveDot(range.to, Bias.Forward);
 			}
 		});
@@ -61,9 +62,9 @@ public class ParagraphCaret extends DefaultCaret {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Range range = Paragraphs.findNextParagraphRange(getComponent().getText(), getMark(), getDot());
+				Range range = Paragraphs.includeNextParagraph(getComponent().getText(), getMark(), getDot());
 				LOG.log(Level.DEBUG, "selection-down: {0} {1} {2}", getMark(), getDot(), range);
-				ParagraphCaret.super.setDot(Math.min(getMark(), getDot()), Bias.Forward);
+				ParagraphCaret.super.setDot(range.from, Bias.Forward);
 				ParagraphCaret.super.moveDot(range.to, Bias.Forward);
 			}
 		});

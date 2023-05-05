@@ -1,14 +1,13 @@
 package org.basilevs.jstackfilter.ui.internal;
 
 public class Paragraphs {
-	private static final String PARAGRPAH_DELIMIETER = "\n\n";
+	private static final String PARAGRAPH_DELIMITER = "\n\n";
 	private Paragraphs() {}
 	
 	public static class Range {
 		public final int from, to;
 
 		public Range(int from, int to) {
-			super();
 			this.from = from;
 			this.to = to;
 		}
@@ -29,10 +28,10 @@ public class Paragraphs {
 
 		Range result ;
 		
-		int length = PARAGRPAH_DELIMIETER.length();
+		int length = PARAGRAPH_DELIMITER.length();
 		int step = length + 1;
 		if (start > end) {
-			if (end + PARAGRPAH_DELIMIETER.length() + 1 < text.length()) {
+			if (end + PARAGRAPH_DELIMITER.length() + 1 < text.length()) {
 				result = toParagraphRange(text, end + length, end + step);
 			} else if (start - step > 0) {
 				result = toParagraphRange(text, start - length, start - step);
@@ -51,17 +50,17 @@ public class Paragraphs {
 	}
 
 	public static int findParagraphStart(String text, int position) {
-		int start = text.lastIndexOf(PARAGRPAH_DELIMIETER, position);
+		int start = text.lastIndexOf(PARAGRAPH_DELIMITER, position);
 		if (start < 0) {
 			start = 0;
 		} else {
-			start += PARAGRPAH_DELIMIETER.length();
+			start += PARAGRAPH_DELIMITER.length();
 		}
 		return start;
 	}
 
 	private static int findParagraphEnd(String text, int position) {
-		int end = text.indexOf(PARAGRPAH_DELIMIETER, position);
+		int end = text.indexOf(PARAGRAPH_DELIMITER, position);
 		if (end == -1) {
 			end = text.length();
 		}
@@ -69,13 +68,23 @@ public class Paragraphs {
 	}
 
 	public static Range findPreviousParagraphRange(String text, int from, int to) {
-		int newPos = Math.min(from, to) - PARAGRPAH_DELIMIETER.length() * 2;
+		int newPos = Math.min(from, to) - PARAGRAPH_DELIMITER.length() * 2;
 		return toParagraphRange(text, newPos, newPos - 1);
 	}
 
 	public static Range findNextParagraphRange(String text, int from, int to) {
-		int newPos = Math.max(from, to) + PARAGRPAH_DELIMIETER.length() * 2;
+		int newPos = Math.max(from, to) + PARAGRAPH_DELIMITER.length() * 2;
 		return toParagraphRange(text, newPos, newPos + 1);
+	}
+
+	public static Range includePreviousParagraph(String text, int from, int to) {
+		Range previous = findPreviousParagraphRange(text, from, to);
+		return new Range(Math.max(from, to), previous.to);
+	}
+
+	public static Range includeNextParagraph(String text, int mark, int dot) {
+		Range next = findNextParagraphRange(text, mark, dot);
+		return new Range(Math.min(mark, dot), next.to);
 	}
 
 }
