@@ -931,3 +931,17 @@ JNI global refs: 221, weak refs: 45
 	- locked <0x000000079abe0628> (a [Ljava.lang.Boolean;)
 	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
 
+"Event Loop Monitor" #55 daemon prio=6 os_prio=31 cpu=9848.85ms elapsed=35909.88s tid=0x000000014d5cfe00 nid=0x27f0b runnable  [0x00000002cc765000]
+   java.lang.Thread.State: RUNNABLE
+	at java.lang.StringConcatHelper.newString(java.base@17.0.4.1/StringConcatHelper.java:387)
+	at java.lang.invoke.DirectMethodHandle$Holder.invokeStatic(java.base@17.0.4.1/DirectMethodHandle$Holder)
+	at java.lang.invoke.LambdaForm$MH/0x0000000800e6b800.invoke(java.base@17.0.4.1/LambdaForm$MH)
+	at java.lang.invoke.Invokers$Holder.linkToTargetMethod(java.base@17.0.4.1/Invokers$Holder)
+	at java.lang.management.ThreadInfo.initialize(java.management@17.0.4.1/ThreadInfo.java:246)
+	at java.lang.management.ThreadInfo.<init>(java.management@17.0.4.1/ThreadInfo.java:200)
+	at sun.management.ThreadImpl.dumpThreads0(java.management@17.0.4.1/Native Method)
+	at sun.management.ThreadImpl.dumpAllThreads(java.management@17.0.4.1/ThreadImpl.java:521)
+	at sun.management.ThreadImpl.dumpAllThreads(java.management@17.0.4.1/ThreadImpl.java:509)
+	at org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.captureThreadStacks(EventLoopMonitorThread.java:650)
+	at org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.run(EventLoopMonitorThread.java:604)
+

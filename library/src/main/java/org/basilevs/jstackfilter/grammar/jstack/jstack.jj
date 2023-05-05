@@ -191,6 +191,11 @@ private String dottedIdentifier() :
     {
       image.append(".");
     }
+  | 
+    "$"
+    {
+      image.append("$");
+    }
   )+
   {
     return image.toString();

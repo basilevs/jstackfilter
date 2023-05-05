@@ -196,6 +196,10 @@ public final class JstackParser implements JstackParserConstants {
         jj_consume_token(19);
       image.append(".");
         break;
+      case 20:
+        jj_consume_token(20);
+      image.append("$");
+        break;
       default:
         jj_la1[4] = jj_gen;
         jj_consume_token(-1);
@@ -204,6 +208,7 @@ public final class JstackParser implements JstackParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case WORD:
       case 19:
+      case 20:
         ;
         break;
       default:
@@ -285,6 +290,7 @@ public final class JstackParser implements JstackParserConstants {
       break;
     case WORD:
     case 19:
+    case 20:
       p = dottedIdentifier();
       image.append(p);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -725,22 +731,6 @@ public final class JstackParser implements JstackParserConstants {
     return false;
   }
 
-  private boolean jj_3R_21() {
-    if (jj_scan_token(WORD)) return true;
-    if (jj_scan_token(34)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_24() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(19)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(3)) return true;
-    }
-    return false;
-  }
-
   private boolean jj_3R_20() {
     if (jj_scan_token(27)) return true;
     Token xsp;
@@ -768,12 +758,6 @@ public final class JstackParser implements JstackParserConstants {
 
   private boolean jj_3_8() {
     if (jj_scan_token(36)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_18() {
-    if (jj_scan_token(21)) return true;
-    if (jj_scan_token(WORD)) return true;
     return false;
   }
 
@@ -814,8 +798,9 @@ public final class JstackParser implements JstackParserConstants {
     return false;
   }
 
-  private boolean jj_3R_17() {
-    if (jj_scan_token(24)) return true;
+  private boolean jj_3R_18() {
+    if (jj_scan_token(21)) return true;
+    if (jj_scan_token(WORD)) return true;
     return false;
   }
 
@@ -836,8 +821,8 @@ public final class JstackParser implements JstackParserConstants {
     return false;
   }
 
-  private boolean jj_3R_16() {
-    if (jj_scan_token(20)) return true;
+  private boolean jj_3R_17() {
+    if (jj_scan_token(24)) return true;
     return false;
   }
 
@@ -846,8 +831,25 @@ public final class JstackParser implements JstackParserConstants {
     return false;
   }
 
+  private boolean jj_3R_16() {
+    if (jj_scan_token(20)) return true;
+    return false;
+  }
+
   private boolean jj_3R_15() {
     if (jj_scan_token(19)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_22() {
+    if (jj_scan_token(QUOTE)) return true;
+    if (jj_scan_token(SPACE)) return true;
+    if (jj_scan_token(35)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_27() {
+    if (jj_scan_token(20)) return true;
     return false;
   }
 
@@ -861,13 +863,6 @@ public final class JstackParser implements JstackParserConstants {
     return false;
   }
 
-  private boolean jj_3R_22() {
-    if (jj_scan_token(QUOTE)) return true;
-    if (jj_scan_token(SPACE)) return true;
-    if (jj_scan_token(35)) return true;
-    return false;
-  }
-
   private boolean jj_3R_26() {
     if (jj_scan_token(19)) return true;
     return false;
@@ -875,6 +870,12 @@ public final class JstackParser implements JstackParserConstants {
 
   private boolean jj_3R_13() {
     if (jj_scan_token(WORD)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_21() {
+    if (jj_scan_token(WORD)) return true;
+    if (jj_scan_token(34)) return true;
     return false;
   }
 
@@ -888,7 +889,10 @@ public final class JstackParser implements JstackParserConstants {
     xsp = jj_scanpos;
     if (jj_3R_25()) {
     jj_scanpos = xsp;
-    if (jj_3R_26()) return true;
+    if (jj_3R_26()) {
+    jj_scanpos = xsp;
+    if (jj_3R_27()) return true;
+    }
     }
     return false;
   }
@@ -915,6 +919,16 @@ public final class JstackParser implements JstackParserConstants {
     return false;
   }
 
+  private boolean jj_3R_24() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(19)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(3)) return true;
+    }
+    return false;
+  }
+
   /** Generated Token Manager. */
   public JstackParserTokenManager token_source;
   SimpleCharStream jj_input_stream;
@@ -934,7 +948,7 @@ public final class JstackParser implements JstackParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0xff805c,0xff804c,0xff004c,0x138000c,0x80004,0x80004,0x2000000,0x80008,0x80008,0x8000000,0x200,0x30080004,0xc0000000,0x4,0x8,0x4,0x0,0x10,0x44,0x44,0x40,0x48,0x8000000,0x0,0x20,0xc6000000,0x40,0x2,0x2,};
+      jj_la1_0 = new int[] {0xff805c,0xff804c,0xff004c,0x138000c,0x180004,0x180004,0x2000000,0x80008,0x80008,0x8000000,0x200,0x30180004,0xc0000000,0x4,0x8,0x4,0x0,0x10,0x44,0x44,0x40,0x48,0x8000000,0x0,0x20,0xc6000000,0x40,0x2,0x2,};
    }
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3,0x0,0x0,0x0,0x20,0x0,0x0,0x0,0x0,0x600,0x0,0x180,0x0,0x3,0x0,0x0,0x0,};
