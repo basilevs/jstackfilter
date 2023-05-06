@@ -20,6 +20,14 @@ public class Paragraphs {
 		public String toString() {
 			return "Range [from=" + from + ", to=" + to + "]";
 		}
+
+		public int min() {
+			return Math.min(to, from);
+		}
+		
+		public int max() {
+			return Math.max(to, from);
+		}
 	}
 	
 	public static Range toParagraphRange(String text, int from, int to) {
@@ -67,24 +75,24 @@ public class Paragraphs {
 		return end;
 	}
 
-	public static Range findPreviousParagraphRange(String text, int from, int to) {
-		int newPos = Math.min(from, to) - PARAGRAPH_DELIMITER.length() * 2;
+	public static Range findPreviousParagraphRange(String text, Range before) {
+		int newPos = before.min() - PARAGRAPH_DELIMITER.length() * 2;
 		return toParagraphRange(text, newPos, newPos - 1);
 	}
 
-	public static Range findNextParagraphRange(String text, int from, int to) {
-		int newPos = Math.max(from, to) + PARAGRAPH_DELIMITER.length() * 2;
+	public static Range findNextParagraphRange(String text, Range before) {
+		int newPos = before.max() + PARAGRAPH_DELIMITER.length() * 2;
 		return toParagraphRange(text, newPos, newPos + 1);
 	}
 
-	public static Range includePreviousParagraph(String text, int from, int to) {
-		Range previous = findPreviousParagraphRange(text, from, to);
-		return new Range(Math.max(from, to), previous.to);
+	public static Range includePreviousParagraph(String text, Range before) {
+		Range previous = findPreviousParagraphRange(text, before);
+		return new Range(before.max(), previous.to);
 	}
 
-	public static Range includeNextParagraph(String text, int mark, int dot) {
-		Range next = findNextParagraphRange(text, mark, dot);
-		return new Range(Math.min(mark, dot), next.to);
+	public static Range includeNextParagraph(String text, Range before) {
+		Range next = findNextParagraphRange(text, before);
+		return new Range(before.min(), next.to);
 	}
 
 }
