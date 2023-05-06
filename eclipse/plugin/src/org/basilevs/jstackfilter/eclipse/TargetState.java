@@ -29,6 +29,7 @@ import com.sun.jdi.ObjectCollectedException;
 import com.sun.jdi.StackFrame;
 import com.sun.jdi.ThreadReference;
 
+@SuppressWarnings("restriction")
 final class TargetState {
 	private final IDebugTarget target;
 	private final Set<IThread> idleThreads = new HashSet<>();
@@ -81,7 +82,6 @@ final class TargetState {
 		}
 	}
 
-	@SuppressWarnings("restriction")
 	private boolean computeIdle(IThread thread) {
 		List<StackFrame> frames;
 		if (!(thread instanceof JDIThread)) {

@@ -15,8 +15,9 @@ public final class Filter {
 	}
 
 	public static void process(Reader reader) throws IOException {
-		Known known = new Known();
-		copy(filter(Predicate.<JavaThread>not(known::isKnown), reader), new OutputStreamWriter(System.out));
+		try (Known known = new Known()) {
+			copy(filter(Predicate.<JavaThread>not(known::isKnown), reader), new OutputStreamWriter(System.out));
+		}
 	}
 
 	public static Reader filter(Predicate<JavaThread> select, Reader reader) {
@@ -32,7 +33,7 @@ public final class Filter {
 		stacksCopy.onClose(stacks::close);
 		return stacksCopy;
 	}
-	
+
 	public static InputStream onClose(InputStream delegate, Closeable runnable) {
 		return new FilterInputStream(delegate) {
 			@Override
@@ -45,7 +46,6 @@ public final class Filter {
 			}
 		};
 	}
-
 
 	public static void copy(Reader input, Writer output) throws IOException {
 		try {
