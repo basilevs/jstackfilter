@@ -1,9 +1,11 @@
 package org.basilevs.jstackfilter.eclipse;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
@@ -20,7 +22,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IThread;
-import org.eclipse.jdt.internal.debug.core.model.JDIThread;
+import org.eclipse.jdt.debug.core.IJavaThread;
 import org.osgi.framework.FrameworkUtil;
 
 import com.sun.jdi.IncompatibleThreadStateException;
@@ -29,13 +31,19 @@ import com.sun.jdi.ObjectCollectedException;
 import com.sun.jdi.StackFrame;
 import com.sun.jdi.ThreadReference;
 
-@SuppressWarnings("restriction")
+/**
+ * Detects idle threads.
+ * 
+ * Uses internal org.eclipse.jdt.internal.debug.core.model.JDIThread.getUnderlyingThread()
+ * 
+ */
 final class TargetState {
 	private final IDebugTarget target;
 	private final Set<IThread> idleThreads = new HashSet<>();
 	private final Runnable listener;
-	private static final ILog LOG = Platform.getLog(TargetState.class); 
-	private static final boolean DEBUG = Platform.getDebugBoolean(FrameworkUtil.getBundle(TargetState.class).getSymbolicName()+"/"+"targetState");
+	private static final ILog LOG = Platform.getLog(TargetState.class);
+	private static final boolean DEBUG = Platform
+			.getDebugBoolean(FrameworkUtil.getBundle(TargetState.class).getSymbolicName() + "/" + "targetState");
 	private final Job job = Job.create("Searching for idle threads", (IJobFunction) (monitor -> {
 		try {
 			compute(monitor::isCanceled);
@@ -56,7 +64,7 @@ final class TargetState {
 			equal = idleThreads.equals(result);
 			idleThreads.clear();
 			idleThreads.addAll(result);
-			
+
 		}
 		if (!equal) {
 			listener.run();
@@ -72,7 +80,7 @@ final class TargetState {
 	}
 
 	public boolean isIdle(IThread thread) {
-		if (!(thread instanceof JDIThread)) {
+		if (!getJdi(thread).isPresent()) {
 			return false;
 		}
 		job.cancel();
@@ -82,14 +90,17 @@ final class TargetState {
 		}
 	}
 
+	@SuppressWarnings("restriction")
+	private static Optional<ThreadReference> getJdi(IThread thread) {
+		if (!(thread instanceof org.eclipse.jdt.internal.debug.core.model.JDIThread)) {
+			return Optional.empty();
+		}
+		var jdiThread = (org.eclipse.jdt.internal.debug.core.model.JDIThread) thread;
+		return Optional.ofNullable(jdiThread.getUnderlyingThread());
+	}
+
 	private boolean computeIdle(IThread thread) {
 		List<StackFrame> frames;
-		if (!(thread instanceof JDIThread)) {
-			return false;
-		}
-
-		JDIThread jdiThread = (JDIThread) thread;
-		
 		synchronized (thread) {
 			if (thread.isSuspended()) {
 				return false;
@@ -99,28 +110,33 @@ final class TargetState {
 				return false;
 			}
 
-			if (jdiThread.isPerformingEvaluation())
+			if (((IJavaThread) thread).isPerformingEvaluation())
 				return false;
 
-			ThreadReference underlyingThread = jdiThread.getUnderlyingThread();
-			underlyingThread.suspend();
-			try {
-				frames = underlyingThread.frames();
-			} catch (IncompatibleThreadStateException e) {
-				LOG.error("Failed to get frames", e);
-				return false;
-			} catch (ObjectCollectedException e) {
-				return false;
-			} finally {
-				underlyingThread.resume();
-			}
+			frames = getJdi(thread).<List<StackFrame>>map((ThreadReference underlyingThread) -> {
+				underlyingThread.suspend();
+				try {
+					return underlyingThread.frames();
+				} catch (IncompatibleThreadStateException e) {
+					LOG.error("Failed to get frames", e);
+					return Collections.emptyList();
+				} catch (ObjectCollectedException e) {
+					return Collections.emptyList();
+				} finally {
+					underlyingThread.resume();
+				}
+			}).orElse(Collections.emptyList());
+		}
+
+		if (frames.isEmpty()) {
+			return false;
 		}
 
 		JavaThread threadCandidate = adapt(frames);
 		boolean idle = isThreadIdle.test(threadCandidate);
 		if (DEBUG) {
 			try {
-				LOG.info(thread.getName() + (idle ?  " is idle" : " is not idle"));
+				LOG.info(thread.getName() + (idle ? " is idle" : " is not idle"));
 			} catch (DebugException e) {
 				LOG.error("Failed to handle error", e);
 			}
