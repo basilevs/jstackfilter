@@ -70,7 +70,7 @@ public final class ThreadRegistry implements Closeable {
 	}
 
 	public boolean contains(JavaThread stack) {
-		return threads.stream().anyMatch(stack::equalByMethodName);
+		return threads.parallelStream().anyMatch(stack::equalByMethodName);
 	}
 
 	@Override
