@@ -16,7 +16,7 @@ public final class Filter {
 
 	public static void process(Reader reader) throws IOException {
 		try (ThreadRegistry known = ThreadRegistry.idle()) {
-			copy(filter(Predicate.<JavaThread>not(known::isKnown), reader), new OutputStreamWriter(System.out));
+			copy(filter(Predicate.<JavaThread>not(known::contains), reader), new OutputStreamWriter(System.out));
 		}
 	}
 

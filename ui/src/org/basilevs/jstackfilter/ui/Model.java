@@ -82,7 +82,7 @@ public class Model {
 		try {
 			Reader filtered;
 			if (filter) {
-				filtered = Filter.filter(Predicate.<JavaThread>not(known::isKnown), input);
+				filtered = Filter.filter(Predicate.<JavaThread>not(known::contains), input);
 			} else {
 				filtered = input;
 			}

@@ -65,7 +65,7 @@ public final class ThreadRegistry implements Closeable {
 		}
 	}
 
-	public boolean isKnown(JavaThread stack) {
+	public boolean contains(JavaThread stack) {
 		return threads.stream().anyMatch(stack::equalByMethodName);
 	}
 
@@ -80,7 +80,7 @@ public final class ThreadRegistry implements Closeable {
 
 	public void addAll(Stream<JavaThread> newThreads) {
 		var tmp = newThreads.peek(this::checkThread).collect(new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2)));
-		threads.addAll(tmp.stream().filter(Predicate.not(this::isKnown)).collect(Collectors.toUnmodifiableList()));
+		threads.addAll(tmp.stream().filter(Predicate.not(this::contains)).collect(Collectors.toUnmodifiableList()));
 		// Due to concurrency, threads will contain some duplicates, but there won't be a lot, and they won't affect performance much
 	}
 

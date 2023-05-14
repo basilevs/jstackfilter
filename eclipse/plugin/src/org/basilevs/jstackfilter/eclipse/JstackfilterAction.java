@@ -34,7 +34,7 @@ public class JstackfilterAction extends AbstractThreadsViewFilterAction {
 		var target = thread.getDebugTarget();
 		TargetState state;
 		synchronized (targetStates) {
-			state = targetStates.computeIfAbsent(target, (t) -> new TargetState(t, idleThreads::isKnown, () -> this.refresh(t)));
+			state = targetStates.computeIfAbsent(target, (t) -> new TargetState(t, idleThreads::contains, () -> this.refresh(t)));
 		}
 		return !state.isIdle(thread);
 	}

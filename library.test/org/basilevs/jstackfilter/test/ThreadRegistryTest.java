@@ -55,27 +55,27 @@ public class ThreadRegistryTest {
 	@Test
 	public void test() {
 		JavaThread first = threads.iterator().next();
-		Assert.assertTrue(subject.isKnown(first));
+		Assert.assertTrue(subject.contains(first));
 		List<Frame> frames = new ArrayList<>(first.frames());
 		JavaThread another = new JavaThread(first.name(), 0, first.state(), frames);
-		Assert.assertTrue(subject.isKnown(another));
+		Assert.assertTrue(subject.contains(another));
 		another = new JavaThread("meh", 0, first.state(), frames);
-		Assert.assertTrue(subject.isKnown(another));
+		Assert.assertTrue(subject.contains(another));
 		another = new JavaThread(first.name(), 0, "boo", frames);
-		Assert.assertTrue(subject.isKnown(another));
+		Assert.assertTrue(subject.contains(another));
 		another = UNKNOWN;
-		Assert.assertFalse(subject.isKnown(another));
+		Assert.assertFalse(subject.contains(another));
 	}
 
 	@Test
 	public void persistOverSaveAndLoad() throws IOException {
 		Assert.assertFalse(Files.exists(configurationFile));
-		Assert.assertFalse(subject.isKnown(UNKNOWN));
+		Assert.assertFalse(subject.contains(UNKNOWN));
 		subject.addAll(Stream.of(UNKNOWN));
-		Assert.assertTrue(subject.isKnown(UNKNOWN));
+		Assert.assertTrue(subject.contains(UNKNOWN));
 		subject.close();
 		subject = new ThreadRegistry(configurationFile, REGISTRY_RESOURCE);
-		Assert.assertTrue(subject.isKnown(UNKNOWN));
+		Assert.assertTrue(subject.contains(UNKNOWN));
 
 	}
 
