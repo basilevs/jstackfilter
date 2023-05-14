@@ -9,10 +9,12 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,6 +27,7 @@ import org.basilevs.jstackfilter.internal.OS;
 public final class ThreadRegistry implements Closeable {
 	public final List<JavaThread> threads = new CopyOnWriteArrayList<>();
 	private final Path configurationFile;
+	private static final Collector<JavaThread, Collection<JavaThread>, Collection<JavaThread>> DISTINCT_BY_NAME = new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2));
 	
 	/** Threads known to be idle uninteresting **/
 	public static ThreadRegistry idle() throws IOException {
@@ -55,7 +58,8 @@ public final class ThreadRegistry implements Closeable {
 	}
 
 	private void save(Writer output) {
-		for (JavaThread thread : threads) {
+		// Can't do parallel streams, as it will change the order of the threads and the file change will be harder to analyze.
+		for (JavaThread thread : threads.stream().collect(DISTINCT_BY_NAME)) {
 			try {
 				output.write(thread.toString());
 				output.write("\n\n");
@@ -79,7 +83,7 @@ public final class ThreadRegistry implements Closeable {
 	}
 
 	public void addAll(Stream<JavaThread> newThreads) {
-		var tmp = newThreads.peek(this::checkThread).collect(new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2)));
+		var tmp = newThreads.peek(this::checkThread).collect(DISTINCT_BY_NAME);
 		threads.addAll(tmp.stream().filter(Predicate.not(this::contains)).collect(Collectors.toUnmodifiableList()));
 		// Due to concurrency, threads will contain some duplicates, but there won't be a lot, and they won't affect performance much
 	}
