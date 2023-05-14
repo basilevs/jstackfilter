@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.basilevs.jstackfilter.Known;
+import org.basilevs.jstackfilter.ThreadRegistry;
 import org.basilevs.jstackfilter.eclipse.jdt.AbstractThreadsViewFilterAction;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
@@ -15,10 +15,10 @@ import org.eclipse.jdt.debug.core.IJavaThread;
 public class JstackfilterAction extends AbstractThreadsViewFilterAction {
 	static final ILog LOG = Platform.getLog(JstackfilterAction.class);
 	private final Map<IDebugTarget, TargetState> targetStates = new WeakHashMap<>();
-	private final Known idleThreads; 
+	private final ThreadRegistry idleThreads; 
 	{
 		try {
-			idleThreads = new Known();
+			idleThreads = ThreadRegistry.idle();
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}

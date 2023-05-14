@@ -17,24 +17,34 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.basilevs.jstackfilter.internal.OS;
-
-/** Widespread threads **/
-public final class Known implements Closeable {
+/**
+* This class represents a Set of JavaThread objects. The state of the Set is persisted to disk 
+* when the application closes and is restored on start. This ensures that the data within the 
+* Set remains consistent across multiple sessions of the application.
+ */
+public final class ThreadRegistry implements Closeable {
 	public final List<JavaThread> threads = new CopyOnWriteArrayList<>();
 	private final Path configurationFile;
-
-	public Known() throws IOException {
-		this(OS.detect().configurationDirectory().resolve("known.txt"));
+	
+	/** Threads known to be idle uninteresting **/
+	public static ThreadRegistry idle() throws IOException {
+		return new ThreadRegistry(OS.detect().configurationDirectory().resolve("known.txt"), "known.txt");
 	}
 
-	public Known(Path configurationFile) throws IOException {
+	/** 
+	 * 
+	 * @param configurationFile - a file on filesystem to store state, MUST be writable, MAY exist, is the flee exists, it must be in the format of jstack output
+	 * @param resource - a resource name stored in ThreadRegistry's package, MUST exist
+	 * @throws IOException - when preconditions are not met
+	 */
+	public ThreadRegistry(Path configurationFile, String resource) throws IOException {
 		this.configurationFile = Objects.requireNonNull(configurationFile);
 		if (Files.exists(configurationFile)) {
 			try (Reader is = Files.newBufferedReader(configurationFile, StandardCharsets.UTF_8)) {
 				load(is);
 			}
 		} else {
-			try (InputStream is = Known.class.getResourceAsStream("known.txt")) {
+			try (InputStream is = ThreadRegistry.class.getResourceAsStream(resource)) {
 				load(new InputStreamReader(is, StandardCharsets.UTF_8));
 			}
 		}

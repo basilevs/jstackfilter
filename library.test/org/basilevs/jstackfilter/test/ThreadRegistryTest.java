@@ -14,17 +14,18 @@ import java.util.stream.Stream;
 import org.basilevs.jstackfilter.Frame;
 import org.basilevs.jstackfilter.JavaThread;
 import org.basilevs.jstackfilter.JstackParser;
-import org.basilevs.jstackfilter.Known;
+import org.basilevs.jstackfilter.ThreadRegistry;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class KnownTest {
+public class ThreadRegistryTest {
 
 	private static final List<JavaThread> threads;
 	private static final JavaThread UNKNOWN;
+	private static final String REGISTRY_RESOURCE = "idle.txt";
 	static {
 		try (InputStream is = JstackParserTest.class.getResourceAsStream("eclipse.txt")) {
 			threads = JstackParser.parseThreads(new InputStreamReader(is, StandardCharsets.UTF_8)).collect(Collectors.toList());
@@ -41,14 +42,14 @@ public class KnownTest {
 	@Rule
 	public final TemporaryFolder temp = new TemporaryFolder();
 
-	private Known subject;
+	private ThreadRegistry subject;
 
 	private Path configurationFile;
 
 	@Before
 	public void before() throws IOException {
-		configurationFile = temp.getRoot().toPath().resolve("known.txt");
-		subject = new Known(configurationFile);
+		configurationFile = temp.getRoot().toPath().resolve(REGISTRY_RESOURCE);
+		subject = new ThreadRegistry(configurationFile, REGISTRY_RESOURCE);
 	}
 
 	@Test
@@ -73,7 +74,7 @@ public class KnownTest {
 		subject.addAll(Stream.of(UNKNOWN));
 		Assert.assertTrue(subject.isKnown(UNKNOWN));
 		subject.close();
-		subject = new Known(configurationFile);
+		subject = new ThreadRegistry(configurationFile, REGISTRY_RESOURCE);
 		Assert.assertTrue(subject.isKnown(UNKNOWN));
 
 	}

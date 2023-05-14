@@ -20,7 +20,7 @@ import java.util.function.Predicate;
 
 import org.basilevs.jstackfilter.Filter;
 import org.basilevs.jstackfilter.JavaThread;
-import org.basilevs.jstackfilter.Known;
+import org.basilevs.jstackfilter.ThreadRegistry;
 import org.basilevs.jstackfilter.ui.internal.SystemUtil;
 
 public class Model {
@@ -35,10 +35,10 @@ public class Model {
 	private final Consumer<String> outputListener;
 	private boolean filter = true;
 	private ReaderSupplier input = NO_INPUT;
-	private final Known known;
+	private final ThreadRegistry known;
 	{
 		try {
-			known = new Known();
+			known = ThreadRegistry.idle();
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
