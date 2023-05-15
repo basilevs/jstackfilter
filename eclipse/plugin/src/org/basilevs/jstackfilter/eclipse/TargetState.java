@@ -1,18 +1,15 @@
 package org.basilevs.jstackfilter.eclipse;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.basilevs.jstackfilter.Frame;
 import org.basilevs.jstackfilter.JavaThread;
+import org.basilevs.jstackfilter.eclipse.ThreadAdapter.Snapshot;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
@@ -25,16 +22,11 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.jdt.debug.core.IJavaThread;
 import org.osgi.framework.FrameworkUtil;
 
-import com.sun.jdi.IncompatibleThreadStateException;
-import com.sun.jdi.Location;
-import com.sun.jdi.ObjectCollectedException;
-import com.sun.jdi.StackFrame;
-import com.sun.jdi.ThreadReference;
-
 /**
  * Detects idle threads.
  * 
- * Uses internal org.eclipse.jdt.internal.debug.core.model.JDIThread.getUnderlyingThread()
+ * Uses internal
+ * org.eclipse.jdt.internal.debug.core.model.JDIThread.getUnderlyingThread()
  * 
  */
 final class TargetState {
@@ -80,7 +72,7 @@ final class TargetState {
 	}
 
 	public boolean isIdle(IThread thread) {
-		if (!getJdi(thread).isPresent()) {
+		if (!(thread instanceof IJavaThread)) {
 			return false;
 		}
 		job.cancel();
@@ -90,17 +82,8 @@ final class TargetState {
 		}
 	}
 
-	@SuppressWarnings("restriction")
-	private static Optional<ThreadReference> getJdi(IThread thread) {
-		if (!(thread instanceof org.eclipse.jdt.internal.debug.core.model.JDIThread)) {
-			return Optional.empty();
-		}
-		var jdiThread = (org.eclipse.jdt.internal.debug.core.model.JDIThread) thread;
-		return Optional.ofNullable(jdiThread.getUnderlyingThread());
-	}
-
 	private boolean computeIdle(IThread thread) {
-		List<StackFrame> frames;
+		Snapshot capturedThread;
 		synchronized (thread) {
 			if (thread.isSuspended()) {
 				return false;
@@ -113,27 +96,10 @@ final class TargetState {
 			if (((IJavaThread) thread).isPerformingEvaluation())
 				return false;
 
-			frames = getJdi(thread).<List<StackFrame>>map((ThreadReference underlyingThread) -> {
-				underlyingThread.suspend();
-				try {
-					return underlyingThread.frames();
-				} catch (IncompatibleThreadStateException e) {
-					LOG.error("Failed to get frames", e);
-					return Collections.emptyList();
-				} catch (ObjectCollectedException e) {
-					return Collections.emptyList();
-				} finally {
-					underlyingThread.resume();
-				}
-			}).orElse(Collections.emptyList());
+			capturedThread = ThreadAdapter.snapshot((IJavaThread) thread);
 		}
 
-		if (frames.isEmpty()) {
-			return false;
-		}
-
-		JavaThread threadCandidate = adapt(frames);
-		boolean idle = isThreadIdle.test(threadCandidate);
+		boolean idle = capturedThread.computeJavaThread().filter(isThreadIdle).isPresent();
 		if (DEBUG) {
 			try {
 				LOG.info(thread.getName() + (idle ? " is idle" : " is not idle"));
@@ -142,16 +108,6 @@ final class TargetState {
 			}
 		}
 		return idle;
-	}
-
-	JavaThread adapt(List<StackFrame> frames) {
-		return new JavaThread("irrelevant", 0, "irrelevant",
-				frames.stream().<Frame>map(TargetState::adapt).collect(Collectors.toUnmodifiableList()));
-	}
-
-	private static Frame adapt(StackFrame frame) {
-		Location location = frame.location();
-		return new Frame(location.declaringType().name() + "." + location.method().name(), "irrelevant");
 	}
 
 }
