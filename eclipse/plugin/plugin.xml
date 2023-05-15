@@ -2,20 +2,46 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.ui.viewActions">
-      <viewContribution
-            id="org.basilevs.jstackfilter.eclipse.contribution"
-            targetID="org.eclipse.debug.ui.DebugView">
-         <action
-               class="org.basilevs.jstackfilter.eclipse.JstackfilterAction"
-               id="org.basilevs.jstackfilter.eclipse.action1"
-               label="Show idle threads"
-               menubarPath="org.eclipse.jdt.debug.ui.LaunchView.javaSubmenu/javaPart"
-               state="true"
-               style="toggle"
-               tooltip="Remove threads thats are known to do nothing per Jstackfilter">
-         </action>
-      </viewContribution>
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.debug.ui.DebugView">
+         <menu
+               id="org.eclipse.jdt.debug.ui.LaunchView.javaSubmenu"
+               label="Java">
+            <command
+                  commandId="org.basilevs.jstackfilter.eclipse.ui.showIdle"
+                  style="toggle">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            description="Hide threads that are known to be idle and uninteresting"
+            id="org.basilevs.jstackfilter.eclipse.ui.showIdle"
+            name="Show Idle Threads">
+         <state
+               class="org.eclipse.jface.commands.ToggleState"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.basilevs.jstackfilter.eclipse.ShowIdleThreadsHandler"
+            commandId="org.basilevs.jstackfilter.eclipse.ui.showIdle">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="org.eclipse.debug.ui.DebugView">
+               </equals>
+            </with>
+         </activeWhen>
+      </handler>
    </extension>
 
 </plugin>

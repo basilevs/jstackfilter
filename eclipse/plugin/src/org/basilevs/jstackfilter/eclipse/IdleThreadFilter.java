@@ -5,15 +5,16 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.basilevs.jstackfilter.ThreadRegistry;
-import org.basilevs.jstackfilter.eclipse.jdt.AbstractThreadsViewFilterAction;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.jdt.debug.core.IJavaThread;
+import org.eclipse.jface.viewers.StructuredViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 
-public class JstackfilterAction extends AbstractThreadsViewFilterAction {
-	static final ILog LOG = Platform.getLog(JstackfilterAction.class);
+public class IdleThreadFilter extends ViewerFilter {
+	static final ILog LOG = Platform.getLog(IdleThreadFilter.class);
 	private final Map<IDebugTarget, TargetState> targetStates = new WeakHashMap<>();
 	private final ThreadRegistry idleThreads; 
 	{
@@ -25,22 +26,21 @@ public class JstackfilterAction extends AbstractThreadsViewFilterAction {
 	}
 
 	@Override
-	protected boolean isCandidateThread(IJavaThread thread) throws DebugException {
-		return thread.canSuspend();
-	}
-
-	@Override
-	protected boolean selectThread(IJavaThread thread) throws DebugException {
+	public boolean select(Viewer viewer, Object parentElement, Object element) {
+		StructuredViewer structuredViewer = (StructuredViewer) viewer;
+		if (!(element instanceof IJavaThread)) {
+			return true;
+		}
+		IJavaThread thread = (IJavaThread) element;
 		var target = thread.getDebugTarget();
 		TargetState state;
 		synchronized (targetStates) {
-			state = targetStates.computeIfAbsent(target, (t) -> new TargetState(t, idleThreads::contains, () -> this.refresh(t)));
+			state = targetStates.computeIfAbsent(target, (t) -> new TargetState(t, idleThreads::contains, () -> this.refresh(structuredViewer, t)));
 		}
 		return !state.isIdle(thread);
 	}
 	
-	private void refresh(IDebugTarget target) {
-		var viewer = getStructuredViewer();
+	private void refresh(StructuredViewer viewer, IDebugTarget target) {
 		var control = viewer.getControl();
 		if (control.isDisposed()) {
 			return;
@@ -53,15 +53,4 @@ public class JstackfilterAction extends AbstractThreadsViewFilterAction {
 			viewer.refresh(target, false);
 		});
 	}
-
-	@Override
-	protected String getPreferenceKey() {
-		return "show_mundane_threads";
-	}
-
-	@Override
-	public void dispose() {
-		super.dispose();
-	}
-
 }
