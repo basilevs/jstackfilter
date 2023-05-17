@@ -6,8 +6,25 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-/** Concatenate a Stream of strings **/
-public class StreamReader extends Reader {
+/**
+ * A Reader that concatenates a Stream of CharSequences into a single continuous
+ * character stream. This class is designed to provide a bridge between
+ * Stream-based and Reader-based APIs.
+ *
+ * <p>This class takes responsibility for closing the Stream it's wrapping.
+ * The {@link #close()} method will close the underlying Stream.
+ *
+ * <p>This class is not thread-safe. If multiple threads need to read from the
+ * same StreamReader, they should synchronize their access to it externally.
+ *
+ * <p>This class does not support marking and resetting. The {@link #mark(int)}
+ * and {@link #reset()} methods from the Reader class are not overridden and
+ * will not work as some might expect.
+ *
+ * @see java.io.Reader
+ * @see java.util.stream.Stream
+ */
+puic class StreamReader extends Reader {
 	private final Stream<? extends CharSequence> delegate;
 	private final StringBuilder buffer = new StringBuilder();
 	private final Iterator<? extends CharSequence> iterator;
