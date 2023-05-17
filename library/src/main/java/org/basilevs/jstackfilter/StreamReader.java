@@ -24,7 +24,7 @@ import java.util.stream.Stream;
  * @see java.io.Reader
  * @see java.util.stream.Stream
  */
-puic class StreamReader extends Reader {
+public class StreamReader extends Reader {
 	private final Stream<? extends CharSequence> delegate;
 	private final StringBuilder buffer = new StringBuilder();
 	private final Iterator<? extends CharSequence> iterator;
