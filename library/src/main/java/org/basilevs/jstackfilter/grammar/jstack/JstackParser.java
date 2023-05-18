@@ -721,6 +721,16 @@ public final class JstackParser implements JstackParserConstants {
     finally { jj_save(10, xla); }
   }
 
+  private boolean jj_3R_24() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(19)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(3)) return true;
+    }
+    return false;
+  }
+
   private boolean jj_3R_19() {
     Token xsp;
     if (jj_3R_23()) return true;
@@ -915,16 +925,6 @@ public final class JstackParser implements JstackParserConstants {
     }
     }
     }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_24() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(19)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(3)) return true;
     }
     return false;
   }

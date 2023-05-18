@@ -945,3 +945,11 @@ JNI global refs: 221, weak refs: 45
 	at org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.captureThreadStacks(EventLoopMonitorThread.java:650)
 	at org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.run(EventLoopMonitorThread.java:604)
 
+"Event Loop Monitor" #54 daemon prio=6 os_prio=31 cpu=16155.48ms elapsed=59356.14s tid=0x000000014d4ab800 nid=0x27a0f waiting on condition  _threads_hazard_ptr=0x000060000b5f8420 [0x00000002c97ca000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.management.ThreadImpl.dumpThreads0(java.management@17.0.4.1/Native Method)
+	at sun.management.ThreadImpl.dumpAllThreads(java.management@17.0.4.1/ThreadImpl.java:521)
+	at sun.management.ThreadImpl.dumpAllThreads(java.management@17.0.4.1/ThreadImpl.java:509)
+	at org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.captureThreadStacks(EventLoopMonitorThread.java:650)
+	at org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.run(EventLoopMonitorThread.java:604)
+
