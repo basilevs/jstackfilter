@@ -346,9 +346,13 @@ JavaThread javaThread() :
       {
         id = Long.valueOf(t.image);
       }
+    < SPACE >
+  (
+     "[" < NUMBER > "]"
+     < SPACE >
+  ) ?
   (
     LOOKAHEAD(2)
-    < SPACE >
     (
       LOOKAHEAD(2)
       pair = keyValue()
@@ -359,8 +363,8 @@ JavaThread javaThread() :
       "in Object.wait()"
     | "at breakpoint"
     )
+    < SPACE >
   )+
-  < SPACE > 
   "[" < NUMBER > "]" 
   (< EOL >)? 
   < SPACE > "java.lang.Thread.State: " t = < WORD >

@@ -953,3 +953,7 @@ JNI global refs: 221, weak refs: 45
 	at org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.captureThreadStacks(EventLoopMonitorThread.java:650)
 	at org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.run(EventLoopMonitorThread.java:604)
 
+"main" #1 [7171] prio=5 os_prio=31 cpu=42466.40ms elapsed=377.27s tid=0x0000000147808200 nid=7171 runnable  [0x000000016de43000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@20/Native Method)
+
