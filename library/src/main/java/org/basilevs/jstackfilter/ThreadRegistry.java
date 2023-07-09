@@ -19,25 +19,31 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.basilevs.jstackfilter.internal.OS;
+
 /**
-* This class represents a Set of JavaThread objects. The state of the Set is persisted to disk 
-* when the application closes and is restored on start. This ensures that the data within the 
-* Set remains consistent across multiple sessions of the application.
+ * This class represents a Set of JavaThread objects. The state of the Set is
+ * persisted to disk when the application closes and is restored on start. This
+ * ensures that the data within the Set remains consistent across multiple
+ * sessions of the application.
  */
 public final class ThreadRegistry implements Closeable {
 	public final List<JavaThread> threads = new CopyOnWriteArrayList<>();
 	private final Path configurationFile;
-	private static final Collector<JavaThread, Collection<JavaThread>, Collection<JavaThread>> DISTINCT_BY_NAME = new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2));
-	
+	private static final Collector<JavaThread, Collection<JavaThread>, Collection<JavaThread>> DISTINCT_BY_NAME = new DistinctBy<JavaThread>(
+			(t1, t2) -> t1.equalByMethodName(t2));
+
 	/** Threads known to be idle uninteresting **/
 	public static ThreadRegistry idle() throws IOException {
 		return new ThreadRegistry(OS.detect().configurationDirectory().resolve("known.txt"), "known.txt");
 	}
 
-	/** 
+	/**
 	 * 
-	 * @param configurationFile - a file on filesystem to store state, MUST be writable, MAY exist, is the flee exists, it must be in the format of jstack output
-	 * @param resource - a resource name stored in ThreadRegistry's package, MUST exist
+	 * @param configurationFile - a file on filesystem to store state, MUST be
+	 *                          writable, MAY exist, is the flee exists, it must be
+	 *                          in the format of jstack output
+	 * @param resource          - a resource name stored in ThreadRegistry's
+	 *                          package, MUST exist
 	 * @throws IOException - when preconditions are not met
 	 */
 	public ThreadRegistry(Path configurationFile, String resource) throws IOException {
@@ -58,7 +64,8 @@ public final class ThreadRegistry implements Closeable {
 	}
 
 	private void save(Writer output) {
-		// Can't do parallel streams, as it will change the order of the threads and the file change will be harder to analyze.
+		// Can't do parallel streams, as it will change the order of the threads and the
+		// file change will be harder to analyze.
 		for (JavaThread thread : threads.stream().collect(DISTINCT_BY_NAME)) {
 			try {
 				output.write(thread.toString());
@@ -85,9 +92,15 @@ public final class ThreadRegistry implements Closeable {
 	public void addAll(Stream<JavaThread> newThreads) {
 		var tmp = newThreads.peek(this::checkThread).collect(DISTINCT_BY_NAME);
 		threads.addAll(tmp.stream().filter(Predicate.not(this::contains)).collect(Collectors.toUnmodifiableList()));
-		// Due to concurrency, threads will contain some duplicates, but there won't be a lot, and they won't affect performance much
+		// Due to concurrency, threads will contain some duplicates, but there won't be
+		// a lot, and they won't affect performance much
 	}
 
+	public void removeAll(Stream<JavaThread> threads2) {
+		var tmp = threads2.collect(DISTINCT_BY_NAME);
+		threads.removeIf(idle -> tmp.stream().anyMatch(idle::equalByMethodName));
+	}
+	
 	private void checkThread(JavaThread input) {
 		var dump = input.toString();
 		JavaThread parsed = JstackParser.parseThread(dump).get();

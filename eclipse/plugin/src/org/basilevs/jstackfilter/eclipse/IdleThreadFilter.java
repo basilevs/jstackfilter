@@ -1,10 +1,8 @@
 package org.basilevs.jstackfilter.eclipse;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.basilevs.jstackfilter.ThreadRegistry;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.model.IDebugTarget;
@@ -16,14 +14,6 @@ import org.eclipse.jface.viewers.ViewerFilter;
 public class IdleThreadFilter extends ViewerFilter {
 	static final ILog LOG = Platform.getLog(IdleThreadFilter.class);
 	private final Map<IDebugTarget, TargetState> targetStates = new WeakHashMap<>();
-	private final ThreadRegistry idleThreads; 
-	{
-		try {
-			idleThreads = ThreadRegistry.idle();
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-	}
 
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
@@ -35,7 +25,7 @@ public class IdleThreadFilter extends ViewerFilter {
 		var target = thread.getDebugTarget();
 		TargetState state;
 		synchronized (targetStates) {
-			state = targetStates.computeIfAbsent(target, (t) -> new TargetState(t, idleThreads::contains, () -> this.refresh(structuredViewer, t)));
+			state = targetStates.computeIfAbsent(target, (t) -> new TargetState(t, Activator.getDefault()::isIdle, () -> this.refresh(structuredViewer, t)));
 		}
 		return !state.isIdle(thread);
 	}

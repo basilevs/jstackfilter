@@ -15,6 +15,14 @@
             </command>
          </menu>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.debug.ui.DebugView">
+         <command
+               commandId="org.basilevs.jstackfilter.eclipse.ui.markidle"
+               style="toggle">
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -22,6 +30,14 @@
             description="Hide threads that are known to be idle and uninteresting"
             id="org.basilevs.jstackfilter.eclipse.ui.showIdle"
             name="Show Idle Threads">
+         <state
+               class="org.eclipse.jface.commands.ToggleState"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+      <command
+            id="org.basilevs.jstackfilter.eclipse.ui.markidle"
+            name="Mark Idle">
          <state
                class="org.eclipse.jface.commands.ToggleState"
                id="org.eclipse.ui.commands.toggleState">
@@ -40,6 +56,30 @@
                      value="org.eclipse.debug.ui.DebugView">
                </equals>
             </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.basilevs.jstackfilter.eclipse.MarkIdleHandler"
+            commandId="org.basilevs.jstackfilter.eclipse.ui.markidle">
+         <activeWhen>
+            <and>
+               <with
+                     variable="activePartId">
+                  <equals
+                        value="org.eclipse.debug.ui.DebugView">
+                  </equals>
+               </with>
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <adapt
+                           type="org.eclipse.jdt.debug.core.IJavaThread">
+                     </adapt>
+                  </iterate>
+               </with>
+            </and>
          </activeWhen>
       </handler>
    </extension>
