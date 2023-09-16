@@ -20,5 +20,13 @@ public class JavaThreadTest {
 		Assert.assertTrue(parsed.equalByMethodName(subject));
 		Assert.assertEquals(subject.id(), parsed.id());
 	}
+	
+	@Test
+	public void doNotBreakOnExtraQuotesInName() {
+		Collection<Frame> frames = List.of(new Frame("package.class", "method"));
+		JavaThread subject = new JavaThread("name with \"quotes\"", 7, "state", frames);
+		JavaThread parsed = JstackParser.parseThread(subject.toString()).get();
+		Assert.assertTrue(parsed.name().contains("name with"));
+	}
 
 }
