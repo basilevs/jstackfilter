@@ -551,7 +551,20 @@ public final class JstackParser implements JstackParserConstants {
         }
         method();
         jj_consume_token(43);
-        jj_consume_token(WORD);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case WORD:
+          jj_consume_token(WORD);
+          break;
+        case 21:
+          jj_consume_token(21);
+          jj_consume_token(WORD);
+          jj_consume_token(22);
+          break;
+        default:
+          jj_la1[23] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
         jj_consume_token(SPACE);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case 27:
@@ -561,7 +574,7 @@ public final class JstackParser implements JstackParserConstants {
           jj_consume_token(SPACE);
           break;
         default:
-          jj_la1[23] = jj_gen;
+          jj_la1[24] = jj_gen;
           ;
         }
         jj_consume_token(15);
@@ -571,13 +584,13 @@ public final class JstackParser implements JstackParserConstants {
         jj_consume_token(EOL);
         break;
       default:
-        jj_la1[24] = jj_gen;
+        jj_la1[25] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[27] = jj_gen;
+      jj_la1[28] = jj_gen;
       label_11:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -585,7 +598,7 @@ public final class JstackParser implements JstackParserConstants {
           ;
           break;
         default:
-          jj_la1[25] = jj_gen;
+          jj_la1[26] = jj_gen;
           break label_11;
         }
         jj_consume_token(FRAMEINDENT);
@@ -602,7 +615,7 @@ public final class JstackParser implements JstackParserConstants {
           frames.add(f);
           break;
         default:
-          jj_la1[26] = jj_gen;
+          jj_la1[27] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -623,7 +636,7 @@ public final class JstackParser implements JstackParserConstants {
         ;
         break;
       default:
-        jj_la1[28] = jj_gen;
+        jj_la1[29] = jj_gen;
         break label_12;
       }
       if (jj_2_11(3)) {
@@ -635,7 +648,7 @@ public final class JstackParser implements JstackParserConstants {
           nativeThread();
           break;
         default:
-          jj_la1[29] = jj_gen;
+          jj_la1[30] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -768,20 +781,6 @@ public final class JstackParser implements JstackParserConstants {
     return false;
   }
 
-  private boolean jj_3_7() {
-    if (jj_scan_token(WORD)) return true;
-    return false;
-  }
-
-  private boolean jj_3_3() {
-    if (jj_3R_19()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_20()) jj_scanpos = xsp;
-    if (jj_scan_token(24)) return true;
-    return false;
-  }
-
   private boolean jj_3_10() {
     Token xsp;
     xsp = jj_scanpos;
@@ -795,6 +794,20 @@ public final class JstackParser implements JstackParserConstants {
     }
     }
     }
+    return false;
+  }
+
+  private boolean jj_3_7() {
+    if (jj_scan_token(WORD)) return true;
+    return false;
+  }
+
+  private boolean jj_3_3() {
+    if (jj_3R_19()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_20()) jj_scanpos = xsp;
+    if (jj_scan_token(24)) return true;
     return false;
   }
 
@@ -951,7 +964,7 @@ public final class JstackParser implements JstackParserConstants {
   private Token jj_scanpos, jj_lastpos;
   private int jj_la;
   private int jj_gen;
-  final private int[] jj_la1 = new int[30];
+  final private int[] jj_la1 = new int[31];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -959,10 +972,10 @@ public final class JstackParser implements JstackParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0xff805c,0xff804c,0xff004c,0x138000c,0x180004,0x180004,0x2000000,0x80008,0x80008,0x8000000,0x200,0x30180004,0xc0000000,0x4,0x8,0x4,0x20000,0x0,0x10,0x44,0x44,0x40,0x48,0x8000000,0x0,0x20,0xc6000000,0x40,0x2,0x2,};
+      jj_la1_0 = new int[] {0xff805c,0xff804c,0xff004c,0x138000c,0x180004,0x180004,0x2000000,0x80008,0x80008,0x8000000,0x200,0x30180004,0xc0000000,0x4,0x8,0x4,0x20000,0x0,0x10,0x44,0x44,0x40,0x48,0x200004,0x8000000,0x0,0x20,0xc6000000,0x40,0x2,0x2,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3,0x0,0x0,0x0,0x0,0x20,0x0,0x0,0x0,0x0,0x600,0x0,0x180,0x0,0x3,0x0,0x0,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3,0x0,0x0,0x0,0x0,0x20,0x0,0x0,0x0,0x0,0x600,0x0,0x0,0x180,0x0,0x3,0x0,0x0,0x0,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[11];
   private boolean jj_rescan = false;
@@ -979,7 +992,7 @@ public final class JstackParser implements JstackParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -994,7 +1007,7 @@ public final class JstackParser implements JstackParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1005,7 +1018,7 @@ public final class JstackParser implements JstackParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1016,7 +1029,7 @@ public final class JstackParser implements JstackParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1026,7 +1039,7 @@ public final class JstackParser implements JstackParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1036,7 +1049,7 @@ public final class JstackParser implements JstackParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1153,7 +1166,7 @@ public final class JstackParser implements JstackParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 30; i++) {
+    for (int i = 0; i < 31; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
