@@ -1006,3 +1006,9 @@ JNI global refs: 221, weak refs: 45
 	at org.eclipse.pde.internal.core.target.TargetDefinition.resolve(TargetDefinition.java:403)
 	at org.eclipse.pde.internal.ui.editor.targetdefinition.TargetEditor$TargetChangedListener$1.run(TargetEditor.java:606)
 	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+"C2 CompilerThread2" #9 daemon prio=9 os_prio=31 cpu=270.14ms elapsed=0.34s tid=0x000000013c518600 nid=0x7917 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   Compiling: 10253       4       jdk.nio.zipfs.ZipFileSystem$Entry::<init> (68 bytes)
+
+

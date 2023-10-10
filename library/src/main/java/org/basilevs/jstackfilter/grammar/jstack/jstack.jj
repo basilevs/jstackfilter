@@ -398,6 +398,7 @@ JavaThread javaThread() :
       "No compile task" < EOL >
     | 
       //   Compiling: 37714 % !   4       org.eclipse.jdt.internal.core.builder.NameEnvironment::computeClasspathLocations @ 698 (2340 bytes)      //   Compiling: 18676 %     4       sun.security.util.AbstractAlgorithmConstraints::checkAlgorithm @ 93 (138 bytes)
+      //   Compiling: 10253       4       jdk.nio.zipfs.ZipFileSystem$Entry::<init> (68 bytes)
       "Compiling: " < NUMBER >
       (
         LOOKAHEAD(2)
@@ -408,7 +409,7 @@ JavaThread javaThread() :
         | < NUMBER >
         )
       )*
-      method() "::" < WORD > < SPACE > ("@" < SPACE > < NUMBER > < SPACE >)? "(" < NUMBER > " bytes" ")" < EOL >
+      method() "::" ( < WORD > | "<" < WORD > ">" ) < SPACE > ("@" < SPACE > < NUMBER > < SPACE >)? "(" < NUMBER > " bytes" ")" < EOL >
     )
   |
     (
