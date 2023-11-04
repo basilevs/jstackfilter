@@ -1,6 +1,7 @@
 package org.basilevs.jstackfilter.eclipse;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -21,6 +22,8 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.jdt.debug.core.IJavaThread;
 import org.osgi.framework.FrameworkUtil;
+
+import com.sun.jdi.VMDisconnectedException;
 
 /**
  * Detects idle threads.
@@ -47,10 +50,19 @@ final class TargetState {
 	private final Predicate<JavaThread> isThreadIdle;
 
 	private void compute(BooleanSupplier isCancelled) throws DebugException {
-		var result = Arrays.stream(target.getThreads()).filter(this::computeIdle).peek(item -> {
-			if (isCancelled.getAsBoolean())
-				throw new OperationCanceledException();
-		}).collect(Collectors.toUnmodifiableSet());
+		Set<IThread> result;
+		try {
+			result = Arrays.stream(target.getThreads()).filter(this::computeIdle).peek(item -> {
+				if (isCancelled.getAsBoolean())
+					throw new OperationCanceledException();
+			}).collect(Collectors.toUnmodifiableSet());
+		} catch (VMDisconnectedException e) {
+			if (target.isDisconnected() || target.isTerminated()) {
+				result = Collections.emptySet();
+			} else {
+				throw e;
+			}
+		}
 		boolean equal;
 		synchronized (idleThreads) {
 			equal = idleThreads.equals(result);
