@@ -1,7 +1,7 @@
 package org.basilevs.jstackfilter.eclipse;
+import static org.basilevs.jstackfilter.eclipse.ShowIdleThreadsHandler.adapt;
+
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -14,18 +14,14 @@ import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jdt.debug.core.IJavaThread;
-import org.eclipse.jface.commands.ToggleState;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.RegistryToggleState;
-import org.eclipse.ui.menus.UIElement;
 
-public class MarkIdleHandler extends AbstractHandlerWithState implements IHandler, IElementUpdater {
+public class MarkIdleHandler extends AbstractHandlerWithState implements IHandler {
 	private static final ILog LOG = Platform.getLog(MarkIdleHandler.class);
 	
 	
@@ -79,15 +75,5 @@ public class MarkIdleHandler extends AbstractHandlerWithState implements IHandle
 		}
 		return null;
 	}
-	
-	private static ExecutionEvent adapt(Object evaluationContext) {
-		return new ExecutionEvent(null, Collections.emptyMap(), null, evaluationContext);
-	}
-
-	@Override
-	public void updateElement(UIElement element, Map parameters) {
-		//element.setChecked(isRegisteredIdle);
-	}
-	
 	
 }

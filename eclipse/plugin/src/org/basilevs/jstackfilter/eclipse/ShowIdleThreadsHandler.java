@@ -26,5 +26,10 @@ public class ShowIdleThreadsHandler extends AbstractHandler {
 		PartManager.updatePartFromCommand(HandlerUtil.getActivePartChecked(event));
 		return null;
 	}
+	
+	public static ExecutionEvent adapt(Object evaluationContext) {
+		return new ExecutionEvent(null, Collections.emptyMap(), null, evaluationContext);
+	}
+
 
 }
