@@ -10,8 +10,10 @@ import org.basilevs.jstackfilter.Frame;
 import org.basilevs.jstackfilter.JavaThread;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.jdt.debug.core.IJavaThread;
+import org.osgi.framework.FrameworkUtil;
 
 import com.sun.jdi.IncompatibleThreadStateException;
 import com.sun.jdi.Location;
@@ -24,6 +26,37 @@ public final class ThreadAdapter {
 
 	private ThreadAdapter() {
 		throw new UnsupportedOperationException();
+	}
+	
+	private static final boolean DEBUG = Platform
+			.getDebugBoolean(FrameworkUtil.getBundle(ThreadAdapter.class).getSymbolicName() + "/" + "targetState");
+	
+	public static boolean computeIdle(IJavaThread thread) {
+		Snapshot capturedThread;
+		synchronized (thread) {
+			if (thread.isSuspended()) {
+				return false;
+			}
+
+			if (!thread.canSuspend()) {
+				return false;
+			}
+
+			if (thread.isPerformingEvaluation())
+				return false;
+
+			capturedThread = ThreadAdapter.snapshot(thread);
+		}
+
+		boolean idle = capturedThread.computeJavaThread().filter(Activator.getDefault()::isIdle).isPresent();
+		if (DEBUG) {
+			try {
+				LOG.info(thread.getName() + (idle ? " is idle" : " is not idle"));
+			} catch (DebugException e) {
+				LOG.error("Can't compute thread name", e);
+			}
+		}
+		return idle;
 	}
 	
 	public static final class Snapshot {
