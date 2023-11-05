@@ -2,7 +2,7 @@
 <feature
       id="org.basilevs.jstackfilter.eclipse.feature"
       label="Jstackfilter"
-      version="0.0.3.qualifier">
+      version="0.0.4.qualifier">
 
    <description url="https://github.com/basilevs/jstackfilter">
       Do not show idle threads in Debug view.
