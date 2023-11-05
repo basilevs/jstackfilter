@@ -1,16 +1,25 @@
 package org.basilevs.jstackfilter.eclipse;
 
 import org.eclipse.jdt.debug.core.IJavaThread;
+import org.eclipse.jface.viewers.Viewer;
 
 public class IdleThreadFilter extends BackgroundViewerFilter {
 	
 	@Override
-	protected void schedule(Object element, Runnable runnable) {
+	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		if (!(element instanceof IJavaThread)) {
-			return;
+			return true;
+		}
+		return super.select(viewer, parentElement, element);
+	}
+	
+	@Override
+	protected Runnable createScheduler(Object element, Runnable runnable) {
+		if (!(element instanceof IJavaThread)) {
+			return () -> {};
 		}
 		IJavaThread thread = (IJavaThread) element;
-		thread.queueRunnable(runnable);
+		return () -> thread.queueRunnable(runnable);
 	}
 	
 	@Override

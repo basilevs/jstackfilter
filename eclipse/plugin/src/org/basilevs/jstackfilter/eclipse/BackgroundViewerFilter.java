@@ -3,6 +3,7 @@ package org.basilevs.jstackfilter.eclipse;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -16,14 +17,24 @@ import org.eclipse.jface.viewers.ViewerFilter;
 
 public abstract class BackgroundViewerFilter extends ViewerFilter {
 	private final Map<Object, Supplier<Boolean>> states = new WeakHashMap<>();
+	private final Map<Object, Runnable> refreshers = new WeakHashMap<>();
 	private StructuredViewer viewer;
+	private final Function<Runnable, Runnable> throttledDisplayScheduler;
+	
+	public BackgroundViewerFilter() {
+		Function<Runnable, Runnable> scheduler = r -> () -> asyncExec(r);
+		scheduler = new ThrottledScheduler(scheduler);
+		this.throttledDisplayScheduler = scheduler;
+		
+	}
 
 	/**
 	 * Override this method to customize computation scheduling
 	 * 
 	 * @param element - context of execution
+	 * @return a runnable that will schedule given operation when called
 	 */
-	protected void schedule(Object element, Runnable runnable) {
+	protected Runnable createScheduler(Object element, Runnable runnable) {
 		var job = new Job("Filtering...") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
@@ -34,13 +45,13 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 		job.setUser(false);
 		job.setSystem(true);
 		job.setPriority(Job.LONG);
-		job.schedule();
+		return job::schedule;
 	}
 
 	protected abstract boolean select(Object element);
 
 	@Override
-	public final boolean select(Viewer viewer, Object parentElement, Object element) {
+	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		Objects.requireNonNull(viewer);
 		if (this.viewer != null && viewer != this.viewer) {
 			throw new IllegalArgumentException("Multiple viewers are not supported");
@@ -61,11 +72,25 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 		} else {
 			lastSegment = parentElement;
 		}
-		return new BackgroundUpdater<>(runnable -> schedule(element, runnable), () -> select(element), Boolean.TRUE,
-				() -> refresh(lastSegment));
+		Function<Runnable, Runnable> scheduler = runnable -> createScheduler(element, runnable);
+		scheduler = new ThrottledScheduler(scheduler);
+		return new BackgroundUpdater<>(scheduler, () -> select(element),
+				Boolean.TRUE, () -> scheduleRefresh(lastSegment));
 	}
 
+	private void scheduleRefresh(Object element) {
+		Runnable schedule;
+		synchronized (refreshers) {
+			schedule = refreshers.computeIfAbsent(element, e -> throttledDisplayScheduler.apply(() -> refresh(e)));
+		}
+		schedule.run();
+	}
+	
 	private void refresh(Object element) {
+		viewer.refresh(element, false);
+	}
+
+	private void asyncExec(Runnable runnable) {
 		StructuredViewer viewerCopy = viewer;
 		if (viewerCopy == null) {
 			return;
@@ -79,7 +104,7 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 			if (control.isDisposed()) {
 				return;
 			}
-			viewer.refresh(element, false);
+			runnable.run();
 		});
 	}
 }
