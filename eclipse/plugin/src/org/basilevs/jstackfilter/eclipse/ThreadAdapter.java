@@ -31,8 +31,7 @@ public final class ThreadAdapter {
 	private static final boolean DEBUG = Platform
 			.getDebugBoolean(FrameworkUtil.getBundle(ThreadAdapter.class).getSymbolicName() + "/" + "targetState");
 	
-	public static boolean computeIdle(IJavaThread thread) {
-		Snapshot capturedThread;
+	public static boolean mightBeIdle(IJavaThread thread) {
 		synchronized (thread) {
 			if (thread.isSuspended()) {
 				return false;
@@ -44,6 +43,16 @@ public final class ThreadAdapter {
 
 			if (thread.isPerformingEvaluation())
 				return false;
+		}
+		return true;
+	}
+	
+	public static boolean computeIdle(IJavaThread thread) {
+		Snapshot capturedThread;
+		synchronized (thread) {
+			if (!mightBeIdle(thread)) {
+				return false;
+			}
 
 			capturedThread = ThreadAdapter.snapshot(thread);
 		}

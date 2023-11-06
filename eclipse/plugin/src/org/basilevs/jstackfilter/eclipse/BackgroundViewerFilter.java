@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -17,20 +16,24 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
 public abstract class BackgroundViewerFilter extends ViewerFilter {
-	private final Map<Object, BackgroundUpdater<Boolean>> states = new WeakHashMap<>();
-	private final Map<Object, Runnable> refreshers = new WeakHashMap<>();
+	private final Map<Object, Boolean> states = new WeakHashMap<>();
 	private StructuredViewer viewer;
 	private final Function<Runnable, Runnable> throttledDisplayScheduler;
-	private final Job fullRefreshJob = Job.createSystem("Full refresh for " + this,
-			(ICoreRunnable) monitor -> fullRefresh());
+	private final Job fullRefreshJob ;
 	private final long refreshInterval;
 
 	public BackgroundViewerFilter(long refreshInterval) {
 		this.refreshInterval = refreshInterval;
 		Function<Runnable, Runnable> scheduler = r -> () -> asyncExec(r);
 		scheduler = new BatchScheduler(scheduler); // group up multiple refreshes in a single redraw operation
-		scheduler = new ThrottledScheduler(scheduler); // avoid refreshes scheduled during an ongoing refresh
 		this.throttledDisplayScheduler = scheduler;
+		
+		Runnable refresh = throttledDisplayScheduler.apply(() -> viewer.refresh(false));
+		
+		fullRefreshJob = Job.createSystem("Full refresh for " + this,
+				(ICoreRunnable) monitor -> {
+					refresh.run();
+				});
 		fullRefreshJob.setPriority(Job.DECORATE);
 	}
 
@@ -56,15 +59,6 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 
 	protected abstract boolean select(Object element);
 
-
-	public void fullRefresh() {
-		synchronized (refreshers) {
-			// We use UI refresh, as we do not want to do updates for collapsed or removed items
-			// If we did state update, if would be unconditional
-			refreshers.values().forEach(Runnable::run);
-		}
-	}
-
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		Objects.requireNonNull(viewer);
@@ -72,27 +66,32 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 			throw new IllegalArgumentException("Multiple viewers are not supported");
 		}
 		this.viewer = (StructuredViewer) viewer;
-		Supplier<Boolean> state;
-		synchronized (states) {
-			state = states.computeIfAbsent(element, (t) -> createState(parentElement, t));
-		}
-		Boolean result = state.get();
-		return result;
-	}
-
-	private BackgroundUpdater<Boolean> createState(Object parentElement, Object element) {
+		
+		
+		
 		final Object lastSegment;
 		if (parentElement instanceof TreePath) {
 			lastSegment = ((TreePath) parentElement).getLastSegment();
 		} else {
 			lastSegment = parentElement;
 		}
-		Function<Runnable, Runnable> scheduler = runnable -> createScheduler(element, runnable);
-
-		scheduler = new ThrottledScheduler(scheduler);
-
-		return new BackgroundUpdater<>(scheduler, () -> doSelect(element), Boolean.TRUE,
-				() -> scheduleRefresh(lastSegment));
+		
+		createScheduler(element, () -> {
+			boolean result = doSelect(element);
+			boolean changed;
+			synchronized(states) {
+				Boolean old = states.put(element, result);
+				changed = !Objects.equals(result, old);
+			}
+			if (changed) {
+				scheduleRefresh(lastSegment);
+			}
+		}).run();
+		Boolean state;
+		synchronized (states) {
+			state = states.getOrDefault(element, Boolean.TRUE);
+		}
+		return state;
 	}
 
 	private boolean doSelect(Object element) {
@@ -107,11 +106,7 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 	}
 
 	private void scheduleRefresh(Object element) {
-		Runnable schedule;
-		synchronized (refreshers) {
-			schedule = refreshers.computeIfAbsent(element, e -> throttledDisplayScheduler.apply(() -> refresh(e)));
-		}
-		schedule.run();
+		throttledDisplayScheduler.apply(() -> refresh(element)).run();
 	}
 
 	private void refresh(Object element) {

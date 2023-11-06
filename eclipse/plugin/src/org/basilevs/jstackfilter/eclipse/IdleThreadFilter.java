@@ -11,10 +11,13 @@ public class IdleThreadFilter extends BackgroundViewerFilter {
 
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		if (!(element instanceof IJavaThread)) {
-			return true;
+		if (element instanceof IJavaThread thread) {
+			if (!ThreadAdapter.mightBeIdle(thread)) {
+				return true;
+			}
+			return super.select(viewer, parentElement, element);
 		}
-		return super.select(viewer, parentElement, element);
+		return true;
 	}
 	
 	@Override
