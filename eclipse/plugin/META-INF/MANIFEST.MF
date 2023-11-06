@@ -19,4 +19,3 @@ Require-Bundle: org.eclipse.debug.ui,
  org.basilevs.jstackfilter,
  org.eclipse.core.expressions;bundle-version="3.8.200",
  org.eclipse.e4.core.contexts;bundle-version="1.11.0"
-Import-Package: org.basilevs.jstackfilter

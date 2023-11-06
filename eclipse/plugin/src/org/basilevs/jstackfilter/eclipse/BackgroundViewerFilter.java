@@ -6,6 +6,7 @@ import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -16,16 +17,21 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
 public abstract class BackgroundViewerFilter extends ViewerFilter {
-	private final Map<Object, Supplier<Boolean>> states = new WeakHashMap<>();
+	private final Map<Object, BackgroundUpdater<Boolean>> states = new WeakHashMap<>();
 	private final Map<Object, Runnable> refreshers = new WeakHashMap<>();
 	private StructuredViewer viewer;
 	private final Function<Runnable, Runnable> throttledDisplayScheduler;
-	
-	public BackgroundViewerFilter() {
+	private final Job fullRefreshJob = Job.createSystem("Full refresh for " + this,
+			(ICoreRunnable) monitor -> fullRefresh());
+	private final long refreshInterval;
+
+	public BackgroundViewerFilter(long refreshInterval) {
+		this.refreshInterval = refreshInterval;
 		Function<Runnable, Runnable> scheduler = r -> () -> asyncExec(r);
-		scheduler = new ThrottledScheduler(scheduler);
+		scheduler = new BatchScheduler(scheduler); // group up multiple refreshes in a single redraw operation
+		scheduler = new ThrottledScheduler(scheduler); // avoid refreshes scheduled during an ongoing refresh
 		this.throttledDisplayScheduler = scheduler;
-		
+		fullRefreshJob.setPriority(Job.DECORATE);
 	}
 
 	/**
@@ -50,6 +56,15 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 
 	protected abstract boolean select(Object element);
 
+
+	public void fullRefresh() {
+		synchronized (refreshers) {
+			// We use UI refresh, as we do not want to do updates for collapsed or removed items
+			// If we did state update, if would be unconditional
+			refreshers.values().forEach(Runnable::run);
+		}
+	}
+
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		Objects.requireNonNull(viewer);
@@ -65,7 +80,7 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 		return result;
 	}
 
-	private Supplier<Boolean> createState(Object parentElement, Object element) {
+	private BackgroundUpdater<Boolean> createState(Object parentElement, Object element) {
 		final Object lastSegment;
 		if (parentElement instanceof TreePath) {
 			lastSegment = ((TreePath) parentElement).getLastSegment();
@@ -73,9 +88,22 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 			lastSegment = parentElement;
 		}
 		Function<Runnable, Runnable> scheduler = runnable -> createScheduler(element, runnable);
+
 		scheduler = new ThrottledScheduler(scheduler);
-		return new BackgroundUpdater<>(scheduler, () -> select(element),
-				Boolean.TRUE, () -> scheduleRefresh(lastSegment));
+
+		return new BackgroundUpdater<>(scheduler, () -> doSelect(element), Boolean.TRUE,
+				() -> scheduleRefresh(lastSegment));
+	}
+
+	private boolean doSelect(Object element) {
+		fullRefreshJob.cancel();
+		try {
+			return select(element);
+		} finally {
+			if (refreshInterval > 0) {
+				fullRefreshJob.schedule(refreshInterval);
+			}
+		}
 	}
 
 	private void scheduleRefresh(Object element) {
@@ -85,7 +113,7 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 		}
 		schedule.run();
 	}
-	
+
 	private void refresh(Object element) {
 		viewer.refresh(element, false);
 	}
@@ -104,7 +132,12 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 			if (control.isDisposed()) {
 				return;
 			}
-			runnable.run();
+			viewerCopy.getControl().setRedraw(false);
+			try {
+				runnable.run();
+			} finally {
+				viewerCopy.getControl().setRedraw(true);
+			}
 		});
 	}
 }

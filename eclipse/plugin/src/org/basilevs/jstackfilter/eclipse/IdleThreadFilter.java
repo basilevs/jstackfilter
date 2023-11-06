@@ -5,6 +5,10 @@ import org.eclipse.jface.viewers.Viewer;
 
 public class IdleThreadFilter extends BackgroundViewerFilter {
 	
+	public IdleThreadFilter() {
+		super(10000);
+	}
+
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		if (!(element instanceof IJavaThread)) {
