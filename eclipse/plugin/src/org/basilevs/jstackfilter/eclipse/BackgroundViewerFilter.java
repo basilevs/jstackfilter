@@ -19,7 +19,7 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 	private final Map<Object, Boolean> states = new WeakHashMap<>();
 	private StructuredViewer viewer;
 	private final Function<Runnable, Runnable> throttledDisplayScheduler;
-	private final Job fullRefreshJob ;
+	private final Job fullRefreshJob;
 	private final long refreshInterval;
 
 	public BackgroundViewerFilter(long refreshInterval) {
@@ -27,13 +27,10 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 		Function<Runnable, Runnable> scheduler = r -> () -> asyncExec(r);
 		scheduler = new BatchScheduler(scheduler); // group up multiple refreshes in a single redraw operation
 		this.throttledDisplayScheduler = scheduler;
-		
+
 		Runnable refresh = throttledDisplayScheduler.apply(() -> viewer.refresh(false));
-		
-		fullRefreshJob = Job.createSystem("Full refresh for " + this,
-				(ICoreRunnable) monitor -> {
-					refresh.run();
-				});
+
+		fullRefreshJob = Job.createSystem("Full refresh for " + this, (ICoreRunnable) monitor -> refresh.run());
 		fullRefreshJob.setPriority(Job.DECORATE);
 	}
 
@@ -66,27 +63,15 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 			throw new IllegalArgumentException("Multiple viewers are not supported");
 		}
 		this.viewer = (StructuredViewer) viewer;
-		
-		
-		
+
 		final Object lastSegment;
 		if (parentElement instanceof TreePath) {
 			lastSegment = ((TreePath) parentElement).getLastSegment();
 		} else {
 			lastSegment = parentElement;
 		}
-		
-		createScheduler(element, () -> {
-			boolean result = doSelect(element);
-			boolean changed;
-			synchronized(states) {
-				Boolean old = states.put(element, result);
-				changed = !Objects.equals(result, old);
-			}
-			if (changed) {
-				scheduleRefresh(lastSegment);
-			}
-		}).run();
+
+		createScheduler(element, () -> update(element, lastSegment)).run();
 		Boolean state;
 		synchronized (states) {
 			state = states.getOrDefault(element, Boolean.TRUE);
@@ -94,19 +79,19 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 		return state;
 	}
 
-	private boolean doSelect(Object element) {
+	private void update(Object element, final Object toRefresh) {
 		fullRefreshJob.cancel();
-		try {
-			return select(element);
-		} finally {
-			if (refreshInterval > 0) {
-				fullRefreshJob.schedule(refreshInterval);
-			}
+		boolean result = select(element);
+		Boolean old;
+		synchronized (states) {
+			old = states.put(element, result);
 		}
-	}
-
-	private void scheduleRefresh(Object element) {
-		throttledDisplayScheduler.apply(() -> refresh(element)).run();
+		if (!Objects.equals(result, old)) {
+			throttledDisplayScheduler.apply(() -> refresh(toRefresh)).run();
+		}
+		if (refreshInterval > 0) {
+			fullRefreshJob.schedule(refreshInterval);
+		}
 	}
 
 	private void refresh(Object element) {
