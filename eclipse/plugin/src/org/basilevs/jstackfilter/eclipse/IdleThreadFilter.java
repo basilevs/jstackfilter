@@ -31,11 +31,10 @@ public class IdleThreadFilter extends BackgroundViewerFilter {
 	
 	@Override
 	protected boolean select(Object element) {
-		if (!(element instanceof IJavaThread)) {
-			return true;
+		if (element instanceof IJavaThread thread) {
+			boolean idle = ThreadAdapter.computeIdle(thread);
+			return !idle;
 		}
-		IJavaThread thread = (IJavaThread) element;
-		boolean idle = ThreadAdapter.computeIdle(thread);
-		return !idle;
+		return true;
 	}
 }
