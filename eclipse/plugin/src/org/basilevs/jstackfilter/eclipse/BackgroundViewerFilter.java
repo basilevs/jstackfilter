@@ -80,6 +80,7 @@ public abstract class BackgroundViewerFilter extends ViewerFilter {
 	}
 
 	private void update(Object element, final Object toRefresh) {
+		// Prevent periodic updates if other updates happen often enough
 		fullRefreshJob.cancel();
 		boolean result = select(element);
 		Boolean old;
