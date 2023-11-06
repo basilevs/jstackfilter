@@ -20,6 +20,7 @@ import com.sun.jdi.Location;
 import com.sun.jdi.ObjectCollectedException;
 import com.sun.jdi.StackFrame;
 import com.sun.jdi.ThreadReference;
+import com.sun.jdi.VMDisconnectedException;
 
 public final class ThreadAdapter {
 	private static final ILog LOG = Platform.getLog(ThreadAdapter.class);
@@ -49,23 +50,31 @@ public final class ThreadAdapter {
 	
 	public static boolean computeIdle(IJavaThread thread) {
 		Snapshot capturedThread;
-		synchronized (thread) {
-			if (!mightBeIdle(thread)) {
+		var target = thread.getDebugTarget();
+		try {
+			synchronized (thread) {
+				if (!mightBeIdle(thread)) {
+					return false;
+				}
+	
+				capturedThread = ThreadAdapter.snapshot(thread);
+			}
+	
+			boolean idle = capturedThread.computeJavaThread().filter(Activator.getDefault()::isIdle).isPresent();
+			if (DEBUG) {
+				try {
+					LOG.info(thread.getName() + (idle ? " is idle" : " is not idle"));
+				} catch (DebugException e) {
+					LOG.error("Can't compute thread name", e);
+				}
+			}
+			return idle;
+		} catch (VMDisconnectedException e) {
+			if (target.isDisconnected() || target.isTerminated()) {
 				return false;
 			}
-
-			capturedThread = ThreadAdapter.snapshot(thread);
+			throw e;
 		}
-
-		boolean idle = capturedThread.computeJavaThread().filter(Activator.getDefault()::isIdle).isPresent();
-		if (DEBUG) {
-			try {
-				LOG.info(thread.getName() + (idle ? " is idle" : " is not idle"));
-			} catch (DebugException e) {
-				LOG.error("Can't compute thread name", e);
-			}
-		}
-		return idle;
 	}
 	
 	public static final class Snapshot {
