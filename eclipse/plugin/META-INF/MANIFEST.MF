@@ -1,8 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Eclipse
 Bundle-SymbolicName: org.basilevs.jstackfilter.eclipse.ui;singleton:=true
-Bundle-Version: 0.0.5.qualifier
+Bundle-Version: 0.0.6.qualifier
 Automatic-Module-Name: org.basilevs.jstackfilter.eclipse
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.basilevs.jstackfilter.eclipse.Activator

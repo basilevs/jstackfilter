@@ -10,7 +10,7 @@ public class FilterTest {
 
 	@Test
 	public void doNotThrowOnNormalInput() throws IOException {
-		try (var data = JstackParserTest.class.getResourceAsStream("eclipse.txt");
+		try (var data = FilterTest.class.getResourceAsStream("eclipse.txt");
 				var reader = new InputStreamReader(data)) {
 			Filter.process(reader);
 		}
