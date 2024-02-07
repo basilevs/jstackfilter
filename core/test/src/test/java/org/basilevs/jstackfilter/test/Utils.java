@@ -20,16 +20,16 @@ public class Utils {
 		}
 		return resultStringBuilder.toString();
 	}
-	
-	public static String readClassResource(Class<?> clazz, String relativeResourcePath) throws IOException {
-		InputStream result = JstackParserTest.class.getResourceAsStream(relativeResourcePath);
-		if (result != null) 
-			return inputStreamToString(result);
-		
-		result = JstackParserTest.class.getResourceAsStream("/"+relativeResourcePath);
-		if (result != null)
-			return inputStreamToString(result);
-		
+
+	@SuppressWarnings("resource")
+	public static String readClassResource(Class<?> clazz, String relativeResourcePath) {
+		try {
+			InputStream result = JstackParserTest.class.getResourceAsStream(relativeResourcePath);
+			if (result != null)
+				return inputStreamToString(result);
+		} catch (IOException e) {
+			throw new AssertionError(e);
+		}
 		throw new AssertionError("Can't load " + relativeResourcePath + " from " + clazz);
 	}
 }

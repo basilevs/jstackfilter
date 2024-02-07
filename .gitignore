@@ -2,3 +2,4 @@ bin/
 bintest/
 target/
 .DS_Store
+.polyglot.*

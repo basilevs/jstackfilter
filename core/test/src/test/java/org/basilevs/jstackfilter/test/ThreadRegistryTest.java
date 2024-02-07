@@ -3,6 +3,7 @@ package org.basilevs.jstackfilter.test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,16 +28,11 @@ public class ThreadRegistryTest {
 	private static final JavaThread UNKNOWN;
 	private static final String REGISTRY_RESOURCE = "idle.txt";
 	static {
-		try (InputStream is = JstackParserTest.class.getResourceAsStream("eclipse.txt")) {
-			threads = JstackParser.parseThreads(new InputStreamReader(is, StandardCharsets.UTF_8)).collect(Collectors.toList());
-		} catch (IOException e) {
-			throw new AssertionError(e);
-		}
+		threads = JstackParser.parseThreads( new StringReader(Utils.readClassResource(JstackParserTest.class, "eclipse.txt"))).collect(Collectors.toList());
 		JavaThread first = threads.iterator().next();
 		List<Frame> frames = new ArrayList<>(first.frames());
 		frames.remove(0);
 		UNKNOWN = new JavaThread(first.name(), 0, first.state(), frames);
-
 	}
 
 	@Rule

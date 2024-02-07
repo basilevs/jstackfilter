@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.basilevs.jstackfilter.test
+Bundle-Version: 0.0.6.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Export-Package: org.basilevs.jstackfilter.test
+Require-Bundle: org.basilevs.jstackfilter;bundle-version="0.0.6",
+ org.junit
