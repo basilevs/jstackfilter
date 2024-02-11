@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature id="org.basilevs.jstackfilter.eclipse.feature">
+      <category name="org.basilevs.jstackfilter"/>
+   </feature>
+   <category-def name="org.basilevs.jstackfilter" label="Jstackfilter">
+      <description>
+         Hide idle threads from Debug view
+      </description>
+   </category-def>
+</site>

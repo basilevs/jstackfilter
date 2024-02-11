@@ -30,6 +30,11 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
+			<name>workflows</name>
+			<type>2</type>
+			<locationURI>PARENT-6-ECLIPSE_HOME/git/jstackfilter/.github/workflows</locationURI>
+		</link>
+		<link>
 			<name>.mvn/extensions.xml</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/.mvn/extensions.xml</locationURI>
