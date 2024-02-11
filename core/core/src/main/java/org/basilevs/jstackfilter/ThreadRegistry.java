@@ -34,7 +34,7 @@ public final class ThreadRegistry implements Closeable {
 
 	/** Threads known to be idle uninteresting **/
 	public static ThreadRegistry idle() throws IOException {
-		return new ThreadRegistry(OS.detect().configurationDirectory().resolve("known.txt"), "known.txt");
+		return new ThreadRegistry(OS.detect().configurationDirectory().resolve("idle.txt"), "idle.txt");
 	}
 
 	/**
@@ -48,13 +48,15 @@ public final class ThreadRegistry implements Closeable {
 	 */
 	public ThreadRegistry(Path configurationFile, String resource) throws IOException {
 		this.configurationFile = Objects.requireNonNull(configurationFile);
-		if (Files.exists(configurationFile)) {
-			try (Reader is = Files.newBufferedReader(configurationFile, StandardCharsets.UTF_8)) {
-				load(is);
-			}
-		} else {
-			try (InputStream is = ThreadRegistry.class.getResourceAsStream(resource)) {
-				load(new InputStreamReader(is, StandardCharsets.UTF_8));
+		try (InputStream defaultConfiguration = ThreadRegistry.class.getResourceAsStream(resource)) {
+			if (defaultConfiguration == null)
+				throw new IllegalArgumentException("Configuration " + resource + " does not exist");
+			if (Files.exists(configurationFile)) {
+				try (Reader is = Files.newBufferedReader(configurationFile, StandardCharsets.UTF_8)) {
+					load(is);
+				}
+			} else {
+				load(new InputStreamReader(defaultConfiguration, StandardCharsets.UTF_8));
 			}
 		}
 	}
@@ -100,7 +102,7 @@ public final class ThreadRegistry implements Closeable {
 		var tmp = threads2.collect(DISTINCT_BY_NAME);
 		threads.removeIf(idle -> tmp.stream().anyMatch(idle::equalByMethodName));
 	}
-	
+
 	private void checkThread(JavaThread input) {
 		var dump = input.toString();
 		JavaThread parsed = JstackParser.parseThread(dump).get();
