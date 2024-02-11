@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.basilevs.jstackfilter</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.0.6</version>
+		<version>${revision}</version>
 	</parent>
 	<artifactId>ui</artifactId>
 	<packaging>jar</packaging>
@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>org.basilevs.jstackfilter</groupId>
 			<artifactId>org.basilevs.jstackfilter</artifactId>
-			<version>${project.version}-SNAPSHOT</version>
+			<version>${revision}</version>
 		</dependency>
 	</dependencies>
 </project>  
