@@ -12,20 +12,22 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.eclipse.pde.ManifestBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>org.eclipse.pde.SchemaBuilder</name>
+			<name>org.eclipse.m2e.core.maven2Builder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
-		<nature>org.eclipse.pde.PluginNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>target_classes</name>
+			<type>2</type>
+			<location>//Users/vasiligulevich/git/jstackfilter/core/test/target/classes/</location>
+		</link>
+	</linkedResources>
 	<filteredResources>
 		<filter>
 			<id>1707321526421</id>

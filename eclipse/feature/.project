@@ -3,6 +3,7 @@
 	<name>org.basilevs.jstackfilter.eclipse.feature</name>
 	<comment></comment>
 	<projects>
+		<project>org.basilevs.jstackfilter.eclipse.ui</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

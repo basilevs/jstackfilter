@@ -15,6 +15,6 @@ Require-Bundle: org.eclipse.debug.ui,
  org.eclipse.jdt.debug,
  org.eclipse.ui;bundle-version="3.0.0",
  org.eclipse.jdt.debug.ui;bundle-version="3.0.0",
- org.basilevs.jstackfilter,
  org.eclipse.core.expressions;bundle-version="3.8.200",
- org.eclipse.e4.core.contexts;bundle-version="1.11.0"
+ org.eclipse.e4.core.contexts;bundle-version="1.11.0",
+ org.basilevs.jstackfilter;bundle-version="0.0.6"
