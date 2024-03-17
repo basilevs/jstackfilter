@@ -29,9 +29,13 @@
 				<version>3.3.0</version>
 				<configuration>
 					<archive>
+						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
 						<manifest>
 							<mainClass>org.basilevs.jstackfilter.process.Input</mainClass>
 						</manifest>
+						<manifestEntries>
+							<Bundle-Version>${project.version}</Bundle-Version>
+						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>

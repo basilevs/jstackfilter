@@ -20,6 +20,13 @@
 		<module>plugin</module>
 		<module>repository</module>
 	</modules>
+	<dependencies>
+		<dependency>
+			<groupId>org.basilevs.jstackfilter</groupId>
+			<artifactId>org.basilevs.jstackfilter</artifactId>
+			<version>0.0.6-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -28,13 +35,14 @@
 				<version>${tycho.version}</version>
 				<extensions>true</extensions>
 			</plugin>
+
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
 				<version>${tycho.version}</version>
 				<configuration>
 					<executionEnvironment>JavaSE-17</executionEnvironment>
-					<pomDependencies>ignore</pomDependencies>
+					<pomDependencies>consider</pomDependencies>
 					<target>
 						<artifact>
 							<groupId>org.basilevs.jstackfilter</groupId>
