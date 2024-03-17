@@ -31,7 +31,7 @@
             id="org.basilevs.jstackfilter.eclipse.ui.showIdle"
             name="Show Idle Threads">
          <state
-               class="org.eclipse.jface.commands.ToggleState"
+               class="org.eclipse.ui.handlers.RegistryRadioState"
                id="org.eclipse.ui.commands.toggleState">
          </state>
       </command>
