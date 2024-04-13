@@ -2,7 +2,6 @@ package org.basilevs.jstackfilter.eclipse;
 
 import java.util.Collections;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.AbstractHandlerWithState;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -23,7 +22,7 @@ public class ShowIdleThreadsHandler extends AbstractHandlerWithState {
 	}
 
 	@Override
-	public void handleStateChange(State state, Object oldValue) {		
+	public void handleStateChange(State state, Object oldValue) {
 	}
 
 
