@@ -1011,4 +1011,16 @@ JNI global refs: 221, weak refs: 45
    java.lang.Thread.State: RUNNABLE
    Compiling: 10253       4       jdk.nio.zipfs.ZipFileSystem$Entry::<init> (68 bytes)
 
+"ForkJoinPool-1-worker-84" #625 [101379] daemon prio=5 os_prio=31 cpu=0.83ms elapsed=19.02s tid=0x00000001218bf200  [0x00000002acca9000]
+   Carrying virtual thread #332
+	at jdk.internal.vm.Continuation.run(java.base@21.0.2/Continuation.java:248)
+	at java.lang.VirtualThread.runContinuation(java.base@21.0.2/VirtualThread.java:221)
+	at java.lang.VirtualThread$$Lambda/0x000000080087bc60.run(java.base@21.0.2/Unknown Source)
+	at java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(java.base@21.0.2/ForkJoinTask.java:1423)
+	at java.util.concurrent.ForkJoinTask.doExec(java.base@21.0.2/ForkJoinTask.java:387)
+	at java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(java.base@21.0.2/ForkJoinPool.java:1312)
+	at java.util.concurrent.ForkJoinPool.scan(java.base@21.0.2/ForkJoinPool.java:1843)
+	at java.util.concurrent.ForkJoinPool.runWorker(java.base@21.0.2/ForkJoinPool.java:1808)
+	at java.util.concurrent.ForkJoinWorkerThread.run(java.base@21.0.2/ForkJoinWorkerThread.java:188)
+
 

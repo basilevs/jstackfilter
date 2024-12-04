@@ -366,8 +366,9 @@ JavaThread javaThread() :
     < SPACE >
   )+
   "[" < NUMBER > "]" 
-  (< EOL >)? 
-  < SPACE > "java.lang.Thread.State: " t = < WORD >
+  (< EOL >)?
+  < SPACE > (    
+  "java.lang.Thread.State: " t = < WORD >
   {
     state = t.image;
   }
@@ -391,6 +392,11 @@ JavaThread javaThread() :
       state += ")";
     }
   )?
+| "Carrying virtual thread #" t = < NUMBER >
+  {
+    state = "Carrying virtual thread #" + t.image;
+  }
+)
   < EOL >
   (
     < SPACE >
