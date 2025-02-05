@@ -55,7 +55,6 @@ public interface JstackParserConstants {
     "\">\"",
     "\";\"",
     "\"/\"",
-    "\"- eliminated <owner is scalar replaced> \"",
     "\"at \"",
     "\"@\"",
     "\"Native Method\"",

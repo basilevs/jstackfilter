@@ -210,9 +210,6 @@ private Frame frame() :
   Token t;
 }
 {
-  (
-	"- eliminated <owner is scalar replaced> " "(" < WORD > < SPACE > dottedIdentifier()  ")" < FRAMEINDENT > 
-  )?
   "at " 
   method = method() 
   "("
