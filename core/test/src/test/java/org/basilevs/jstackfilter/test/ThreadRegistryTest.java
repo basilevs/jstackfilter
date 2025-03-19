@@ -1,17 +1,14 @@
 package org.basilevs.jstackfilter.test;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.basilevs.jstackfilter.Frame;
 import org.basilevs.jstackfilter.JavaThread;
-import org.basilevs.jstackfilter.JstackParser;
 import org.basilevs.jstackfilter.ThreadRegistry;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,7 +22,7 @@ public class ThreadRegistryTest {
 	private static final JavaThread UNKNOWN;
 	private static final String REGISTRY_RESOURCE = "idle.txt";
 	static {
-		threads = JstackParser.parseThreads( new StringReader(Utils.readClassResource(JstackParserTest.class, "eclipse.txt"))).collect(Collectors.toList());
+		threads = Utils.readThreadResource(JstackParserTest.class, "eclipse.txt");
 		JavaThread first = threads.iterator().next();
 		List<Frame> frames = new ArrayList<>(first.frames());
 		frames.remove(0);

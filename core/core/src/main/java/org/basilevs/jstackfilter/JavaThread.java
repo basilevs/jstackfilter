@@ -55,12 +55,14 @@ public final class JavaThread {
 		return new JavaThread(this.name(), this.id(), this.state(), frames, representation);
 	}
 
-	private static final Pattern LAMBDA_PATTERN = Pattern.compile("\\$\\$Lambda\\$\\d+[\\./]0x[\\dabcdef]+\\.");
+	private static final Pattern LAMBDA_PATTERN = Pattern.compile("\\$\\$Lambda(?:\\$\\d+)?[\\./]0x[\\dabcdef]+\\.");
 
 	private static String stripVersions(String input) {
 		// org.eclipse.ui.internal.Workbench$$Lambda$189/0x0000000800dbfa08.run
 		// org.eclipse.ui.infernal.Workbench$$Lambda$175/0x00000001003b2040.run
 		//
+		// org.eclipse.jdt.internal.core.search.processing.JobManager$$Lambda/0x000007ff017facf8.run
+		// org.eclipse.jdt.internal.core.search.processing.JobManager$$Lambda/0x000018000168a2d8.run
 		// Should produce same result
 		return LAMBDA_PATTERN.matcher(input).replaceAll(JavaThread.class.getName());
 	}

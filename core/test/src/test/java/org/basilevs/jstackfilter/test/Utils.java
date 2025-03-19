@@ -4,9 +4,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class Utils {
+import org.basilevs.jstackfilter.JavaThread;
+import org.basilevs.jstackfilter.JstackParser;
+
+class Utils {
 	public static String inputStreamToString(InputStream inputStream) throws IOException {
 		StringBuilder resultStringBuilder = new StringBuilder();
 		char[] buffer = new char[100 * 1024];
@@ -32,4 +38,9 @@ public class Utils {
 		}
 		throw new AssertionError("Can't load " + relativeResourcePath + " from " + clazz);
 	}
+
+	public static List<JavaThread> readThreadResource(Class<?> origin, String name) {
+		return JstackParser.parseThreads( new StringReader(readClassResource(origin, name))).collect(Collectors.toList());
+	}
+	
 }
