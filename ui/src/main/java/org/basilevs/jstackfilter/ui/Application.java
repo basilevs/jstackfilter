@@ -262,7 +262,10 @@ public class Application {
 			private static final long serialVersionUID = 9199450855113081882L;
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				model.rememberIdleThreads(output.getSelectedText());
+				String selectedText = output.getSelectedText();
+				if (selectedText != null) {
+					model.rememberIdleThreads(selectedText);
+				}
 			}
 		};
 		markIdle.putValue(Action.SHORT_DESCRIPTION, "(Ctrl+I) Mark selected threads as idle.");
