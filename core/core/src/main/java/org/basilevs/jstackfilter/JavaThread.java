@@ -1,10 +1,10 @@
 package org.basilevs.jstackfilter;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Pattern;
+import java.util.function.BiPredicate;
 
 public final class JavaThread {
 
@@ -45,26 +45,14 @@ public final class JavaThread {
 	}
 
 	public boolean equalByMethodName(JavaThread that) {
-		Object[] thisList = frames().stream().map(Frame::method).map(JavaThread::stripVersions).toArray();
-		Object[] thatList = that.frames().stream().map(Frame::method).map(JavaThread::stripVersions).toArray();
-		boolean result = Arrays.equals(thisList, thatList);
-		return result;
+		if (that == null) {
+			return false;
+		}
+		return iteratorsEqual(frames().iterator(), that.frames().iterator(), (t1, t2) -> t1.equalByMethodName(t2));
 	}
-
+	
 	public JavaThread withRepresentation(String representation) {
 		return new JavaThread(this.name(), this.id(), this.state(), frames, representation);
-	}
-
-	private static final Pattern LAMBDA_PATTERN = Pattern.compile("\\$\\$Lambda(?:\\$\\d+)?[\\./]0x[\\dabcdef]+\\.");
-
-	private static String stripVersions(String input) {
-		// org.eclipse.ui.internal.Workbench$$Lambda$189/0x0000000800dbfa08.run
-		// org.eclipse.ui.infernal.Workbench$$Lambda$175/0x00000001003b2040.run
-		//
-		// org.eclipse.jdt.internal.core.search.processing.JobManager$$Lambda/0x000007ff017facf8.run
-		// org.eclipse.jdt.internal.core.search.processing.JobManager$$Lambda/0x000018000168a2d8.run
-		// Should produce same result
-		return LAMBDA_PATTERN.matcher(input).replaceAll(JavaThread.class.getName());
 	}
 
 	private static String buildRepresentation(String name, long id, String state, Collection<Frame> frames) {
@@ -79,4 +67,19 @@ public final class JavaThread {
 	public long id() {
 		return id;
 	}
+	
+    private static <T> boolean iteratorsEqual(
+            Iterator<T> it1, 
+            Iterator<T> it2, 
+            BiPredicate<T, T> comparator) {
+        
+        while (it1.hasNext() && it2.hasNext()) {
+            T o1 = it1.next();
+            T o2 = it2.next();
+            if (!comparator.test(o1, o2)) {
+                return false;
+            }
+        }
+        return !it1.hasNext() && !it2.hasNext();
+    }
 }
