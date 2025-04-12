@@ -1,5 +1,6 @@
 package org.basilevs.jstackfilter.ui.internal;
 
+import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -7,6 +8,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 public class WindowUtil {
 	public static void configureSize(Preferences preferences, Window window) {
@@ -29,6 +31,16 @@ public class WindowUtil {
 		for (var key: keys) {
 			handler.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(key, actionCommand);
 		}
+	}
+	
+	public static void onClose(Component component, Runnable runnable) {
+		Window window = SwingUtilities.getWindowAncestor(component);
+		window.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				runnable.run();
+			}
+		});
 	}
 	
 }

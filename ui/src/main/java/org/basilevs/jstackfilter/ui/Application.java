@@ -6,8 +6,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -36,6 +34,7 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
@@ -106,15 +105,12 @@ public class Application {
 			}
 		});
 
-		final Container content = frame.getContentPane();
-		content.setLayout(new GridBagLayout());
-
+		final Container content = Box.createVerticalBox();
+		frame.getContentPane().add(content);
+		
 		var controls = Box.createHorizontalBox();
-		var c = new GridBagConstraints();
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridwidth = GridBagConstraints.REMAINDER;
-		c.weightx = 1;
-		content.add(controls, c);
+		controls.setAlignmentX(Component.LEFT_ALIGNMENT);
+		content.add(controls);
 		var filter = new JCheckBox("filter");
 		controls.add(filter);
 		filter.setSelected(true);
@@ -131,18 +127,24 @@ public class Application {
 		var markIdleButton = new JButton();
 		controls.add(markIdleButton);
 
+		var split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		split.setAlignmentX(Component.LEFT_ALIGNMENT);
+		content.add(split);
+		
+		WindowUtil.onClose(split, () ->{
+			prefs.putInt("dividerLocation", split.getDividerLocation());
+		});
+		split.setDividerLocation(prefs.getInt("dividerLocation", -1));
 
 		JTable table = new JTable();
-		var tableScroll = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+		var tableScroll = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		content.add(tableScroll, c);
+		split.add(tableScroll);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
 		JTextArea output = new JTextArea();
 		var scrollPane = new JScrollPane(output);
-		c.fill = GridBagConstraints.BOTH;
-		c.weighty = 1;
-		content.add(scrollPane, c);
+		split.add(scrollPane);
 		output.enableInputMethods(false);
 		output.setEditable(false);
 		
