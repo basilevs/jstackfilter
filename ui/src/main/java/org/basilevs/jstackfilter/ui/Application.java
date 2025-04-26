@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -111,10 +110,14 @@ public class Application {
 		var controls = Box.createHorizontalBox();
 		controls.setAlignmentX(Component.LEFT_ALIGNMENT);
 		content.add(controls);
-		var filter = new JCheckBox("filter");
-		controls.add(filter);
-		filter.setSelected(true);
+		var showIdleThreads = new JCheckBox("Idle threads");
+		controls.add(showIdleThreads);
+		showIdleThreads.setSelected(false);
 		
+		var showOldProcesses = new JCheckBox("Old processes");
+		controls.add(showOldProcesses);
+		showOldProcesses.setSelected(true);
+
 		var refreshButton = new JButton();
 		controls.add(refreshButton);
 		
@@ -166,32 +169,23 @@ public class Application {
 				output.setText(message);
 			});
 		};
-		
-		Supplier<Optional<Long>> selection = () -> {
-			return Optional.of(table.getSelectedRow())
-					.filter(x -> x >= 0)
-					.map(index -> 
-			table.getModel().getValueAt(index, 0)).map(Long.class::cast);
-		};
-		
-		String filterName = "filter";
-		var filterAction = new AbstractAction(filterName) {
-			private static final long serialVersionUID = 2783229494384910800L;
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				model.setFilter(filter.isSelected());
-			}
-		};
-		filterAction.putValue(Action.SHORT_DESCRIPTION, "Disable jstackfilter to see original jstack output");
-		filter.setAction(filterAction);
-		
+				
+		configureCheckbox(showIdleThreads, "Do not filter out idle threads, show original jstack output", isSelected -> {
+			model.showIdle(isSelected);
+		});
+
+		configureCheckbox(showOldProcesses, "When unchecked, currently runnning processes are hidden. Refresh action would only show processes created since.", isSelected -> {
+			model.showOldProcesses(isSelected);
+			refreshButton.doClick();
+		});
+
 		
 		String refreshName = "refresh";
 		AbstractAction refreshAction = new AbstractAction(refreshName) {
 			private static final long serialVersionUID = -5436279312088472338L;
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Optional<Long> previousSelection = selection.get();
+				Optional<Long> previousSelection = getSelection(table);
 				table.setModel(toTableModel(model.getJavaProcesses()));
 				previousSelection.ifPresent(selection -> 
 					selectRowByFirstColumn(table, selection)
@@ -301,7 +295,7 @@ public class Application {
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				selection.get().ifPresent(model::selectJavaProcess);
+				getSelection(table).ifPresent(model::selectJavaProcess);
 			}
 		});
 
@@ -309,6 +303,28 @@ public class Application {
 
 		refreshAction.actionPerformed(null);
 		frame.setVisible(true);
+	}
+
+	private void configureCheckbox(JCheckBox checkbox, String description, Consumer<Boolean> onChange) {
+		AbstractAction action = new AbstractAction(checkbox.getText()) {
+			private static final long serialVersionUID = 6469816842427120859L;
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onChange.accept(checkbox.isSelected());
+			}
+		};
+		action.putValue(Action.SHORT_DESCRIPTION, description);
+		checkbox.setAction(action);
+		action.actionPerformed(null);
+	}
+
+	private Optional<Long> getSelection(JTable processTable) {
+		return Optional.of(processTable.getSelectedRow())
+				.filter(x -> x >= 0)
+				.map(index -> 
+		{
+			return processTable.getModel().getValueAt(index, 0);
+		}).map(Long.class::cast);
 	}
 
 	private static void packColumns(JTable table) {

@@ -10,9 +10,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -33,12 +35,14 @@ public class Model {
 	private static final long CURRENT_PID = ProcessHandle.current().pid();
 	private final Consumer<String> errorListener;
 	private final Consumer<String> outputListener;
-	private boolean filter = true;
+	private boolean showIdle = true;
 	private ReaderSupplier input = NO_INPUT;
-	private final ThreadRegistry known;
+	private final ThreadRegistry idle;
+	private final Set<Long> oldProcesses = new HashSet<>();
+	private long selectedPid = -1;
 	{
 		try {
-			known = ThreadRegistry.idle();
+			idle = ThreadRegistry.idle();
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
@@ -51,6 +55,10 @@ public class Model {
 	}
 
 	public void selectJavaProcess(long pid) {
+		if (pid == selectedPid) {
+			return;
+		}
+		selectedPid = pid;
 		input = () -> jstackByPid(pid);
 		update();
 	}
@@ -73,16 +81,23 @@ public class Model {
 		}
 	}
 
-	public void setFilter(boolean filter) {
-		this.filter = filter;
+	public void showIdle(boolean doShow) {
+		this.showIdle = doShow;
 		update();
+	}
+
+	public void showOldProcesses(boolean selected) {
+		oldProcesses.clear();
+		if (!selected) {
+			getJavaProcesses().stream().map(JavaProcess::pid).forEach(oldProcesses::add);
+		}
 	}
 
 	private void filter(Reader input) throws IOException {
 		try {
 			Reader filtered;
-			if (filter) {
-				filtered = Filter.filter(Predicate.<JavaThread>not(known::contains), input);
+			if (!showIdle) {
+				filtered = Filter.filter(Predicate.<JavaThread>not(idle::contains), input);
 			} else {
 				filtered = input;
 			}
@@ -98,7 +113,7 @@ public class Model {
 	
 	public void rememberIdleThreads(String selection) {
 		try {
-			known.load(new StringReader(selection));
+			idle.load(new StringReader(selection));
 			update();
 		} catch (Exception e) {
 			handleError(e);
@@ -107,29 +122,35 @@ public class Model {
 
 	public void close() throws IOException {
 		executor.shutdownNow();
-		known.close();
+		idle.close();
+	}
+	public List<JavaProcess> getJavaProcesses() {
+		List<JavaProcess> result = parseJavaProcesses();
+		result.removeIf(p -> oldProcesses.contains(p.pid()));
+		return result;
 	}
 
-	public List<JavaProcess> getJavaProcesses() {
+	public List<JavaProcess> parseJavaProcesses() {
 		ArrayList<JavaProcess> rows = new ArrayList<>();
 		try (Scanner lines = new Scanner(SystemUtil.captureOutput(executor, "jps", "-v"), StandardCharsets.UTF_8)) {
 			try {
 				lines.useDelimiter("\n");
 				while (lines.hasNext()) {
-					Scanner fields = new Scanner(lines.next());
-					fields.useDelimiter("\\s+");
-					if (fields.hasNext()) {
-						long pid = Long.parseLong(fields.next());
-						fields.skip("\\s+");
-						fields.useDelimiter("\\A");
-						var rest = fields.next();
-						if (rest.startsWith("Jps")) {
-							continue;
+					try (Scanner fields = new Scanner(lines.next())) {
+						fields.useDelimiter("\\s+");
+						if (fields.hasNext()) {
+							long pid = Long.parseLong(fields.next());
+							fields.skip("\\s+");
+							fields.useDelimiter("\\A");
+							var rest = fields.next();
+							if (rest.startsWith("Jps")) {
+								continue;
+							}
+							if (pid == CURRENT_PID) {
+								continue;
+							}
+							rows.add(new JavaProcess(pid, rest));
 						}
-						if (pid == CURRENT_PID) {
-							continue;
-						}
-						rows.add(new JavaProcess(pid, rest));
 					}
 				}
 				lines.close();
