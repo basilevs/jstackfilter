@@ -1,5 +1,6 @@
 package org.basilevs.jstackfilter.ui;
 
+import static javax.swing.KeyStroke.getKeyStroke;
 import static javax.swing.SwingUtilities.invokeLater;
 
 import java.awt.Color;
@@ -17,19 +18,22 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import java.util.stream.Stream;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -110,7 +114,7 @@ public class Application {
 		var controls = Box.createHorizontalBox();
 		controls.setAlignmentX(Component.LEFT_ALIGNMENT);
 		content.add(controls);
-		var showIdleThreads = new JCheckBox("Idle threads");
+		var showIdleThreads = new JCheckBox();
 		controls.add(showIdleThreads);
 		showIdleThreads.setSelected(false);
 		
@@ -169,75 +173,55 @@ public class Application {
 				output.setText(message);
 			});
 		};
-				
-		configureCheckbox(showIdleThreads, "Do not filter out idle threads, show original jstack output", isSelected -> {
+		
+		List<Action> actions = new ArrayList<>();
+		actions.add(configureCheckbox(showIdleThreads, "Idle threads", "Do not filter out idle threads, show original jstack output", isSelected -> {
 			model.showIdle(isSelected);
-		});
+		}));
 
-		configureCheckbox(showOldProcesses, "When unchecked, currently runnning processes are hidden. Refresh action would only show processes created since.", isSelected -> {
+		actions.add(configureCheckbox(showOldProcesses, "Old processes", "When unchecked, currently runnning processes are hidden. Refresh action would only show processes created since.", isSelected -> {
 			model.showOldProcesses(isSelected);
 			refreshButton.doClick();
+		}));
+
+
+		AbstractAction refreshAction = createAction("Refresh", "(F5) Reload the file, rerun jps and jstack.", KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0), () -> {
+			Optional<Long> previousSelection = getSelection(table);
+			table.setModel(toTableModel(model.getJavaProcesses()));
+			previousSelection.ifPresent(selection -> 
+				selectRowByFirstColumn(table, selection)
+			);
+			packColumns(table);
+			Dimension size = new Dimension(100, table.getRowHeight() * table.getModel().getRowCount());
+			table.setPreferredScrollableViewportSize(size);
 		});
-
-		
-		String refreshName = "refresh";
-		AbstractAction refreshAction = new AbstractAction(refreshName) {
-			private static final long serialVersionUID = -5436279312088472338L;
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Optional<Long> previousSelection = getSelection(table);
-				table.setModel(toTableModel(model.getJavaProcesses()));
-				previousSelection.ifPresent(selection -> 
-					selectRowByFirstColumn(table, selection)
-				);
-				packColumns(table);
-				Dimension size = new Dimension(100, table.getRowHeight() * table.getModel().getRowCount());
-				table.setPreferredScrollableViewportSize(size);
-			}
-
-		};
-		refreshAction.putValue(Action.SHORT_DESCRIPTION, "(F5) Reload the file, rerun jps and jstack.");
-		frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0), refreshName);
-		frame.getRootPane().getActionMap().put(refreshName, refreshAction);
+		actions.add(refreshAction);
 		refreshButton.setAction(refreshAction);
 
 		
 		Clipboard clipboard = frame.getToolkit().getSystemClipboard();
 		String pasteName = (String) TransferHandler.getPasteAction().getValue(Action.NAME);
-		AbstractAction pasteAction = new AbstractAction(pasteName) {
-			
-			private static final long serialVersionUID = 9199450855113081882L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					table.clearSelection();
-					model.setInput((String) clipboard.getData(DataFlavor.stringFlavor));
-				} catch (UnsupportedFlavorException | IOException e1) {
-					handleError(e1);
-				}
+		AbstractAction pasteAction = createAction(pasteName, "(Ctrl+V) Take jstack output from system's clipboard.", getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK), () -> {
+			try {
+				table.clearSelection();
+				model.setInput((String) clipboard.getData(DataFlavor.stringFlavor));
+			} catch (UnsupportedFlavorException | IOException e1) {
+				handleError(e1);
 			}
-		};
-		pasteAction.putValue(Action.SHORT_DESCRIPTION, "(Ctrl+V) Take jstack output from system's clipboard.");
-		WindowUtil.handleKeystrokes(frame.getRootPane(), pasteName, KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK), KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK));
-		frame.getRootPane().getActionMap().put(pasteName, pasteAction);
+		});
+		actions.add(pasteAction);
 		frame.getRootPane().getActionMap().put(DefaultEditorKit.pasteAction, pasteAction);
-		table.getActionMap().put(pasteName, pasteAction);
 		output.getActionMap().put(DefaultEditorKit.pasteAction, pasteAction);
 		pasteButton.setAction(pasteAction);
 		
 		
-		String loadName = "load";
 		if (fileChooser == null) {
 			fileChooser = new JFileChooser();
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		}
 		String previousFile = prefs.get("lastFile", System.getProperty("user.home"));
 		fileChooser.ensureFileIsVisible(new File(previousFile));
-		AbstractAction loadAction = new AbstractAction(loadName) {
-			private static final long serialVersionUID = 9199450855113081882L;
-			@Override
-			public void actionPerformed(ActionEvent e) {
+		AbstractAction loadAction = createAction("load", "(Ctrl+O) Load jstack output from a file.", getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK), () -> {
 				table.clearSelection();
 				int result = fileChooser.showOpenDialog(frame);
 				if (result == JFileChooser.APPROVE_OPTION) {
@@ -245,42 +229,34 @@ public class Application {
 				    prefs.put("lastFile", selectedFile.toString());
 				    model.setFile(selectedFile.toPath());
 				}
-			}
-		};
-		loadAction.putValue(Action.SHORT_DESCRIPTION, "(Ctrl+O) Load jstack output from a file.");
-		WindowUtil.handleKeystrokes(frame.getRootPane(), loadName, KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK), KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_DOWN_MASK));
-		frame.getRootPane().getActionMap().put(loadName, loadAction);
-		table.getActionMap().put(loadName, loadAction);
+		});
+		actions.add(loadAction);
 		loadButton.setAction(loadAction);
 		
-		var markIdleName = "mark idle";
-		AbstractAction markIdle = new AbstractAction(markIdleName) {
-			private static final long serialVersionUID = 9199450855113081882L;
-			@Override
-			public void actionPerformed(ActionEvent e) {
+		AbstractAction markIdle = createAction("mark idle", "(Ctrl+I) Mark selected threads as idle.", getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK), () -> {
 				String selectedText = output.getSelectedText();
 				if (selectedText != null) {
 					model.rememberIdleThreads(selectedText);
 				}
-			}
-		};
-		markIdle.putValue(Action.SHORT_DESCRIPTION, "(Ctrl+I) Mark selected threads as idle.");
-		WindowUtil.handleKeystrokes(frame.getRootPane(), markIdleName, KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK), KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.META_DOWN_MASK));
-		frame.getRootPane().getActionMap().put(markIdleName, markIdle);
+		});
+		actions.add(markIdle);
 		markIdleButton.setAction(markIdle);
 
-		String exitName = "exit";
-		AbstractAction exitAction = new AbstractAction(exitName) {
-			private static final long serialVersionUID = -5146316832581685550L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
-			}
-		};
+		AbstractAction exitAction = createAction("exit", "(Esc) Exit Jstackfilter", getKeyStroke(KeyEvent.VK_ESCAPE, 0), () -> {
+			frame.dispose();
+		});
+		actions.add(exitAction);
 		
-		frame.getRootPane().getActionMap().put(exitName, exitAction);
-		WindowUtil.handleKeystrokes(frame.getRootPane(), exitName, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+		for (Action a: actions) {
+			KeyStroke ks =  (KeyStroke) a.getValue(Action.ACCELERATOR_KEY);
+			KeyStroke[] keys = alternateKeys(ks).toArray(KeyStroke[]::new);
+			Stream.of(Action.ACTION_COMMAND_KEY, Action.NAME).map(a::getValue).filter(Objects::nonNull).map(String.class::cast).forEach(command -> {
+				frame.getRootPane().getActionMap().put(command, a);
+				table.getActionMap().put(command, a); // suppress default actions
+				output.getActionMap().put(command, a); // suppress default actions
+				WindowUtil.handleKeystrokes(frame.getRootPane(), command, keys);
+			});
+		}
 		
 		table.setAutoCreateColumnsFromModel(false);
 		var column = new TableColumn(0);
@@ -289,8 +265,6 @@ public class Application {
 		column = new TableColumn(1);
 		column.setHeaderValue("Command");;
 		table.getColumnModel().addColumn(column);
-
-
 
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -305,17 +279,53 @@ public class Application {
 		frame.setVisible(true);
 	}
 
-	private void configureCheckbox(JCheckBox checkbox, String description, Consumer<Boolean> onChange) {
-		AbstractAction action = new AbstractAction(checkbox.getText()) {
-			private static final long serialVersionUID = 6469816842427120859L;
+	private static Stream<KeyStroke> alternateKeys(KeyStroke origin) {
+		if (origin == null) {
+			return Stream.empty();
+		}
+		KeyStroke alternative = null;
+		int modifiers = origin.getModifiers();
+		if ((modifiers & KeyEvent.CTRL_DOWN_MASK) !=0) {
+			alternative = getKeyStroke(origin.getKeyCode(), KeyEvent.META_DOWN_MASK);
+		}
+		return Stream.of(origin, alternative).filter(Objects::nonNull);
+	}
+
+	private AbstractAction createAction(String name, String description, KeyStroke accelerator, Runnable r) {
+		AbstractAction refreshAction = new AbstractAction(name) {
+			private static final long serialVersionUID = -5436279312088472338L;
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				onChange.accept(checkbox.isSelected());
+				r.run();
 			}
 		};
-		action.putValue(Action.SHORT_DESCRIPTION, description);
+		refreshAction.putValue(Action.SHORT_DESCRIPTION, description);
+		refreshAction.putValue(Action.ACCELERATOR_KEY, accelerator);
+		configureMnemonic(refreshAction);
+		return refreshAction;
+	}
+
+	private AbstractAction configureCheckbox(JCheckBox checkbox, String text, String description, Consumer<Boolean> onChange) {
+		AbstractAction action = createAction(text, description, null,() -> {
+				onChange.accept(checkbox.isSelected());
+		});
 		checkbox.setAction(action);
 		action.actionPerformed(null);
+		return action;
+	}
+
+	private final Set<String> usedMnemonics = new HashSet<>();
+	private void configureMnemonic(AbstractAction action) {
+		for (char c: ((String)action.getValue(Action.NAME)).toCharArray()) {
+			c = Character.toLowerCase(c);
+			int offset = c - 'a';
+			int code = KeyEvent.VK_A + offset;
+			String mnemonic = String.valueOf(c);
+			if (usedMnemonics.add(mnemonic)) {
+				action.putValue(Action.MNEMONIC_KEY, code);
+				break;
+			}
+		}
 	}
 
 	private Optional<Long> getSelection(JTable processTable) {
