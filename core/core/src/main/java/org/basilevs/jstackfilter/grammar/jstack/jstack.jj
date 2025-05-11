@@ -104,8 +104,12 @@ private void line() :
      "["
   | 
      "]"
-  | 
+  |
      "."
+  |
+     "%"
+  |
+     "!"
   | 
      "$"
   | 
@@ -402,17 +406,7 @@ JavaThread javaThread() :
     | 
       //   Compiling: 37714 % !   4       org.eclipse.jdt.internal.core.builder.NameEnvironment::computeClasspathLocations @ 698 (2340 bytes)      //   Compiling: 18676 %     4       sun.security.util.AbstractAlgorithmConstraints::checkAlgorithm @ 93 (138 bytes)
       //   Compiling: 10253       4       jdk.nio.zipfs.ZipFileSystem$Entry::<init> (68 bytes)
-      "Compiling: " < NUMBER >
-      (
-        LOOKAHEAD(2)
-        (
-          < SPACE >
-        | "%"
-        | "!"
-        | < NUMBER >
-        )
-      )*
-      method() "::" ( < WORD > | "<" < WORD > ">" ) < SPACE > ("@" < SPACE > < NUMBER > < SPACE >)? "(" < NUMBER > " bytes" ")" < EOL >
+      "Compiling: " line()
     )
   |
     (

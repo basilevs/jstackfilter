@@ -1043,4 +1043,7 @@ JNI global refs: 221, weak refs: 45
 	at java.lang.Thread.runWith(java.base@23.0.1/Thread.java:1588)
 	at java.lang.Thread.run(java.base@23.0.1/Thread.java:1575)
 
+"C2 CompilerThread0" #14 [39683] daemon prio=9 os_prio=31 cpu=3283.87ms elapsed=38.66s tid=0x000000015800d400 nid=39683 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   Compiling: 7810  s    4       org.eclipse.core.internal.watson.ElementTree::immutable (36 bytes)
 

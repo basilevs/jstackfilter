@@ -50,6 +50,8 @@ public interface JstackParserConstants {
     "\"[\"",
     "\"]\"",
     "\".\"",
+    "\"%\"",
+    "\"!\"",
     "\"$\"",
     "\"<\"",
     "\">\"",
@@ -71,10 +73,6 @@ public interface JstackParserConstants {
     "\"Carrying virtual thread #\"",
     "\"No compile task\"",
     "\"Compiling: \"",
-    "\"%\"",
-    "\"!\"",
-    "\"::\"",
-    "\" bytes\"",
   };
 
 }
