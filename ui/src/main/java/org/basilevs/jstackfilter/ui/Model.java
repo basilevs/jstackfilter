@@ -39,7 +39,6 @@ public class Model {
 	private ReaderSupplier input = NO_INPUT;
 	private final ThreadRegistry idle;
 	private final Set<Long> oldProcesses = new HashSet<>();
-	private long selectedPid = -1;
 	{
 		try {
 			idle = ThreadRegistry.idle();
@@ -55,10 +54,7 @@ public class Model {
 	}
 
 	public void selectJavaProcess(long pid) {
-		if (pid == selectedPid) {
-			return;
-		}
-		selectedPid = pid;
+
 		input = () -> jstackByPid(pid);
 		update();
 	}
