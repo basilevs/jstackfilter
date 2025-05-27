@@ -39,6 +39,7 @@ public class Model {
 	private ReaderSupplier input = NO_INPUT;
 	private final ThreadRegistry idle;
 	private final Set<Long> oldProcesses = new HashSet<>();
+	private long lastJavaProcess = 0;
 	{
 		try {
 			idle = ThreadRegistry.idle();
@@ -54,7 +55,7 @@ public class Model {
 	}
 
 	public void selectJavaProcess(long pid) {
-
+		lastJavaProcess = pid;
 		input = () -> jstackByPid(pid);
 		update();
 	}
@@ -85,7 +86,7 @@ public class Model {
 	public void showOldProcesses(boolean selected) {
 		oldProcesses.clear();
 		if (!selected) {
-			getJavaProcesses().stream().map(JavaProcess::pid).forEach(oldProcesses::add);
+			getJavaProcesses().stream().map(JavaProcess::pid).filter(pid -> pid != lastJavaProcess).forEach(oldProcesses::add);
 		}
 	}
 
