@@ -42,6 +42,8 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
@@ -84,6 +86,12 @@ public class Application {
 	 * from the event-dispatching thread.
 	 */
 	private void createAndShowGUI() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
+			throw new IllegalStateException(e); 
+		}
 		// Create and set up the window.
 		final JFrame frame = new JFrame("jstackfilter");
 		WindowUtil.configureSize(prefs, frame);
