@@ -227,8 +227,9 @@ public class Application {
 			fileChooser = new JFileChooser();
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		}
-		String previousFile = prefs.get("lastFile", System.getProperty("user.home"));
-		fileChooser.ensureFileIsVisible(new File(previousFile));
+		File previousFile = new File(prefs.get("lastFile", System.getProperty("user.home")));
+		fileChooser.ensureFileIsVisible(previousFile);
+		fileChooser.setCurrentDirectory(previousFile);
 		AbstractAction loadAction = createAction("load", "(Ctrl+O) Load jstack output from a file.", getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK), () -> {
 				table.clearSelection();
 				int result = fileChooser.showOpenDialog(frame);
