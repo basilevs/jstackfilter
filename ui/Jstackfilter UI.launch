@@ -22,5 +22,5 @@
     </listAttribute>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="org.basilevs.jstackfilter.ui"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="org.basilevs.jstackfilter.ui"/>
-    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.util.logging.config.file=${workspace_loc:org.basilevs.jstackfilter.ui/logging.properties}"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.util.logging.config.file=${workspace_loc:org.basilevs.jstackfilter.ui/logging.properties}&#10;-Xmx70m&#10;-Xms50m"/>
 </launchConfiguration>
