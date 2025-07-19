@@ -48,7 +48,7 @@ TOKEN :
   < NUMBER : 
     [ "0"-"9", "-" ] 
     (
-    [ "0"-"9", "x", "a"-"f", "_", "." ]
+    [ "0"-"9", "x", "a"-"f", "_", ".", "," ]
     )* >
 }
 
@@ -326,6 +326,10 @@ void nativeThread() :
 //	- locked <0x0000000083286520> (a org.eclipse.core.internal.jobs.WorkerPool)
 //	at org.eclipse.core.internal.jobs.WorkerPool.startJob(WorkerPool.java:242)
 //	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:58)
+// or
+//"main" #1 [755] prio=5 os_prio=0 cpu=2680,94ms elapsed=46236,64s tid=0x00007fb8d00285a0 nid=755 in Object.wait()  [0x00007fb8d7f56000]
+//   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+//	at java.lang.Object.wait0(java.base@21.0.7/Native Method)
 JavaThread javaThread() :
 {
   ArrayList < Frame > frames = new ArrayList < Frame > ();
