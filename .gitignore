@@ -3,3 +3,4 @@ bintest/
 target/
 .DS_Store
 .polyglot.*
+.flattened-pom.xml

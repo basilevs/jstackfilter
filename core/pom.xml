@@ -14,5 +14,6 @@
 	<modules>
 		<module>core</module>
 		<module>test</module>
+		<module>benchmark</module>
 	</modules>
 </project>  
