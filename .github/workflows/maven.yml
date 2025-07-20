@@ -38,6 +38,12 @@ jobs:
         if-no-files-found: error
         name: ui
         path: 'ui/target/ui-*-jar-with-dependencies.jar'
+    - name: Other results 
+      uses: actions/upload-artifact@v4
+      with:
+        if-no-files-found: error
+        name: other
+        path: 'core/benchmark/result.txt'
     - name: Upload Eclipse repository
       uses: actions/upload-artifact@v4
       with:
