@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import org.basilevs.jstackfilter.JavaThread;
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
@@ -16,10 +17,13 @@ import org.openjdk.jmh.annotations.State;
 public class MyBenchmark {
 	public String input;
 
-	@Setup
+	@Setup(Level.Trial)
 	public void setup() {
 		try (Scanner scanner = new Scanner(getClass().getResourceAsStream("/eclipse.txt"), StandardCharsets.UTF_8)) {
 			input = scanner.useDelimiter("\\A").next();
+		}
+		if (input.contains("java.lang.d=0x3d2c")) {
+			throw new IllegalArgumentException();
 		}
 	}
 	
