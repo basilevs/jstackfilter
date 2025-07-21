@@ -8,6 +8,7 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.basilevs.jstackfilter.JavaThread;
 import org.basilevs.jstackfilter.JstackParser;
@@ -40,7 +41,9 @@ class Utils {
 	}
 
 	public static List<JavaThread> readThreadResource(Class<?> origin, String name) {
-		return JstackParser.parseThreads( new StringReader(readClassResource(origin, name))).collect(Collectors.toList());
+		try (Stream<JavaThread> threads = JstackParser.parseThreads( new StringReader(readClassResource(origin, name)))) {
+			return threads.collect(Collectors.toList());
+		}
 	}
 	
 }

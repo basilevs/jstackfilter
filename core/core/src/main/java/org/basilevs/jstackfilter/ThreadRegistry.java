@@ -62,7 +62,9 @@ public final class ThreadRegistry implements Closeable {
 	}
 
 	public void load(Reader reader) {
-		addAll(JstackParser.parseThreads(reader));
+		try (Stream<JavaThread> threads2 = JstackParser.parseThreads(reader)) {
+			addAll(threads2);
+		}
 	}
 
 	private void save(Writer output) {

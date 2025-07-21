@@ -4,6 +4,7 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 import org.basilevs.jstackfilter.JavaThread;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -24,7 +25,8 @@ public class MyBenchmark {
 	
     @Benchmark
     public List<JavaThread> parse() {
-    	try (StringReader stringReader = new StringReader(input)) {
+    	try (StringReader stringReader = new StringReader(input);
+    			Stream<JavaThread> threads = org.basilevs.jstackfilter.JstackParser.parseThreads(stringReader)) {
 			return org.basilevs.jstackfilter.JstackParser.parseThreads(stringReader).toList();
 		}
     }
