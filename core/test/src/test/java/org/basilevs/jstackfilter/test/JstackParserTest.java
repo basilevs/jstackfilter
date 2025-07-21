@@ -1,12 +1,16 @@
 package org.basilevs.jstackfilter.test;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.basilevs.jstackfilter.Frame;
 import org.basilevs.jstackfilter.JavaThread;
@@ -44,19 +48,38 @@ public class JstackParserTest {
 	@Test
 	public void concurrentParsing() {
 		String data = Utils.readClassResource(JstackParserTest.class, "eclipse.txt");
-		long expectedSize = JstackParser.parseThreads(new StringReader(data)).collect(Collectors.toList()).size();
-		var futures = new CompletableFuture<?>[100];
-		for (int i = 0; i < futures.length; i++) {
-			futures[i] = CompletableFuture.supplyAsync(() -> {
-				try (Stream<JavaThread> threads = JstackParser.parseThreads(new StringReader(data))) {
-					return threads.count();
-				}
-			});
-		}
-		CompletableFuture.allOf(futures).join();
-		for (int i = 0; i < futures.length; i++) {
-			Assert.assertEquals(expectedSize, futures[i].join());
+		List<JavaThread> expected = JstackParser.splitToChunks((Reader) new StringReader(data)).map(JstackParser::parseThread).flatMap(Optional::stream).toList();
+		for (int i = 0; i < 100; i++) {
+			assertEquals(expected, JstackParser.parseThreads(new StringReader(data)).toList());
 		}
 	}
 
+	@Test
+	public void concurrentSplitting() {
+		String data = Utils.readClassResource(JstackParserTest.class, "eclipse.txt");
+		List<String> expected = JstackParser.splitToChunks((Reader) new StringReader(data)).toList();
+		for (int i = 0; i < 100; i++) {
+			Assert.assertEquals(expected, JstackParser.parallel(JstackParser.splitToChunks((Reader) new StringReader(data))).map(j -> "a" + j).map(j -> j.substring(1)).toList());
+		}
+	}
+	
+	private static final void assertEquals(Collection<JavaThread> expected, Collection<JavaThread> actual) {
+		actual = new ArrayList<JavaThread>(actual);
+		
+		for (JavaThread thread : expected) {
+			Assert.assertTrue("Expected:\n" + thread + "\n Found:\n"+actual, removeFirst(actual, t -> t.equalByMethodName(thread)));
+		}
+		
+		Assert.assertEquals(Collections.emptyList(), actual);
+	}
+	
+	private static <T> boolean removeFirst(Collection<T> list, Predicate<T> predicate) {
+		for (Iterator<T> i = list.iterator(); i.hasNext();) {
+			if (predicate.test(i.next())) {
+				i.remove();
+				return true;
+			}
+		}
+		return false;
+	}
 }
