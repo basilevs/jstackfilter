@@ -12,74 +12,74 @@
 
 # Run progress: 0.00% complete, ETA 00:16:40
 # Fork: 1 of 5
-# Warmup Iteration   1: 462.857 ops/s
-# Warmup Iteration   2: 471.211 ops/s
-# Warmup Iteration   3: 473.434 ops/s
-# Warmup Iteration   4: 472.817 ops/s
-# Warmup Iteration   5: 473.367 ops/s
-Iteration   1: 472.925 ops/s
-Iteration   2: 470.561 ops/s
-Iteration   3: 473.902 ops/s
-Iteration   4: 472.688 ops/s
-Iteration   5: 471.091 ops/s
+# Warmup Iteration   1: 456.409 ops/s
+# Warmup Iteration   2: 469.143 ops/s
+# Warmup Iteration   3: 468.562 ops/s
+# Warmup Iteration   4: 469.338 ops/s
+# Warmup Iteration   5: 471.826 ops/s
+Iteration   1: 472.916 ops/s
+Iteration   2: 473.731 ops/s
+Iteration   3: 474.353 ops/s
+Iteration   4: 472.285 ops/s
+Iteration   5: 472.865 ops/s
 
-# Run progress: 10.00% complete, ETA 00:15:03
+# Run progress: 10.00% complete, ETA 00:15:02
 # Fork: 2 of 5
-# Warmup Iteration   1: 464.860 ops/s
-# Warmup Iteration   2: 470.977 ops/s
-# Warmup Iteration   3: 471.317 ops/s
-# Warmup Iteration   4: 474.630 ops/s
-# Warmup Iteration   5: 477.235 ops/s
-Iteration   1: 477.257 ops/s
-Iteration   2: 477.132 ops/s
-Iteration   3: 477.497 ops/s
-Iteration   4: 477.359 ops/s
-Iteration   5: 476.627 ops/s
+# Warmup Iteration   1: 525.561 ops/s
+# Warmup Iteration   2: 546.206 ops/s
+# Warmup Iteration   3: 547.530 ops/s
+# Warmup Iteration   4: 548.158 ops/s
+# Warmup Iteration   5: 546.420 ops/s
+Iteration   1: 548.830 ops/s
+Iteration   2: 546.966 ops/s
+Iteration   3: 543.762 ops/s
+Iteration   4: 550.755 ops/s
+Iteration   5: 550.800 ops/s
 
-# Run progress: 20.00% complete, ETA 00:13:22
+# Run progress: 20.00% complete, ETA 00:13:21
 # Fork: 3 of 5
-# Warmup Iteration   1: 466.229 ops/s
-# Warmup Iteration   2: 476.405 ops/s
-# Warmup Iteration   3: 477.323 ops/s
-# Warmup Iteration   4: 477.369 ops/s
-# Warmup Iteration   5: 475.090 ops/s
-Iteration   1: 470.410 ops/s
-Iteration   2: 471.406 ops/s
-Iteration   3: 475.151 ops/s
-Iteration   4: 477.305 ops/s
-Iteration   5: 477.281 ops/s
+# Warmup Iteration   1: 402.248 ops/s
+# Warmup Iteration   2: 413.502 ops/s
+# Warmup Iteration   3: 415.124 ops/s
+# Warmup Iteration   4: 416.192 ops/s
+# Warmup Iteration   5: 412.463 ops/s
+Iteration   1: 414.705 ops/s
+Iteration   2: 415.773 ops/s
+Iteration   3: 415.727 ops/s
+Iteration   4: 415.790 ops/s
+Iteration   5: 415.927 ops/s
 
-# Run progress: 30.00% complete, ETA 00:11:42
+# Run progress: 30.00% complete, ETA 00:11:41
 # Fork: 4 of 5
-# Warmup Iteration   1: 538.297 ops/s
-# Warmup Iteration   2: 550.783 ops/s
-# Warmup Iteration   3: 550.472 ops/s
-# Warmup Iteration   4: 551.072 ops/s
-# Warmup Iteration   5: 550.675 ops/s
-Iteration   1: 549.968 ops/s
-Iteration   2: 549.618 ops/s
-Iteration   3: 547.638 ops/s
-Iteration   4: 548.273 ops/s
-Iteration   5: 548.890 ops/s
+# Warmup Iteration   1: 531.529 ops/s
+# Warmup Iteration   2: 543.943 ops/s
+# Warmup Iteration   3: 545.312 ops/s
+# Warmup Iteration   4: 542.237 ops/s
+# Warmup Iteration   5: 544.709 ops/s
+Iteration   1: 541.621 ops/s
+Iteration   2: 542.858 ops/s
+Iteration   3: 543.525 ops/s
+Iteration   4: 542.810 ops/s
+Iteration   5: 544.045 ops/s
 
 # Run progress: 40.00% complete, ETA 00:10:01
 # Fork: 5 of 5
-# Warmup Iteration   1: 463.736 ops/s
-# Warmup Iteration   2: 471.238 ops/s
-# Warmup Iteration   3: 470.715 ops/s
-# Warmup Iteration   4: 470.742 ops/s
-# Warmup Iteration   5: 465.464 ops/s
-Iteration   1: 470.112 ops/s
-Iteration   2: 469.141 ops/s
-Iteration   3: 471.305 ops/s
-Iteration   4: 469.164 ops/s
-Iteration   5: 468.076 ops/s
+# Warmup Iteration   1: 462.864 ops/s
+# Warmup Iteration   2: 466.873 ops/s
+# Warmup Iteration   3: 469.688 ops/s
+# Warmup Iteration   4: 468.775 ops/s
+# Warmup Iteration   5: 470.363 ops/s
+Iteration   1: 470.517 ops/s
+Iteration   2: 469.660 ops/s
+Iteration   3: 471.437 ops/s
+Iteration   4: 471.300 ops/s
+Iteration   5: 471.519 ops/s
 
 
 Result "org.basilevs.jstackfilter.benchmark.MyBenchmark.parseParallel":
-  488.431 ±(99.9%) 23.215 ops/s [Average]
-  (min, avg, max) = (468.076, 488.431, 549.968), stdev = 30.992
-  CI (99.9%): [465.216, 511.646] (assumes normal distribution)
+  490.179 ±(99.9%) 38.056 ops/s [Average]
+  (min, avg, max) = (414.705, 490.179, 550.800), stdev = 50.804
+  CI (99.9%): [452.123, 528.235] (assumes normal distribution)
 
 
 # JMH version: 1.37
@@ -96,74 +96,74 @@ Result "org.basilevs.jstackfilter.benchmark.MyBenchmark.parseParallel":
 
 # Run progress: 50.00% complete, ETA 00:08:21
 # Fork: 1 of 5
-# Warmup Iteration   1: 285.200 ops/s
-# Warmup Iteration   2: 287.238 ops/s
-# Warmup Iteration   3: 287.737 ops/s
-# Warmup Iteration   4: 286.944 ops/s
-# Warmup Iteration   5: 282.071 ops/s
-Iteration   1: 287.208 ops/s
-Iteration   2: 290.139 ops/s
-Iteration   3: 289.135 ops/s
-Iteration   4: 285.702 ops/s
-Iteration   5: 291.227 ops/s
+# Warmup Iteration   1: 285.126 ops/s
+# Warmup Iteration   2: 289.081 ops/s
+# Warmup Iteration   3: 289.126 ops/s
+# Warmup Iteration   4: 289.852 ops/s
+# Warmup Iteration   5: 289.681 ops/s
+Iteration   1: 289.387 ops/s
+Iteration   2: 289.202 ops/s
+Iteration   3: 289.026 ops/s
+Iteration   4: 288.649 ops/s
+Iteration   5: 289.207 ops/s
 
 # Run progress: 60.00% complete, ETA 00:06:41
 # Fork: 2 of 5
-# Warmup Iteration   1: 283.489 ops/s
-# Warmup Iteration   2: 287.893 ops/s
-# Warmup Iteration   3: 286.800 ops/s
-# Warmup Iteration   4: 287.753 ops/s
-# Warmup Iteration   5: 287.593 ops/s
-Iteration   1: 288.009 ops/s
-Iteration   2: 287.845 ops/s
-Iteration   3: 287.421 ops/s
-Iteration   4: 287.422 ops/s
-Iteration   5: 287.483 ops/s
+# Warmup Iteration   1: 284.391 ops/s
+# Warmup Iteration   2: 290.624 ops/s
+# Warmup Iteration   3: 290.343 ops/s
+# Warmup Iteration   4: 290.878 ops/s
+# Warmup Iteration   5: 290.396 ops/s
+Iteration   1: 290.432 ops/s
+Iteration   2: 290.049 ops/s
+Iteration   3: 289.454 ops/s
+Iteration   4: 288.087 ops/s
+Iteration   5: 286.748 ops/s
 
 # Run progress: 70.00% complete, ETA 00:05:00
 # Fork: 3 of 5
-# Warmup Iteration   1: 322.473 ops/s
-# Warmup Iteration   2: 326.398 ops/s
-# Warmup Iteration   3: 326.461 ops/s
-# Warmup Iteration   4: 324.908 ops/s
-# Warmup Iteration   5: 325.102 ops/s
-Iteration   1: 325.983 ops/s
-Iteration   2: 325.256 ops/s
-Iteration   3: 325.581 ops/s
-Iteration   4: 326.384 ops/s
-Iteration   5: 325.818 ops/s
+# Warmup Iteration   1: 282.955 ops/s
+# Warmup Iteration   2: 287.860 ops/s
+# Warmup Iteration   3: 287.318 ops/s
+# Warmup Iteration   4: 288.765 ops/s
+# Warmup Iteration   5: 289.148 ops/s
+Iteration   1: 288.286 ops/s
+Iteration   2: 289.060 ops/s
+Iteration   3: 287.679 ops/s
+Iteration   4: 286.331 ops/s
+Iteration   5: 285.828 ops/s
 
 # Run progress: 80.00% complete, ETA 00:03:20
 # Fork: 4 of 5
-# Warmup Iteration   1: 280.314 ops/s
-# Warmup Iteration   2: 278.146 ops/s
-# Warmup Iteration   3: 282.482 ops/s
-# Warmup Iteration   4: 280.857 ops/s
-# Warmup Iteration   5: 282.352 ops/s
-Iteration   1: 283.973 ops/s
-Iteration   2: 283.263 ops/s
-Iteration   3: 284.005 ops/s
-Iteration   4: 284.167 ops/s
-Iteration   5: 283.794 ops/s
+# Warmup Iteration   1: 318.150 ops/s
+# Warmup Iteration   2: 323.107 ops/s
+# Warmup Iteration   3: 328.499 ops/s
+# Warmup Iteration   4: 326.872 ops/s
+# Warmup Iteration   5: 327.953 ops/s
+Iteration   1: 329.034 ops/s
+Iteration   2: 327.402 ops/s
+Iteration   3: 327.828 ops/s
+Iteration   4: 329.072 ops/s
+Iteration   5: 325.197 ops/s
 
 # Run progress: 90.00% complete, ETA 00:01:40
 # Fork: 5 of 5
-# Warmup Iteration   1: 263.571 ops/s
-# Warmup Iteration   2: 266.914 ops/s
-# Warmup Iteration   3: 267.909 ops/s
-# Warmup Iteration   4: 266.821 ops/s
-# Warmup Iteration   5: 267.572 ops/s
-Iteration   1: 267.380 ops/s
-Iteration   2: 267.502 ops/s
-Iteration   3: 267.780 ops/s
-Iteration   4: 266.400 ops/s
-Iteration   5: 266.629 ops/s
+# Warmup Iteration   1: 320.281 ops/s
+# Warmup Iteration   2: 328.032 ops/s
+# Warmup Iteration   3: 325.572 ops/s
+# Warmup Iteration   4: 322.885 ops/s
+# Warmup Iteration   5: 324.012 ops/s
+Iteration   1: 328.435 ops/s
+Iteration   2: 328.733 ops/s
+Iteration   3: 328.605 ops/s
+Iteration   4: 328.413 ops/s
+Iteration   5: 329.119 ops/s
 
 
 Result "org.basilevs.jstackfilter.benchmark.MyBenchmark.serialParse":
-  290.620 ±(99.9%) 14.716 ops/s [Average]
-  (min, avg, max) = (266.400, 290.620, 326.384), stdev = 19.645
-  CI (99.9%): [275.904, 305.336] (assumes normal distribution)
+  304.370 ±(99.9%) 14.895 ops/s [Average]
+  (min, avg, max) = (285.828, 304.370, 329.119), stdev = 19.884
+  CI (99.9%): [289.476, 319.265] (assumes normal distribution)
 
 
 # Run complete. Total time: 00:16:42
@@ -181,5 +181,5 @@ different JVMs are already problematic, the performance difference caused by dif
 modes can be very significant. Please make sure you use the consistent Blackhole mode for comparisons.
 
 Benchmark                   Mode  Cnt    Score    Error  Units
-MyBenchmark.parseParallel  thrpt   25  488.431 ± 23.215  ops/s
-MyBenchmark.serialParse    thrpt   25  290.620 ± 14.716  ops/s
+MyBenchmark.parseParallel  thrpt   25  490.179 ± 38.056  ops/s
+MyBenchmark.serialParse    thrpt   25  304.370 ± 14.895  ops/s

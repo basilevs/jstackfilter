@@ -1,5 +1,7 @@
 package org.basilevs.jstackfilter.test;
 
+import static org.basilevs.jstackfilter.PushSpliterator.parallel;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -59,7 +61,7 @@ public class JstackParserTest {
 		String data = Utils.readClassResource(JstackParserTest.class, "eclipse.txt");
 		List<String> expected = JstackParser.splitToChunks((Reader) new StringReader(data)).toList();
 		for (int i = 0; i < 100; i++) {
-			Assert.assertEquals(expected, JstackParser.parallel(JstackParser.splitToChunks((Reader) new StringReader(data))).map(j -> "a" + j).map(j -> j.substring(1)).toList());
+			Assert.assertEquals(expected, parallel(JstackParser.splitToChunks((Reader) new StringReader(data))).map(j -> "a" + j).map(j -> j.substring(1)).toList());
 		}
 	}
 	

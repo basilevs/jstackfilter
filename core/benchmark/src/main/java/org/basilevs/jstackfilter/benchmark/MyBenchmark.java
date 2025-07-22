@@ -1,9 +1,10 @@
 package org.basilevs.jstackfilter.benchmark;
 
+import static org.basilevs.jstackfilter.PushSpliterator.parallel;
+
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Stream;
@@ -44,7 +45,7 @@ public class MyBenchmark {
 	@Benchmark
 	public void parseParallel(Blackhole bh) {
 		try (StringReader stringReader = new StringReader(input);
-				Stream<JavaThread> threads = JstackParser.parallel(JstackParser.splitToChunks((Reader) stringReader))
+				Stream<JavaThread> threads = parallel(JstackParser.splitToChunks((Reader) stringReader))
 						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
 			threads.forEach(bh::consume);
 		}
