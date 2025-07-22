@@ -43,7 +43,7 @@ jobs:
       with:
         if-no-files-found: error
         name: other
-        path: 'core/benchmark/result.txt'
+        path: 'core/benchmark/result.json'
     - name: Upload Eclipse repository
       uses: actions/upload-artifact@v4
       with:
