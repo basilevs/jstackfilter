@@ -2,11 +2,11 @@ package org.basilevs.jstackfilter.benchmark;
 
 import static org.basilevs.jstackfilter.PushSpliterator.parallel;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.stream.Stream;
 
 import org.basilevs.jstackfilter.JavaThread;
@@ -16,36 +16,54 @@ import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.infra.Blackhole;
 
-@State(Scope.Benchmark)
-public class MyBenchmark {
-	public String input;
-	
 
-	@Setup(Level.Trial)
-	public void setup() {
-		try (Scanner scanner = new Scanner(getClass().getResourceAsStream("/eclipse.txt"), StandardCharsets.UTF_8)) {
-			input = scanner.useDelimiter("\\A").next();
+public class MyBenchmark {
+	
+	@State(Scope.Thread)
+	public static class State1 {
+		public Reader input;
+		@Setup(Level.Invocation)
+		public void setup() {
+			input = new InputStreamReader(getClass().getResourceAsStream("/eclipse.txt"), StandardCharsets.UTF_8);
 		}
-		if (input.contains("java.lang.d=0x3d2c")) {
-			throw new IllegalArgumentException();
+		
+		@TearDown(Level.Invocation)
+		public void teardown() throws IOException {
+			input.close();
 		}
 	}
 	
 	@Benchmark
-	public void serialParse(Blackhole bh) {
-		try (StringReader stringReader = new StringReader(input);
-				Stream<JavaThread> threads = JstackParser.splitToChunks((Reader) stringReader)
+	public void serial(Blackhole bh, State1 state) {
+		try (Stream<JavaThread> threads = JstackParser.splitToChunks(state.input)
+						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
+			threads.forEach(bh::consume);
+		}
+	}
+	
+	@Benchmark
+	public void serialChunkParallelParse(Blackhole bh, State1 state) {
+		try (Stream<JavaThread> threads = JstackParser.splitToChunks(state.input).parallel()
 						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
 			threads.forEach(bh::consume);
 		}
 	}
 
+
 	@Benchmark
-	public void parseParallel(Blackhole bh) {
-		try (StringReader stringReader = new StringReader(input);
-				Stream<JavaThread> threads = parallel(JstackParser.splitToChunks((Reader) stringReader))
+	public void parallelChunkSerialParse(Blackhole bh, State1 state) {
+		try (Stream<JavaThread> threads = parallel(JstackParser.splitToChunks(state.input))
+						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
+			threads.forEach(bh::consume);
+		}
+	}
+	
+	@Benchmark
+	public void parallelChunkParallelParse(Blackhole bh, State1 state) {
+		try (Stream<JavaThread> threads = parallel(JstackParser.splitToChunks(state.input)).parallel()
 						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
 			threads.forEach(bh::consume);
 		}
