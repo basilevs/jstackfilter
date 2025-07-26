@@ -6,15 +6,30 @@ import java.util.Collection;
 import java.util.Spliterator;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/** Speed up serial inputs by dedicating a thread to them
+ * 
+ *  **/
 public class PushSpliterator<T> implements Spliterator<T>, Closeable {
+	public PushSpliterator(int queueCapacity, int splitThreshold) {
+		this.pipe = new ArrayBlockingQueue<>(queueCapacity);
+		if (splitThreshold <= 0) {
+			throw new IllegalArgumentException("expected splitThreshold > 0, but received - " + splitThreshold);
+		}
+		this.splitThreshold = splitThreshold;
+	}
 
-	public static <T> Stream<T> parallel(Stream<T> input) {
+	public static final class ClosedException extends Exception {
+		private static final long serialVersionUID = 4707636972101757900L;
+	}
+
+	public static <T> Stream<T> parallel(Stream<T> input, int queueCapacity, int splitThreshold) {
 		Spliterator<T> inputSpliterator = input.spliterator();
-		PushSpliterator<T> spliterator = new PushSpliterator<>() {
+		PushSpliterator<T> spliterator = new PushSpliterator<>(queueCapacity, splitThreshold) {
 			@Override
 			public long estimateSize() {
 				long result = inputSpliterator.estimateSize() + super.estimateSize();
@@ -31,25 +46,26 @@ public class PushSpliterator<T> implements Spliterator<T>, Closeable {
 		};
 		CompletableFuture<Void> reader = CompletableFuture.runAsync(() -> {
 			try {
-				try {
-					boolean[] stop = new boolean[] { false };
-					while (!stop[0]) {
-						if (!inputSpliterator.tryAdvance(t -> {
-							try {
-								spliterator.put(t);
-							} catch (InterruptedException e) {
-								Thread.currentThread().interrupt();
-								stop[0] = true;
-							}
-						})) {
-							break;
-						}
+				while (!spliterator.isClosed() && inputSpliterator.tryAdvance(t -> {
+					try {
+						spliterator.put(t);
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+						spliterator.close();
+					} catch (ClosedException e) {
+						// The loop will terminate by checking spliterator.isClosed()
 					}
-				} finally {
+				})) {
+				}
+				if (!spliterator.isClosed()) {
 					spliterator.done();
 				}
 			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 				spliterator.close();
+			} catch (Throwable e) {
+				spliterator.close();
+				throw e;
 			}
 		});
 		return StreamSupport.stream(spliterator, true).onClose(() -> {
@@ -62,15 +78,30 @@ public class PushSpliterator<T> implements Spliterator<T>, Closeable {
 					spliterator.close();
 				}
 			}
+			if (!reader.isCancelled()) {
+				// Throw if reader terminated unexpectedly
+				reader.join();
+			}
 		});
 	}
 
-	public final void put(T item) throws InterruptedException {
+	public boolean isClosed() {
+		return closed.get();
+	}
+
+	public final void put(T item) throws InterruptedException, ClosedException {
+		ensureOpen();
 		pipe.put(new Some(item));
+		ensureOpen();
 	}
 
 	public final void done() throws InterruptedException {
-		pipe.put(end);
+		// Do not block on queue, when consumers may not longer be active
+		if (isClosed()) {
+			close();
+		} else {
+			pipe.put(end);
+		}
 	}
 
 	@Override
@@ -87,6 +118,9 @@ public class PushSpliterator<T> implements Spliterator<T>, Closeable {
 
 	@Override
 	public final Spliterator<T> trySplit() {
+		if (pipe.size() < splitThreshold) {
+			return null;
+		}
 		Collection<Entry<T>> chunk = new ArrayList<>();
 		pipe.drainTo(chunk);
 		if (chunk.removeIf(Entry::isDone)) {
@@ -105,11 +139,12 @@ public class PushSpliterator<T> implements Spliterator<T>, Closeable {
 
 	@Override
 	public int characteristics() {
-		return SUBSIZED;
+		return SUBSIZED | CONCURRENT;
 	}
 
 	@Override
 	public final void close() {
+		closed.set(true);
 		do {
 			pipe.clear();
 		} while (!pipe.offer(end));
@@ -165,7 +200,17 @@ public class PushSpliterator<T> implements Spliterator<T>, Closeable {
 		}
 	}
 
-	// Use of Object collection instead of Entry wrappers reduces performance
-	private final ArrayBlockingQueue<Entry<T>> pipe = new ArrayBlockingQueue<>(1000);
+	private void ensureOpen() throws ClosedException {
+		if (isClosed()) {
+			close(); // Do not allow queue to accumulate garbage data
+			throw new ClosedException();
+		}
+	}
+
+	private final AtomicBoolean closed = new AtomicBoolean(false);
+	// Raw Object references and "instanceof" are slower than Entry wrapping
+	private final ArrayBlockingQueue<Entry<T>> pipe;
 	private final End end = new End();
+	private int splitThreshold;
+
 }

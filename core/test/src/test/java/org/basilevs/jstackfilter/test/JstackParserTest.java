@@ -61,7 +61,7 @@ public class JstackParserTest {
 		String data = Utils.readClassResource(JstackParserTest.class, "eclipse.txt");
 		List<String> expected = JstackParser.splitToChunks((Reader) new StringReader(data)).toList();
 		for (int i = 0; i < 100; i++) {
-			Assert.assertEquals(expected, parallel(JstackParser.splitToChunks((Reader) new StringReader(data))).map(j -> "a" + j).map(j -> j.substring(1)).toList());
+			Assert.assertEquals(expected, parallel(JstackParser.splitToChunks((Reader) new StringReader(data)), 50, 10).map(j -> "a" + j).map(j -> j.substring(1)).toList());
 		}
 	}
 	

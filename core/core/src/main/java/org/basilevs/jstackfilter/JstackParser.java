@@ -20,7 +20,7 @@ public class JstackParser {
 	 * Parses threads as printed by jstack. Header and native threads are ignored.
 	 */
 	public static Stream<JavaThread> parseThreads(Reader reader) {
-		return parallel(splitToChunks(reader)).map(JstackParser::parseThread).flatMap(Optional::stream);
+		return parallel(splitToChunks(reader), 1000, 10).map(JstackParser::parseThread).flatMap(Optional::stream);
 	}
 
 	public static Stream<String> splitToChunks(Reader reader) {

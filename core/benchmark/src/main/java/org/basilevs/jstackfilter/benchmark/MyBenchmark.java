@@ -55,7 +55,7 @@ public class MyBenchmark {
 
 	@Benchmark
 	public void parallelChunkSerialParse(Blackhole bh, State1 state) {
-		try (Stream<JavaThread> threads = parallel(JstackParser.splitToChunks(state.input))
+		try (Stream<JavaThread> threads = defaultParallel(JstackParser.splitToChunks(state.input))
 						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
 			threads.forEach(bh::consume);
 		}
@@ -63,10 +63,14 @@ public class MyBenchmark {
 	
 	@Benchmark
 	public void parallelChunkParallelParse(Blackhole bh, State1 state) {
-		try (Stream<JavaThread> threads = parallel(JstackParser.splitToChunks(state.input)).parallel()
+		try (Stream<JavaThread> threads = defaultParallel(JstackParser.splitToChunks(state.input)).parallel()
 						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
 			threads.forEach(bh::consume);
 		}
+	}
+	
+	private static <T> Stream<T> defaultParallel(Stream<T> input) {
+		return parallel(input, 1000, 10);
 	}
 
 }
