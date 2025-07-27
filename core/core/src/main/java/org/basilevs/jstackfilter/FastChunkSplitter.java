@@ -16,6 +16,8 @@ import java.util.stream.StreamSupport;
 class ChunkSpliterator extends Spliterators.AbstractSpliterator<String> {
 
     private final BufferedReader bufferedReader;
+    private final StringBuilder chunkBuilder = new StringBuilder();
+
 
     public ChunkSpliterator(Reader reader) {
         super(Long.MAX_VALUE, Spliterator.ORDERED | Spliterator.NONNULL);
@@ -43,7 +45,7 @@ class ChunkSpliterator extends Spliterators.AbstractSpliterator<String> {
             }
 
             // 2. We have the first line of a new chunk.
-            StringBuilder chunkBuilder = new StringBuilder();
+            chunkBuilder.setLength(0);
             chunkBuilder.append(line);
 
             // 3. Read subsequent lines belonging to the same chunk.

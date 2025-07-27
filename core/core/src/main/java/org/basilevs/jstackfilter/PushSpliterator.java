@@ -129,7 +129,7 @@ public class PushSpliterator<T> implements Spliterator<T>, Closeable {
 		if (chunk.isEmpty()) {
 			return null;
 		}
-		return chunk.stream().flatMap(Entry::stream).spliterator();
+		return chunk.stream().flatMap(Entry::stream).parallel().spliterator();
 	}
 
 	@Override

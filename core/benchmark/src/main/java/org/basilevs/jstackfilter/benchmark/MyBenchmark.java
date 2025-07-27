@@ -39,35 +39,35 @@ public class MyBenchmark {
 	
 	@Benchmark
 	public void serial(Blackhole bh, State1 state) {
-		try (Stream<JavaThread> threads = defaultSplitToChunks(state.input)
-						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
-			threads.forEach(bh::consume);
+		try (Stream<String> chunks = defaultSplitToChunks(state.input)) {
+			consume(chunks, bh);
 		}
 	}
 	
 	@Benchmark
 	public void serialChunkParallelParse(Blackhole bh, State1 state) {
-		try (Stream<JavaThread> threads = defaultSplitToChunks(state.input).parallel()
-						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
-			threads.forEach(bh::consume);
+		try (Stream<String> chunks = defaultSplitToChunks(state.input).parallel()) {
+			consume(chunks, bh);
 		}
 	}
 
 
 	@Benchmark
 	public void parallelChunkSerialParse(Blackhole bh, State1 state) {
-		try (Stream<JavaThread> threads = defaultParallel(defaultSplitToChunks(state.input))
-						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
-			threads.forEach(bh::consume);
+		try (Stream<String> chunks = defaultParallel(defaultSplitToChunks(state.input))) {
+			consume(chunks, bh);
 		}
 	}
 	
 	@Benchmark
 	public void parallelChunkParallelParse(Blackhole bh, State1 state) {
-		try (Stream<JavaThread> threads = defaultParallel(defaultSplitToChunks(state.input)).parallel()
-						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
-			threads.forEach(bh::consume);
+		try (Stream<String> chunks = defaultParallel(defaultSplitToChunks(state.input)).parallel()) {
+			consume(chunks, bh);
 		}
+	}
+	
+	private static void consume(Stream<String> toParse, Blackhole bh) {
+		toParse.map(JstackParser::parseThread).flatMap(Optional::stream).forEach(bh::consume);
 	}
 	
 	private static <T> Stream<T> defaultParallel(Stream<T> input) {
