@@ -1,5 +1,7 @@
 package org.basilevs.jstackfilter;
 
+import static java.lang.Math.max;
+
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +9,7 @@ import java.util.Spliterator;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -22,7 +25,7 @@ public class PushSpliterator<T> implements Spliterator<T>, Closeable {
 		}
 		this.splitThreshold = splitThreshold;
 	}
-
+		
 	public static final class ClosedException extends Exception {
 		private static final long serialVersionUID = 4707636972101757900L;
 	}
@@ -118,8 +121,13 @@ public class PushSpliterator<T> implements Spliterator<T>, Closeable {
 
 	@Override
 	public final Spliterator<T> trySplit() {
-		if (pipe.size() < splitThreshold) {
+		if (isClosed()) {
 			return null;
+		}
+		if (pipe.size() < splitThreshold) {
+			// If the first split fails, Stream framework does slow serial processing
+			// We return this instead
+			return extraConsumer();
 		}
 		Collection<Entry<T>> chunk = new ArrayList<>();
 		pipe.drainTo(chunk);
@@ -127,9 +135,17 @@ public class PushSpliterator<T> implements Spliterator<T>, Closeable {
 			close();
 		}
 		if (chunk.isEmpty()) {
-			return null;
+			return extraConsumer();
 		}
-		return chunk.stream().flatMap(Entry::stream).parallel().spliterator();
+		return chunk.stream().flatMap(Entry::stream).spliterator();
+	}
+
+	private Spliterator<T> extraConsumer() {
+		int maxExtraConsumers = 1;
+		if (splitCount.getAndUpdate(i -> max(i + 1, maxExtraConsumers)) < maxExtraConsumers) {
+			return this;
+		}
+		return null;
 	}
 
 	@Override
@@ -139,7 +155,7 @@ public class PushSpliterator<T> implements Spliterator<T>, Closeable {
 
 	@Override
 	public int characteristics() {
-		return SUBSIZED | CONCURRENT;
+		return CONCURRENT;
 	}
 
 	@Override
@@ -207,6 +223,7 @@ public class PushSpliterator<T> implements Spliterator<T>, Closeable {
 		}
 	}
 
+	private final AtomicInteger splitCount = new AtomicInteger(0);
 	private final AtomicBoolean closed = new AtomicBoolean(false);
 	// Raw Object references and "instanceof" are slower than Entry wrapping
 	private final ArrayBlockingQueue<Entry<T>> pipe;

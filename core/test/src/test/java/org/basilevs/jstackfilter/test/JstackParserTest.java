@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -53,7 +54,7 @@ public class JstackParserTest {
 		String data = Utils.readClassResource(JstackParserTest.class, "eclipse.txt");
 		List<JavaThread> expected = FastChunkSplitter.splitToChunks((Reader) new StringReader(data)).map(JstackParser::parseThread).flatMap(Optional::stream).toList();
 		for (int i = 0; i < 100; i++) {
-			assertEquals(expected, JstackParser.parseThreads(new StringReader(data)).toList());
+			assertSameThreads(expected, JstackParser.parseThreads(new StringReader(data)).parallel().toList());
 		}
 	}
 
@@ -62,19 +63,38 @@ public class JstackParserTest {
 		String data = Utils.readClassResource(JstackParserTest.class, "eclipse.txt");
 		List<String> expected = FastChunkSplitter.splitToChunks((Reader) new StringReader(data)).toList();
 		for (int i = 0; i < 100; i++) {
-			Assert.assertEquals(expected, parallel( FastChunkSplitter.splitToChunks((Reader) new StringReader(data)), 50, 2).map(j -> "a" + j).map(j -> j.substring(1)).parallel().toList());
+			assertSameStrings(expected, parallel( FastChunkSplitter.splitToChunks((Reader) new StringReader(data)), 100, 10).map(j -> "a" + j).map(j -> j.substring(1)).parallel().toList());
 		}
 	}
 	
-	private static final void assertEquals(Collection<JavaThread> expected, Collection<JavaThread> actual) {
-		actual = new ArrayList<JavaThread>(actual);
+	@Test
+	public void concurrentSplittingAndParsing() {
+		String data = Utils.readClassResource(JstackParserTest.class, "eclipse.txt");
+		List<JavaThread> expected = FastChunkSplitter.splitToChunks((Reader) new StringReader(data)).map(JstackParser::parseThread).flatMap(Optional::stream).toList();
+		for (int i = 0; i < 100; i++) {
+			assertSameThreads(expected, parallel( FastChunkSplitter.splitToChunks((Reader) new StringReader(data)), 100, 10).map(JstackParser::parseThread).flatMap(Optional::stream).toList());
+		}
+	}
+	
+	
+	private static <T> void assertEquals(Collection<T> expected, Collection<T> actual, BiPredicate<T, T> areEqual) {
+		actual = new ArrayList<T>(actual);
 		
-		for (JavaThread thread : expected) {
-			Assert.assertTrue("Expected:\n" + thread + "\n Found:\n"+actual, removeFirst(actual, t -> t.equalByMethodName(thread)));
+		for (T thread : expected) {
+			Assert.assertTrue("Expected:\n" + thread + "\n Found:\n"+actual, removeFirst(actual, t -> areEqual.test(t, thread)));
 		}
 		
 		Assert.assertEquals(Collections.emptyList(), actual);
 	}
+	
+	private static final void assertSameThreads(Collection<JavaThread> expected, Collection<JavaThread> actual) {
+		assertEquals(expected, actual, JavaThread::equalByMethodName);
+	}
+	
+	private static final void assertSameStrings(Collection<String> expected, Collection<String> actual) {
+		assertEquals(expected, actual, Object::equals);
+	}
+
 	
 	private static <T> boolean removeFirst(Collection<T> list, Predicate<T> predicate) {
 		for (Iterator<T> i = list.iterator(); i.hasNext();) {
