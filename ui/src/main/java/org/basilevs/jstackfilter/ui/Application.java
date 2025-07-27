@@ -126,6 +126,10 @@ public class Application {
 		controls.add(showIdleThreads);
 		showIdleThreads.setSelected(false);
 		
+		var showIdenticalThreads = new JCheckBox();
+		controls.add(showIdenticalThreads);
+		showIdenticalThreads.setSelected(false);
+
 		var showOldProcesses = new JCheckBox("Old processes");
 		controls.add(showOldProcesses);
 		showOldProcesses.setSelected(true);
@@ -183,8 +187,12 @@ public class Application {
 		};
 		
 		List<Action> actions = new ArrayList<>();
-		actions.add(configureCheckbox(showIdleThreads, "Idle threads", "Do not filter out idle threads, show original jstack output", isSelected -> {
+		actions.add(configureCheckbox(showIdleThreads, "Idle", "Do not filter out idle threads, show original jstack output", isSelected -> {
 			model.showIdle(isSelected);
+		}));
+
+		actions.add(configureCheckbox(showIdenticalThreads, "Identical", "Do not filter out similar threads, show original jstack output", isSelected -> {
+			model.showIdentical(isSelected);
 		}));
 
 		actions.add(configureCheckbox(showOldProcesses, "Old processes", "When unchecked, currently runnning processes are hidden. Refresh action would only show processes created since.", isSelected -> {

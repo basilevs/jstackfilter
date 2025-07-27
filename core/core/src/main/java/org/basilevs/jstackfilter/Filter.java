@@ -16,22 +16,13 @@ public final class Filter {
 
 	public static void process(Reader reader) throws IOException {
 		try (ThreadRegistry known = ThreadRegistry.idle()) {
-			copy(filter(Predicate.<JavaThread>not(known::contains), reader), new OutputStreamWriter(System.out));
+			try (Stream<JavaThread> stacks = JstackParser.parseThreads(reader)) {
+				Stream<JavaThread> stacksCopy = stacks; 
+				stacksCopy = stacksCopy.collect(new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2))).stream();
+				stacksCopy = stacksCopy.filter(Predicate.<JavaThread>not(known::contains));
+				copy(new StreamReader(stacksCopy.map(thread -> thread + "\n\n")), new OutputStreamWriter(System.out));
+			}
 		}
-	}
-
-	public static Reader filter(Predicate<JavaThread> select, Reader reader) {
-		Stream<JavaThread> stacks = JstackParser.parseThreads(reader);
-		Stream<JavaThread> stacksCopy = filter(select, stacks);
-		return new StreamReader(stacksCopy.map(thread -> thread + "\n\n"));
-	}
-
-	public static Stream<JavaThread> filter(Predicate<JavaThread> select, Stream<JavaThread> stacks) {
-		Stream<JavaThread> stacksCopy = stacks;
-		stacksCopy = stacksCopy.filter(select);
-		stacksCopy = stacksCopy.collect(new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2))).stream();
-		stacksCopy.onClose(stacks::close);
-		return stacksCopy;
 	}
 
 	public static InputStream onClose(InputStream delegate, Closeable runnable) {

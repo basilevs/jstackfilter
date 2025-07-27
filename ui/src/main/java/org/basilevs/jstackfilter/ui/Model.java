@@ -19,9 +19,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.basilevs.jstackfilter.Filter;
+import org.basilevs.jstackfilter.DistinctBy;
 import org.basilevs.jstackfilter.JavaThread;
+import org.basilevs.jstackfilter.JstackParser;
 import org.basilevs.jstackfilter.ThreadRegistry;
 import org.basilevs.jstackfilter.ui.internal.SystemUtil;
 
@@ -40,6 +43,7 @@ public class Model {
 	private final ThreadRegistry idle;
 	private final Set<Long> oldProcesses = new HashSet<>();
 	private long lastJavaProcess = 0;
+	private boolean showIdentical = false;
 	{
 		try {
 			idle = ThreadRegistry.idle();
@@ -71,8 +75,8 @@ public class Model {
 	}
 
 	private void update() {
-		try {
-			filter(input.read());
+		try (Reader reader = input.read()) { 
+			filter(reader);
 		} catch (Exception e) {
 			handleError(e);
 		}
@@ -80,6 +84,11 @@ public class Model {
 
 	public void showIdle(boolean doShow) {
 		this.showIdle = doShow;
+		update();
+	}
+	
+	public void showIdentical(boolean doShow) {
+		this.showIdentical = doShow;
 		update();
 	}
 
@@ -91,21 +100,25 @@ public class Model {
 	}
 
 	private void filter(Reader input) throws IOException {
-		try {
-			Reader filtered;
-			if (!showIdle) {
-				filtered = Filter.filter(Predicate.<JavaThread>not(idle::contains), input);
+		String result;
+		try (Stream<JavaThread> stacks = JstackParser.parseThreads(input)) {
+			Stream<JavaThread> stacksCopy = stacks;
+			if (showIdentical && showIdle) {
+				result =  SystemUtil.toString(input);;
 			} else {
-				filtered = input;
+				if (!showIdentical) {
+					stacksCopy = stacksCopy.collect(new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2))).stream();
+				}
+				if (!showIdle) {
+					stacksCopy = stacksCopy.filter(Predicate.<JavaThread>not(idle::contains));
+				}
+				result = stacksCopy.map(Object::toString).collect(Collectors.joining("\n\n"));
 			}
-			var str = SystemUtil.toString(filtered);
-			if (str.isEmpty()) {
-				str = "No interesting threads";
-			}
-			outputListener.accept(str);
-		} finally {
-			input.close();
 		}
+		if (result.isEmpty()) {
+			result = "No interesting threads";
+		}
+		outputListener.accept(result);
 	}
 	
 	public void rememberIdleThreads(String selection) {
