@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.basilevs.jstackfilter.FastChunkSplitter;
 import org.basilevs.jstackfilter.JavaThread;
 import org.basilevs.jstackfilter.JstackParser;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -38,7 +39,7 @@ public class MyBenchmark {
 	
 	@Benchmark
 	public void serial(Blackhole bh, State1 state) {
-		try (Stream<JavaThread> threads = JstackParser.splitToChunks(state.input)
+		try (Stream<JavaThread> threads = defaultSplitToChunks(state.input)
 						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
 			threads.forEach(bh::consume);
 		}
@@ -46,7 +47,7 @@ public class MyBenchmark {
 	
 	@Benchmark
 	public void serialChunkParallelParse(Blackhole bh, State1 state) {
-		try (Stream<JavaThread> threads = JstackParser.splitToChunks(state.input).parallel()
+		try (Stream<JavaThread> threads = defaultSplitToChunks(state.input).parallel()
 						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
 			threads.forEach(bh::consume);
 		}
@@ -55,7 +56,7 @@ public class MyBenchmark {
 
 	@Benchmark
 	public void parallelChunkSerialParse(Blackhole bh, State1 state) {
-		try (Stream<JavaThread> threads = defaultParallel(JstackParser.splitToChunks(state.input))
+		try (Stream<JavaThread> threads = defaultParallel(defaultSplitToChunks(state.input))
 						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
 			threads.forEach(bh::consume);
 		}
@@ -63,7 +64,7 @@ public class MyBenchmark {
 	
 	@Benchmark
 	public void parallelChunkParallelParse(Blackhole bh, State1 state) {
-		try (Stream<JavaThread> threads = defaultParallel(JstackParser.splitToChunks(state.input)).parallel()
+		try (Stream<JavaThread> threads = defaultParallel(defaultSplitToChunks(state.input)).parallel()
 						.map(JstackParser::parseThread).flatMap(Optional::stream)) {
 			threads.forEach(bh::consume);
 		}
@@ -71,6 +72,10 @@ public class MyBenchmark {
 	
 	private static <T> Stream<T> defaultParallel(Stream<T> input) {
 		return parallel(input, 1000, 10);
+	}
+	
+	private static Stream<String> defaultSplitToChunks(Reader reader) {
+		return FastChunkSplitter.splitToChunks(reader);
 	}
 
 }

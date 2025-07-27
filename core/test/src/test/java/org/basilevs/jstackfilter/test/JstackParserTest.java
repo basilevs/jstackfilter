@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.basilevs.jstackfilter.FastChunkSplitter;
 import org.basilevs.jstackfilter.Frame;
 import org.basilevs.jstackfilter.JavaThread;
 import org.basilevs.jstackfilter.JstackParser;
@@ -50,7 +51,7 @@ public class JstackParserTest {
 	@Test
 	public void concurrentParsing() {
 		String data = Utils.readClassResource(JstackParserTest.class, "eclipse.txt");
-		List<JavaThread> expected = JstackParser.splitToChunks((Reader) new StringReader(data)).map(JstackParser::parseThread).flatMap(Optional::stream).toList();
+		List<JavaThread> expected = FastChunkSplitter.splitToChunks((Reader) new StringReader(data)).map(JstackParser::parseThread).flatMap(Optional::stream).toList();
 		for (int i = 0; i < 100; i++) {
 			assertEquals(expected, JstackParser.parseThreads(new StringReader(data)).toList());
 		}
@@ -59,9 +60,9 @@ public class JstackParserTest {
 	@Test
 	public void concurrentSplitting() {
 		String data = Utils.readClassResource(JstackParserTest.class, "eclipse.txt");
-		List<String> expected = JstackParser.splitToChunks((Reader) new StringReader(data)).toList();
+		List<String> expected = FastChunkSplitter.splitToChunks((Reader) new StringReader(data)).toList();
 		for (int i = 0; i < 100; i++) {
-			Assert.assertEquals(expected, parallel(JstackParser.splitToChunks((Reader) new StringReader(data)), 50, 10).map(j -> "a" + j).map(j -> j.substring(1)).toList());
+			Assert.assertEquals(expected, parallel( FastChunkSplitter.splitToChunks((Reader) new StringReader(data)), 50, 10).map(j -> "a" + j).map(j -> j.substring(1)).toList());
 		}
 	}
 	
