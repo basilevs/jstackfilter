@@ -18,7 +18,7 @@ public class JstackParser {
 	 * Parses threads as printed by jstack. Header and native threads are ignored.
 	 */
 	public static Stream<JavaThread> parseThreads(Reader reader) {
-		return parallel(FastChunkSplitter.splitToChunks(reader), 1000, 10).map(JstackParser::parseThread).flatMap(Optional::stream);
+		return FastChunkSplitter.splitToChunks(reader).map(JstackParser::parseThread).flatMap(Optional::stream);
 	}
 
 	private static final Pattern JAVA_THREAD_HEADER_PATTERN = Pattern.compile("^\"[^\\n]+\" #\\d");
