@@ -11,9 +11,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.basilevs.jstackfilter.FastChunkSplitter;
 import org.basilevs.jstackfilter.Frame;
 import org.basilevs.jstackfilter.JavaThread;
 import org.basilevs.jstackfilter.JstackParser;
@@ -50,30 +52,49 @@ public class JstackParserTest {
 	@Test
 	public void concurrentParsing() {
 		String data = Utils.readClassResource(JstackParserTest.class, "eclipse.txt");
-		List<JavaThread> expected = JstackParser.splitToChunks((Reader) new StringReader(data)).map(JstackParser::parseThread).flatMap(Optional::stream).toList();
+		List<JavaThread> expected = FastChunkSplitter.splitToChunks((Reader) new StringReader(data)).map(JstackParser::parseThread).flatMap(Optional::stream).toList();
 		for (int i = 0; i < 100; i++) {
-			assertEquals(expected, JstackParser.parseThreads(new StringReader(data)).toList());
+			assertSameThreads(expected, JstackParser.parseThreads(new StringReader(data)).parallel().toList());
 		}
 	}
 
 	@Test
 	public void concurrentSplitting() {
 		String data = Utils.readClassResource(JstackParserTest.class, "eclipse.txt");
-		List<String> expected = JstackParser.splitToChunks((Reader) new StringReader(data)).toList();
+		List<String> expected = FastChunkSplitter.splitToChunks((Reader) new StringReader(data)).toList();
 		for (int i = 0; i < 100; i++) {
-			Assert.assertEquals(expected, parallel(JstackParser.splitToChunks((Reader) new StringReader(data))).map(j -> "a" + j).map(j -> j.substring(1)).toList());
+			assertSameStrings(expected, parallel( FastChunkSplitter.splitToChunks((Reader) new StringReader(data))).map(j -> "a" + j).map(j -> j.substring(1)).parallel().toList());
 		}
 	}
 	
-	private static final void assertEquals(Collection<JavaThread> expected, Collection<JavaThread> actual) {
-		actual = new ArrayList<JavaThread>(actual);
+	@Test
+	public void concurrentSplittingAndParsing() {
+		String data = Utils.readClassResource(JstackParserTest.class, "eclipse.txt");
+		List<JavaThread> expected = FastChunkSplitter.splitToChunks((Reader) new StringReader(data)).map(JstackParser::parseThread).flatMap(Optional::stream).toList();
+		for (int i = 0; i < 100; i++) {
+			assertSameThreads(expected, parallel( FastChunkSplitter.splitToChunks((Reader) new StringReader(data))).map(JstackParser::parseThread).flatMap(Optional::stream).toList());
+		}
+	}
+	
+	
+	private static <T> void assertEquals(Collection<T> expected, Collection<T> actual, BiPredicate<T, T> areEqual) {
+		actual = new ArrayList<T>(actual);
 		
-		for (JavaThread thread : expected) {
-			Assert.assertTrue("Expected:\n" + thread + "\n Found:\n"+actual, removeFirst(actual, t -> t.equalByMethodName(thread)));
+		for (T thread : expected) {
+			Assert.assertTrue("Expected:\n" + thread + "\n Found:\n"+actual, removeFirst(actual, t -> areEqual.test(t, thread)));
 		}
 		
 		Assert.assertEquals(Collections.emptyList(), actual);
 	}
+	
+	private static final void assertSameThreads(Collection<JavaThread> expected, Collection<JavaThread> actual) {
+		assertEquals(expected, actual, JavaThread::equalByMethodName);
+	}
+	
+	private static final void assertSameStrings(Collection<String> expected, Collection<String> actual) {
+		assertEquals(expected, actual, Object::equals);
+	}
+
 	
 	private static <T> boolean removeFirst(Collection<T> list, Predicate<T> predicate) {
 		for (Iterator<T> i = list.iterator(); i.hasNext();) {
