@@ -23,7 +23,7 @@ public class ThreadRegistryTest {
 	private static final String REGISTRY_RESOURCE = "idle.txt";
 	static {
 		threads = Utils.readThreadResource(JstackParserTest.class, "eclipse.txt");
-		JavaThread first = threads.iterator().next();
+		JavaThread first = threads.stream().filter(t -> t.toString().contains("[0x00000014682fe000]")).findAny().get();
 		List<Frame> frames = new ArrayList<>(first.frames());
 		frames.remove(0);
 		UNKNOWN = new JavaThread(first.name(), 0, first.state(), frames);

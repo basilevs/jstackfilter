@@ -30,7 +30,7 @@ public class JstackParserTest {
 		Collection<JavaThread> threads = JstackParser.parseThreads(new StringReader(data)).collect(Collectors.toList());
 		Assert.assertTrue(threads.stream().map(JavaThread::name)
 				.anyMatch(Predicate.isEqual("Active Thread: Equinox Container: 4201e9ce-3eab-4ab0-8431-f4be70328a4d")));
-		JavaThread first = threads.iterator().next();
+		JavaThread first = threads.stream().filter(t -> t.toString().contains("[0x00000014682fe000]")).findAny().get();
 		Frame firstFrame = first.frames().get(0);
 		Assert.assertEquals(firstFrame.method(), "org.eclipse.swt.internal.win32.OS.WaitMessage");
 		Assert.assertEquals(firstFrame.location(), "Native Method");
