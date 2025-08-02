@@ -225,6 +225,7 @@ private Frame frame() :
       (
         "."
       | < NUMBER >
+      | < WORD >
       )+
     )?
     "/"
