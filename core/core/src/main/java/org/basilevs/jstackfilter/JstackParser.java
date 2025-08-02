@@ -2,11 +2,9 @@ package org.basilevs.jstackfilter;
 
 import static org.basilevs.jstackfilter.PushSpliterator.parallel;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -20,19 +18,7 @@ public class JstackParser {
 	 * Parses threads as printed by jstack. Header and native threads are ignored.
 	 */
 	public static Stream<JavaThread> parseThreads(Reader reader) {
-		return parallel(splitToChunks(reader)).map(JstackParser::parseThread).flatMap(Optional::stream);
-	}
-
-	public static Stream<String> splitToChunks(Reader reader) {
-		Scanner scanner = new Scanner(reader);
-		scanner.useDelimiter("(?:\n\r|\r\n|\n){2}");
-		return scanner.tokens().onClose(() -> {
-			scanner.close();
-			IOException error = scanner.ioException();
-			if (error != null) {
-				throw new IllegalStateException(error);
-			}
-		});
+		return PushSpliterator.parallel(FastChunkSplitter.splitToChunks(reader)).map(JstackParser::parseThread).flatMap(Optional::stream);
 	}
 
 	private static final Pattern JAVA_THREAD_HEADER_PATTERN = Pattern.compile("^\"[^\\n]+\" #\\d");
