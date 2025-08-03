@@ -30,7 +30,7 @@ public abstract class PushSpliterator<T> implements Spliterator<T> , Closeable {
 
 	public PushSpliterator() {
 		this.pipe = new ArrayBlockingQueue<>(getParallelism()*100);
-		this.presplit = new PreSplitSpliterator<>(Stream.generate(Drainer::new).limit(getParallelism()).toList());
+		this.splitLimit = getParallelism();
 	}
 
 	public static final class ClosedException extends Exception {
@@ -119,12 +119,26 @@ public abstract class PushSpliterator<T> implements Spliterator<T> , Closeable {
 
 	@Override
 	public final boolean tryAdvance(Consumer<? super T> action) {
-		return presplit.tryAdvance(action);
+		if (isClosed()) {
+			return false;
+		}
+		try {
+			Entry<T> item = pipe.take();
+			return item.tryAdvance(action);
+		} catch (InterruptedException e) {
+			close();
+			Thread.currentThread().interrupt();
+			return false;
+		}
 	}
 
 	@Override
 	public final Spliterator<T> trySplit() {
-		return presplit.trySplit();
+		if (splitLimit <= 0) {
+			return null;
+		}
+		splitLimit--;
+		return new Drainer();
 	}
 
 	private interface Entry<T> {
@@ -165,17 +179,7 @@ public abstract class PushSpliterator<T> implements Spliterator<T> , Closeable {
 	private final class Drainer implements Spliterator<T> {
 		@Override
 		public boolean tryAdvance(Consumer<? super T> action) {
-			if (isClosed()) {
-				return false;
-			}
-			try {
-				Entry<T> item = pipe.take();
-				return item.tryAdvance(action);
-			} catch (InterruptedException e) {
-				close();
-				Thread.currentThread().interrupt();
-				return false;
-			}
+			return PushSpliterator.this.tryAdvance(action);
 		}
 
 		@Override
@@ -213,7 +217,7 @@ public abstract class PushSpliterator<T> implements Spliterator<T> , Closeable {
 		return ForkJoinPool.commonPool();
 	}
 
-	private final PreSplitSpliterator<T> presplit;
+	private int splitLimit;
 	private final AtomicBoolean closed = new AtomicBoolean(false);
 	// Raw Object references and "instanceof" are slower than Entry wrapping
 	private final ArrayBlockingQueue<Entry<T>> pipe;
