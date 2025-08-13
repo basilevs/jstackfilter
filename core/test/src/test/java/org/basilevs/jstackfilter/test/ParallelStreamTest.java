@@ -1,6 +1,7 @@
 package org.basilevs.jstackfilter.test;
 
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.System.Logger.Level;
@@ -11,6 +12,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Spliterators;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -52,13 +55,8 @@ public class ParallelStreamTest {
 	}
 
 	
-	private <T> Stream<T> defaultParallel(Stream<T> serialStream) {
-		return PushSpliterator.parallel(serialStream);
-	}
-
 	@Test
 	public void close() {
-		int count = 15;
 		Stream<Object> input = Stream.empty();
 		AtomicBoolean closed = new AtomicBoolean(false);
 		input.onClose(() -> {
@@ -66,6 +64,25 @@ public class ParallelStreamTest {
 		});
 		defaultParallel(input).close();
 		assertTrue(closed.get());
+	}
+	
+	@Test
+	public void closedInputShouldNotBeConsumed() {
+		AtomicInteger consumed = new AtomicInteger(0);
+		AtomicInteger closeCount = new AtomicInteger(0);
+		Stream<Object> input = Stream.generate(this::produce).peek(ignored -> consumed.incrementAndGet()).onClose(() -> consumed.set(0)).onClose(() -> closeCount.incrementAndGet());
+		try (Stream<Object> subject = defaultParallel(input).map(this::process)) {
+			subject.forEach(ignored -> {throw new CancellationException();});
+			Assert.fail("Should throw");
+		} catch (CancellationException e ) {
+			// expected
+		}
+		assertEquals(consumed.get(), 0);
+		assertEquals(closeCount.get(), 1);
+	}
+	
+	private <T> Stream<T> defaultParallel(Stream<T> serialStream) {
+		return PushSpliterator.parallel(serialStream);
 	}
 
 	private final AtomicInteger count = new AtomicInteger(0);
