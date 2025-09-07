@@ -33,7 +33,7 @@ $ jstack 33299
 ...
 ```
 
-Notice, how the output is wast and requires prolonged analysis to be useful.
+Notice, how the output is vast and requires prolonged analysis to be useful.
 Now filter output of `jstack` through `jstackfilter`
 
 ```
