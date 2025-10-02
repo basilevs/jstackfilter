@@ -60,6 +60,7 @@ public abstract class PushSpliterator<T> implements Spliterator<T> , Closeable {
 						spliterator.close();
 					} catch (ClosedException e) {
 						// The loop will terminate by checking spliterator.isClosed()
+						assert spliterator.isClosed();
 					}
 				})) {
 				}
@@ -76,17 +77,17 @@ public abstract class PushSpliterator<T> implements Spliterator<T> , Closeable {
 		});
 		return StreamSupport.stream(spliterator, true).onClose(() -> {
 			try {
-				reader.cancel(true);
+				spliterator.close();
 			} finally {
 				try {
-					input.close();
+					reader.cancel(true);
+					if (!reader.isCancelled()) {
+						// Throw if reader terminated unexpectedly
+						reader.join();
+					}
 				} finally {
-					spliterator.close();
+					input.close();
 				}
-			}
-			if (!reader.isCancelled()) {
-				// Throw if reader terminated unexpectedly
-				reader.join();
 			}
 		});
 	}
@@ -105,16 +106,17 @@ public abstract class PushSpliterator<T> implements Spliterator<T> , Closeable {
 		// Do not block on queue, when consumers may not longer be active
 		if (!isClosed()) {
 			pipe.put(end);
+		} else {
+			close();
 		}
 	}
 
 	@Override
 	public final void close() {
-		if (closed.compareAndSet(false, true)) {
-			do {
-				pipe.clear();
-			} while (!pipe.offer(end));
-		}
+		closed.set(true);
+		do {
+			pipe.clear();
+		} while (!pipe.offer(end));
 	}
 
 	@Override
@@ -129,6 +131,8 @@ public abstract class PushSpliterator<T> implements Spliterator<T> , Closeable {
 			close();
 			Thread.currentThread().interrupt();
 			return false;
+		} catch (Exception e ) {
+			throw e;
 		}
 	}
 
