@@ -73,10 +73,14 @@ public class Model {
 		this.input = () -> new StringReader(jstackOutput);
 		update();
 	}
+	
+	public void refresh() {
+		update();
+	}
 
 	private void update() {
-		try (Reader reader = input.read()) { 
-			filter(reader);
+		try (Reader reader = input.read()) {
+			outputListener.accept(filter(reader));
 		} catch (Exception e) {
 			handleError(e);
 		}
@@ -99,13 +103,13 @@ public class Model {
 		}
 	}
 
-	private void filter(Reader input) throws IOException {
+	private String filter(Reader input) throws IOException {
 		String result;
-		try (Stream<JavaThread> stacks = JstackParser.parseThreads(input)) {
-			Stream<JavaThread> stacksCopy = stacks;
-			if (showIdentical && showIdle) {
-				result =  SystemUtil.toString(input);;
-			} else {
+		if (showIdentical && showIdle) {
+			result =  SystemUtil.toString(input);
+		} else {
+			try (Stream<JavaThread> stacks = JstackParser.parseThreads(input)) {
+				Stream<JavaThread> stacksCopy = stacks;
 				if (!showIdentical) {
 					stacksCopy = stacksCopy.collect(new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2))).stream();
 				}
@@ -118,7 +122,7 @@ public class Model {
 		if (result.isEmpty()) {
 			result = "No interesting threads";
 		}
-		outputListener.accept(result);
+		return result;
 	}
 	
 	public void rememberIdleThreads(String selection) {

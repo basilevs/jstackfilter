@@ -210,6 +210,9 @@ public class Application {
 			packColumns(table);
 			Dimension size = new Dimension(100, table.getRowHeight() * table.getModel().getRowCount());
 			table.setPreferredScrollableViewportSize(size);
+			if (!previousSelection.isPresent()) {
+				model.refresh();
+			}
 		});
 		actions.add(refreshAction);
 		refreshButton.setAction(refreshAction);
