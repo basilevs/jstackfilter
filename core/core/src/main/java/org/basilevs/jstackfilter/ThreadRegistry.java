@@ -1,5 +1,7 @@
 package org.basilevs.jstackfilter;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +36,13 @@ public final class ThreadRegistry implements Closeable {
 
 	/** Threads known to be idle uninteresting **/
 	public static ThreadRegistry idle() throws IOException {
-		return new ThreadRegistry(OS.detect().configurationDirectory().resolve("idle.txt"), "idle.txt");
+		try (Stream<JavaThread> defaultConfiguration = readResource("idle")) {
+			return new ThreadRegistry(OS.detect().configurationDirectory().resolve("idle.txt"), defaultConfiguration);
+		}
+	}
+
+	public static Stream<JavaThread> readResource(String name) {
+		return JstackParser.parseThreads(new InputStreamReader(ThreadRegistry.class.getResourceAsStream(name+".txt"), StandardCharsets.UTF_8));
 	}
 
 	/**
@@ -46,18 +54,15 @@ public final class ThreadRegistry implements Closeable {
 	 *                          package, MUST exist
 	 * @throws IOException - when preconditions are not met
 	 */
-	public ThreadRegistry(Path configurationFile, String resource) throws IOException {
-		this.configurationFile = Objects.requireNonNull(configurationFile);
-		try (InputStream defaultConfiguration = ThreadRegistry.class.getResourceAsStream(resource)) {
-			if (defaultConfiguration == null)
-				throw new IllegalArgumentException("Configuration " + resource + " does not exist");
-			if (Files.exists(configurationFile)) {
-				try (Reader is = Files.newBufferedReader(configurationFile, StandardCharsets.UTF_8)) {
-					load(is);
-				}
-			} else {
-				load(new InputStreamReader(defaultConfiguration, StandardCharsets.UTF_8));
+	public ThreadRegistry(Path configurationFile, Stream<JavaThread> defaultConfiguration) throws IOException {
+		this.configurationFile = requireNonNull(configurationFile);
+		requireNonNull(defaultConfiguration, "Default configuration can not be null. But it can be empty.");
+		if (Files.exists(configurationFile)) {
+			try (Reader is = Files.newBufferedReader(configurationFile, StandardCharsets.UTF_8)) {
+				load(is);
 			}
+		} else {
+			addAll(defaultConfiguration);
 		}
 	}
 

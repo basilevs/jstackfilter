@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.basilevs.jstackfilter.Frame;
@@ -20,7 +21,7 @@ public class ThreadRegistryTest {
 
 	private static final List<JavaThread> threads;
 	private static final JavaThread UNKNOWN;
-	private static final String REGISTRY_RESOURCE = "idle.txt";
+	private static final String REGISTRY_RESOURCE = "idle";
 	static {
 		threads = Utils.readThreadResource(JstackParserTest.class, "eclipse.txt");
 		JavaThread first = threads.stream().filter(t -> t.toString().contains("[0x00000014682fe000]")).findAny().get();
@@ -38,8 +39,10 @@ public class ThreadRegistryTest {
 
 	@Before
 	public void before() throws IOException {
-		configurationFile = temp.getRoot().toPath().resolve(REGISTRY_RESOURCE);
-		subject = new ThreadRegistry(configurationFile, REGISTRY_RESOURCE);
+		configurationFile = temp.getRoot().toPath().resolve(REGISTRY_RESOURCE+".txt");
+		try (Stream<JavaThread> is = ThreadRegistry.readResource(REGISTRY_RESOURCE)) {
+			subject = new ThreadRegistry(configurationFile, is);
+		}
 	}
 
 	@Test
@@ -64,17 +67,22 @@ public class ThreadRegistryTest {
 		subject.addAll(Stream.of(UNKNOWN));
 		Assert.assertTrue(subject.contains(UNKNOWN));
 		subject.close();
-		subject = new ThreadRegistry(configurationFile, REGISTRY_RESOURCE);
+		try (Stream<JavaThread> is = ThreadRegistry.readResource(REGISTRY_RESOURCE)) {
+			subject = new ThreadRegistry(configurationFile, is);
+		}
 		Assert.assertTrue(subject.contains(UNKNOWN));
 
 	}
 
 	@Test
 	public void knownThreadsAreUnique() {
-		List<JavaThread> threads = new ArrayList<>(subject.threads);
-		while (!threads.isEmpty()) {
-			JavaThread first = threads.remove(0);
-			for (JavaThread i : threads) {
+		List<JavaThread> collected;
+		try (Stream<JavaThread> threads = ThreadRegistry.readResource(REGISTRY_RESOURCE)) {
+			collected = threads.collect(Collectors.toCollection(ArrayList::new));
+		}
+		while (!collected.isEmpty()) {
+			JavaThread first = collected.remove(0);
+			for (JavaThread i : collected) {
 				boolean matches = i.equalByMethodName(first);
 				Assert.assertFalse("" + first + "\n" + i, matches);
 			}
