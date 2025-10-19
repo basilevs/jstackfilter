@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.System.Logger.Level;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,6 +30,8 @@ import org.basilevs.jstackfilter.internal.OS;
  * sessions of the application.
  */
 public final class ThreadRegistry implements Closeable {
+	private static final Level LOG_LEVEL = System.Logger.Level.DEBUG;
+	private static final System.Logger LOG = System.getLogger(ThreadRegistry.class.getName());
 	public final List<JavaThread> threads = new CopyOnWriteArrayList<>();
 	private final Path configurationFile;
 	private static final Collector<JavaThread, Collection<JavaThread>, Collection<JavaThread>> DISTINCT_BY_NAME = new DistinctBy<JavaThread>(
@@ -99,10 +102,13 @@ public final class ThreadRegistry implements Closeable {
 	}
 
 	public void addAll(Stream<JavaThread> newThreads) {
+		long start = System.nanoTime();
 		var tmp = newThreads.peek(this::checkThread).collect(DISTINCT_BY_NAME);
 		threads.addAll(tmp.stream().filter(Predicate.not(this::contains)).collect(Collectors.toUnmodifiableList()));
 		// Due to concurrency, threads will contain some duplicates, but there won't be
 		// a lot, and they won't affect performance much
+		long stop = System.nanoTime();
+		LOG.log(LOG_LEVEL, "{0} seconds elapsed", (double)(stop - start)*1e-9);
 	}
 
 	public void removeAll(Stream<JavaThread> threads2) {

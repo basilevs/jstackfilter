@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.System.Logger.Level;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,6 +34,8 @@ public class Model {
 		Reader read() throws IOException;
 	}
 
+	private static final Level LOG_LEVEL = System.Logger.Level.DEBUG;
+	private static final System.Logger LOG = System.getLogger(Model.class.getName());
 	private static final ReaderSupplier NO_INPUT = () -> new StringReader("No input selected");
 	private final ExecutorService executor = Executors.newFixedThreadPool(1);
 	private static final long CURRENT_PID = ProcessHandle.current().pid();
@@ -108,16 +111,19 @@ public class Model {
 		if (showIdentical && showIdle) {
 			result =  SystemUtil.toString(input);
 		} else {
+			long start = System.nanoTime();
 			try (Stream<JavaThread> stacks = JstackParser.parseThreads(input)) {
 				Stream<JavaThread> stacksCopy = stacks;
 				if (!showIdentical) {
-					stacksCopy = stacksCopy.collect(new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2))).stream();
+					stacksCopy = stacksCopy.parallel().collect(new DistinctBy<JavaThread>((t1, t2) -> t1.equalByMethodName(t2))).stream();
 				}
 				if (!showIdle) {
 					stacksCopy = stacksCopy.filter(Predicate.<JavaThread>not(idle::contains));
 				}
-				result = stacksCopy.map(Object::toString).collect(Collectors.joining("\n\n"));
+				result = stacksCopy.parallel().map(Object::toString).collect(Collectors.joining("\n\n"));
 			}
+			long stop = System.nanoTime();
+			LOG.log(LOG_LEVEL, "{0} seconds elapsed", (double)(stop-start)*1e-9);
 		}
 		if (result.isEmpty()) {
 			result = "No interesting threads";
