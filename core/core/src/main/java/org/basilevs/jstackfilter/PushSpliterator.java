@@ -25,7 +25,7 @@ import java.util.stream.StreamSupport;
  **/
 public abstract class PushSpliterator<T> implements Spliterator<T> , Closeable {
 
-	private static final Level LOG_LEVEL = System.Logger.Level.INFO;
+	private static final Level LOG_LEVEL = System.Logger.Level.DEBUG;
 	private static final System.Logger LOG = System.getLogger(PushSpliterator.class.getName());
 
 	public PushSpliterator() {
