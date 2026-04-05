@@ -12,7 +12,6 @@
 	<artifactId>org.basilevs.jstackfilter.test</artifactId>
 	<packaging>jar</packaging>
 
-
 	<build>
 		<testResources>
 			<testResource>
@@ -27,6 +26,13 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-install-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
 				<configuration>
 					<skip>true</skip>
 				</configuration>
@@ -48,4 +54,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-</project>  
+</project>
