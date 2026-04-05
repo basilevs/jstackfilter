@@ -67,6 +67,7 @@ There are some additional tools provided for convenience:
 ```
 java --class-path jstackfilter.jar org.basilevs.jstackfilter.process.File /tmp/1.txt # Process a file without shell redirects
 java --class-path jstackfilter.jar org.basilevs.jstackfilter.process.ExternalJstack 33299 # Run jstack given a PID
+java --class-path jstackfilter.jar org.basilevs.jstackfilter.process.IdleRegistryPath # Print user-specific idle registry path
 ```
 
 # Using as a Maven Library

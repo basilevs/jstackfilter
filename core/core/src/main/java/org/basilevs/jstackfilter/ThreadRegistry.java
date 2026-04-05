@@ -92,6 +92,10 @@ public final class ThreadRegistry implements Closeable {
 		return threads.parallelStream().anyMatch(stack::equalByMethodName);
 	}
 
+	public Path configurationFile() {
+		return configurationFile;
+	}
+
 	@Override
 	public void close() throws IOException {
 		Files.createDirectories(configurationFile.getParent());
