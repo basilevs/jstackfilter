@@ -61,6 +61,7 @@ public interface JstackParserConstants {
     "\"@\"",
     "\"Native Method\"",
     "\"Unknown Source\"",
+    "\"<generated>\"",
     "\"- locked \"",
     "\"- eliminated \"",
     "\"- waiting \"",

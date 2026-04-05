@@ -242,6 +242,11 @@ private Frame frame() :
       image.append(t.image);
     }
   | 
+    t = "<generated>"
+    {
+      image.append(t.image);
+    }
+  | 
     p = dottedIdentifier()
     {
       image.append(p);
