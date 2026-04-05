@@ -68,7 +68,20 @@ There are some additional tools provided for convenience:
 java --class-path jstackfilter.jar org.basilevs.jstackfilter.process.File /tmp/1.txt # Process a file without shell redirects
 java --class-path jstackfilter.jar org.basilevs.jstackfilter.process.ExternalJstack 33299 # Run jstack given a PID
 java --class-path jstackfilter.jar org.basilevs.jstackfilter.process.IdleRegistryPath # Print user-specific idle registry path
+java --class-path jstackfilter.jar org.basilevs.jstackfilter.process.Update /path/to/idle.txt < /path/to/new-jstack.txt # Merge incoming dump into an idle registry file
 ```
+
+# Update Local Idle Registry
+
+Use `IdleRegistryPath` to discover the user-specific registry path used by `ThreadRegistry.idle()`, then merge new dump data into that file with `Update`.
+
+```bash
+REGISTRY_PATH=$(java --class-path jstackfilter.jar org.basilevs.jstackfilter.process.IdleRegistryPath)
+jstack <PID> > /tmp/new-jstack.txt # when your program is idle
+java --class-path jstackfilter.jar org.basilevs.jstackfilter.process.Update "$REGISTRY_PATH" < /tmp/new-jstack.txt
+```
+
+`Update` keeps existing registry entries and adds new distinct thread signatures from standard input.
 
 # Using as a Maven Library
 
