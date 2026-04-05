@@ -1,4 +1,5 @@
 # Overview
+
 `jstack` is a program bundled with JDK that allows capturing stacktraces of all threads in a running JVM. It is essential in debugging poor performance and deadlocks especially outside of a full development environment. Modern Java applications abuse threads, making the full dump of Jstack bloated and noisy. Significant time should be spent to find needed threads among everpresent pools and mundane background tasks.
 Jstackfilter aims to drastically reduce noise in Jstack output by filtering out trivial threads and eliminating stacktrace duplicates to allow a user to focus on unusual, meaningful threads to hopefully isolate the problem quicker.
 # Usage
@@ -68,6 +69,28 @@ java --class-path jstackfilter.jar org.basilevs.jstackfilter.process.File /tmp/1
 java --class-path jstackfilter.jar org.basilevs.jstackfilter.process.ExternalJstack 33299 # Run jstack given a PID
 ```
 
+# Using as a Maven Library
+
+To use jstackfilter as a library in your Maven project, add the following dependency to your `pom.xml`:
+
+```xml
+<dependency>
+	<groupId>org.basilevs.jstackfilter</groupId>
+	<artifactId>org.basilevs.jstackfilter</artifactId>
+	<version>0.0.6-SNAPSHOT</version>
+</dependency>
+```
+
+If using GitHub Packages, make sure to add the repository to your `pom.xml` or `settings.xml`:
+
+```xml
+<repository>
+	<id>github</id>
+	<url>https://maven.pkg.github.com/basilevs/jstackfilter</url>
+</repository>
+```
+
+Authentication is required for GitHub Packages. See the project root `pom.xml` for details.
 # Jstackfilter UI
 Jstackfilter is designed to be minimal in function and size and is used in a command line shell. It is usually sufficient for occasional use but can be a chore working with large datasets, multiple files, multiple hosts, etc. Consider using [an interactive UI wrapper of jstackfilter](https://github.com/basilevs/jstackfilter/tree/master/ui) if this is the case.
   
